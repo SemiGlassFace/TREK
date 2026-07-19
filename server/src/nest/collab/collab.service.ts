@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { db } from '../../db/database';
 import { broadcast } from '../../websocket';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as svc from '../../services/collabService';
 
@@ -19,10 +19,12 @@ export class CollabService {
   }
 
   canEdit(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('collab_edit', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 
   canUploadFiles(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('file_upload', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 

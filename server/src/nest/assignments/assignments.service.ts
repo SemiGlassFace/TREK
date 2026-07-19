@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { broadcast } from '../../websocket';
 import { canAccessTrip } from '../../db/database';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as svc from '../../services/assignmentService';
 import { reconcileTripSkeletons } from '../../services/journeyService';
 
-type Trip = { user_id: number };
+type Trip = { user_id: number; is_viewer?: boolean | number | null };
 
 /**
  * Thin Nest wrapper around the existing assignment service. Trip access mirrors
@@ -21,6 +21,7 @@ export class AssignmentsService {
   }
 
   canEdit(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('day_edit', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 

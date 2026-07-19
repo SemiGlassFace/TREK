@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Request } from 'express';
 import { broadcast } from '../../websocket';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User, TripFile } from '../../types';
 import * as svc from '../../services/fileService';
 
@@ -20,6 +20,7 @@ export class FilesService {
   }
 
   can(action: FilePermission, trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission(action, user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 

@@ -15,6 +15,7 @@ import type { User } from '../../types';
 import { BudgetService } from './budget.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { isTripViewer } from '../../services/permissions';
 
 /**
  * /api/trips/:tripId/budget — trip-scoped expense planner.
@@ -40,6 +41,9 @@ export class BudgetController {
   }
 
   private requireEdit(trip: ReturnType<BudgetService['verifyTripAccess']>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.budget.canEdit(trip!, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }

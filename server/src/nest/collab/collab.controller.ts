@@ -24,6 +24,7 @@ import { CollabService } from './collab.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { BLOCKED_EXTENSIONS } from '../../services/fileService';
+import { isTripViewer } from '../../services/permissions';
 
 const MAX_NOTE_FILE_SIZE = 50 * 1024 * 1024;
 const filesDir = path.join(__dirname, '../../../uploads/files');
@@ -69,6 +70,9 @@ export class CollabController {
   }
 
   private requireEdit(trip: NonNullable<ReturnType<CollabService['verifyTripAccess']>>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.collab.canEdit(trip, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }

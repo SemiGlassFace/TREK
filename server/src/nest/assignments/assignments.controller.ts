@@ -14,6 +14,7 @@ import type { User } from '../../types';
 import { AssignmentsService } from './assignments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { isTripViewer } from '../../services/permissions';
 
 type Trip = NonNullable<ReturnType<AssignmentsService['verifyTripAccess']>>;
 
@@ -27,6 +28,9 @@ function requireTrip(svc: AssignmentsService, tripId: string, user: User): Trip 
 }
 
 function requireEdit(svc: AssignmentsService, trip: Trip, user: User): void {
+  if (isTripViewer(trip)) {
+    throw new HttpException({ error: 'Read-only access' }, 403);
+  }
   if (!svc.canEdit(trip, user)) {
     throw new HttpException({ error: 'No permission' }, 403);
   }
