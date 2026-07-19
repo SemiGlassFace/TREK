@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Reservation uppdaterad',
   'trip.toast.reservationAdded': 'Reservation tillagd',
   'trip.toast.deleted': 'Raderad',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Är du säker på att du vill radera denna plats?',
   'trip.confirm.deletePlaces': 'Radera {count} platser?',
   'trip.toast.placesDeleted': '{count} platser raderade',

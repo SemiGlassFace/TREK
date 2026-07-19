@@ -23,6 +23,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Foglalás frissítve',
   'trip.toast.reservationAdded': 'Foglalás hozzáadva',
   'trip.toast.deleted': 'Törölve',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Biztosan törölni szeretnéd ezt a helyet?',
   'trip.confirm.deletePlaces': '{count} helyet töröl?',
   'trip.toast.placesDeleted': '{count} hely törölve',

@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Đã cập nhật đặt chỗ',
   'trip.toast.reservationAdded': 'Đã thêm đặt chỗ',
   'trip.toast.deleted': 'Đã xóa',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Bạn có chắc chắn muốn xóa địa điểm này không?',
   'trip.confirm.deletePlaces': 'Xóa {count} địa điểm?',
   'trip.toast.placesDeleted': '{count} địa điểm đã bị xóa',

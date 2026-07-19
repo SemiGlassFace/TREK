@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Rezervace aktualizována',
   'trip.toast.reservationAdded': 'Rezervace přidána',
   'trip.toast.deleted': 'Smazáno',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Opravdu chcete toto místo smazat?',
   'trip.confirm.deletePlaces': 'Smazat {count} míst?',
   'trip.toast.placesDeleted': '{count} míst smazáno',

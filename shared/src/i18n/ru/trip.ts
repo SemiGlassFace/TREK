@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Бронирование обновлено',
   'trip.toast.reservationAdded': 'Бронирование добавлено',
   'trip.toast.deleted': 'Удалено',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Вы уверены, что хотите удалить это место?',
   'trip.confirm.deletePlaces': 'Удалить {count} мест?',
   'trip.toast.placesDeleted': '{count} мест удалено',

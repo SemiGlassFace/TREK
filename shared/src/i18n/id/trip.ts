@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Reservasi diperbarui',
   'trip.toast.reservationAdded': 'Reservasi ditambahkan',
   'trip.toast.deleted': 'Dihapus',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Apakah kamu yakin ingin menghapus tempat ini?',
   'trip.confirm.deletePlaces': 'Hapus {count} tempat?',
   'trip.toast.placesDeleted': '{count} tempat dihapus',

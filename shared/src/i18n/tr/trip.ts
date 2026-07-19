@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Rezervasyon güncellendi',
   'trip.toast.reservationAdded': 'Rezervasyon eklendi',
   'trip.toast.deleted': 'Silindi',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Bu yeri silmek istediğinizden emin misiniz?',
   'trip.confirm.deletePlaces': '{count} Yer silinsin mi?',
   'trip.toast.placesDeleted': '{count} yer silindi',

@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Reservierung aktualisiert',
   'trip.toast.reservationAdded': 'Reservierung hinzugefügt',
   'trip.toast.deleted': 'Gelöscht',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Möchtest du diesen Ort wirklich löschen?',
   'trip.confirm.deletePlaces': '{count} Orte löschen?',
   'trip.toast.placesDeleted': '{count} Orte gelöscht',

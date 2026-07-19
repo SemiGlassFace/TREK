@@ -24,6 +24,7 @@ const trip: TranslationStrings = {
   'trip.toast.reservationUpdated': 'Бронювання оновлено',
   'trip.toast.reservationAdded': 'Бронювання додано',
   'trip.toast.deleted': 'Видалено',
+  'trip.toast.loadError': 'Failed to load trip',
   'trip.confirm.deletePlace': 'Ви впевнені, що хочете видалити це місце?',
   'trip.confirm.deletePlaces': 'Видалити {count} місць?',
   'trip.toast.placesDeleted': '{count} місць видалено',
