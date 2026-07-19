@@ -1,0 +1,39 @@
+name: Sync from upstream
+
+on:
+    schedule:
+        - cron: '0 */8 * * *'
+    workflow_dispatch:
+
+jobs:
+    sync:
+        runs-on: docker
+        container:
+            image: catthehacker/ubuntu:act-latest
+        steps:
+            - name: Checkout main
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+                  fetch-depth: 0
+                  token: ${{ secrets.FORGEJO_TOKEN }}
+
+            - name: Fetch and fast-forward from upstream
+              run: |
+                  git remote add upstream https://github.com/mauriceboe/TREK.git || true
+                  git fetch upstream main
+                  NEW_COMMITS=$(git rev-list HEAD..upstream/main --count)
+                  if [ "$NEW_COMMITS" -eq 0 ]; then
+                    echo "Already up to date"
+                    exit 0
+                  fi
+                  echo "Found $NEW_COMMITS new commit(s) from upstream"
+                  git merge --ff-only upstream/main
+                  git push origin main
+
+            - name: Trigger build workflow
+              run: |
+                  curl -s -X POST \
+                    -H "Authorization: token ${{ secrets.FORGEJO_TOKEN }}" \
+                    "https://git.semig.dev/api/v1/repos/semiglassface/TREK/actions/workflows/build.yml/dispatches" \
+                    -d '{"ref":"automatic-build"}'
