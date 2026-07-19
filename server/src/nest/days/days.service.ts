@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { broadcast } from '../../websocket';
 import { canAccessTrip } from '../../db/database';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as dayService from '../../services/dayService';
 
-type Trip = { user_id: number };
+type Trip = { user_id: number; is_viewer?: boolean | number | null };
 
 /**
  * Thin Nest wrapper around the day parts of the existing day service. Trip access
@@ -20,6 +20,7 @@ export class DaysService {
   }
 
   canEdit(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('day_edit', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 
@@ -27,8 +28,10 @@ export class DaysService {
     broadcast(tripId, event, payload, socketId);
   }
 
-  list(tripId: string) {
-    return dayService.listDays(tripId);
+  list(tripId: string, isViewer?: boolean | number | null) {
+    const result = dayService.listDays(tripId);
+    if (isViewer) return dayService.redactDaysForViewer(result);
+    return result;
   }
 
   getDay(id: string, tripId: string) {

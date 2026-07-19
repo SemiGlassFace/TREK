@@ -130,14 +130,25 @@ interface TripAccess {
   id: number;
   user_id: number;
   currency: string | null;
+  is_viewer?: boolean;
 }
 
 function canAccessTrip(tripId: number | string, userId: number): TripAccess | undefined {
-  return db.prepare(`
+  const row = db.prepare(`
     SELECT t.id, t.user_id, t.currency FROM trips t
     LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = ?
     WHERE t.id = ? AND (t.user_id = ? OR m.user_id IS NOT NULL)
   `).get(userId, tripId, userId) as TripAccess | undefined;
+  if (row) return row;
+
+  const publicRow = db.prepare(`
+    SELECT t.id, t.user_id, t.currency FROM trips t
+    JOIN trip_public_visibility pv ON pv.trip_id = t.id
+    WHERE t.id = ?
+  `).get(tripId) as TripAccess | undefined;
+  if (publicRow) return { ...publicRow, is_viewer: true };
+
+  return undefined;
 }
 
 function isOwner(tripId: number | string, userId: number): boolean {

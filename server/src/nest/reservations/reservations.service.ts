@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { db } from '../../db/database';
 import { broadcast } from '../../websocket';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as svc from '../../services/reservationService';
 import { createBudgetItem, updateBudgetItem, deleteBudgetItem, linkBudgetItemToReservation } from '../../services/budgetService';
@@ -24,6 +24,7 @@ export class ReservationsService {
   }
 
   canEdit(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('reservation_edit', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 
@@ -31,8 +32,10 @@ export class ReservationsService {
     broadcast(tripId, event, payload, socketId);
   }
 
-  list(tripId: string) {
-    return svc.listReservations(tripId);
+  list(tripId: string, isViewer?: boolean | number | null) {
+    const result = svc.listReservations(tripId);
+    if (isViewer) return svc.redactReservationsForViewer(result);
+    return result;
   }
 
   // Cross-trip "upcoming reservations" feed (dashboard widget). Reuses the legacy

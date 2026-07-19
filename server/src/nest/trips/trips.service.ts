@@ -149,4 +149,62 @@ export class TripsService {
       }).catch(() => {});
     });
   }
+
+  // ── Public visibility ─────────────────────────────────────────────────
+
+  getVisibility(tripId: string): boolean {
+    return tripSvc.getTripPublicVisibility(tripId);
+  }
+
+  setVisibility(tripId: string, isPublic: boolean, userId: number): void {
+    tripSvc.setTripPublicVisibility(tripId, isPublic, userId);
+  }
+
+  // ── Join requests ─────────────────────────────────────────────────────
+
+  getJoinRequestStatus(tripId: string, userId: number): string | null {
+    return tripSvc.getJoinRequestStatus(tripId, userId);
+  }
+
+  getJoinRequests(tripId: string) {
+    return tripSvc.getJoinRequests(tripId);
+  }
+
+  submitJoinRequest(tripId: string, userId: number): 'created' | 'pending' | 'accepted' {
+    const result = tripSvc.submitJoinRequest(tripId, userId);
+    if (result === 'created') {
+      this.notifyJoinRequest(tripId, userId);
+    }
+    return result;
+  }
+
+  /** Fire-and-forget: notify the trip owner of a new join request with accept/reject actions. */
+  private notifyJoinRequest(tripId: string, requesterId: number): void {
+    import('../../services/notificationService').then(({ send }) => {
+      const trip = tripSvc.getTripRaw(tripId);
+      if (!trip) return;
+      send({
+        event: 'trip_join_request',
+        actorId: requesterId,
+        scope: 'user',
+        targetId: trip.user_id,
+        params: { tripId: String(tripId), userId: String(requesterId) },
+        inApp: {
+          type: 'boolean',
+          positiveTextKey: 'notif.action.accept',
+          negativeTextKey: 'notif.action.reject',
+          positiveCallback: { action: 'join_request_accept', payload: { tripId: Number(tripId), userId: requesterId } },
+          negativeCallback: { action: 'join_request_reject', payload: { tripId: Number(tripId), userId: requesterId } },
+        },
+      }).catch(() => {});
+    });
+  }
+
+  acceptJoinRequest(tripId: string, requestId: number): number | null {
+    return tripSvc.acceptJoinRequest(tripId, requestId);
+  }
+
+  rejectJoinRequest(tripId: string, requestId: number): number | null {
+    return tripSvc.rejectJoinRequest(tripId, requestId);
+  }
 }

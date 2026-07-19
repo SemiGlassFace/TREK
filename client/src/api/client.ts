@@ -381,6 +381,14 @@ export const tripsApi = {
   deleteGuest: (id: number | string, userId: number) => apiClient.delete(`/trips/${id}/guests/${userId}`).then(r => r.data),
   copy: (id: number | string, data?: TripCopyRequest) => apiClient.post(`/trips/${id}/copy`, data || {}).then(r => r.data),
   bundle: (id: number | string) => apiClient.get(`/trips/${id}/bundle`).then(r => r.data),
+  // Public visibility and join requests
+  getVisibility: (id: number | string) => apiClient.get(`/trips/${id}/visibility`).then(r => r.data),
+  setVisibility: (id: number | string, isPublic: boolean) => apiClient.put(`/trips/${id}/visibility`, { is_public: isPublic }).then(r => r.data),
+  requestJoin: (id: number | string) => apiClient.post(`/trips/${id}/join-request`).then(r => r.data),
+  getJoinRequestStatus: (id: number | string) => apiClient.get(`/trips/${id}/join-request`).then(r => r.data),
+  getJoinRequests: (id: number | string) => apiClient.get(`/trips/${id}/join-requests`).then(r => r.data),
+  acceptJoinRequest: (id: number | string, requestId: number) => apiClient.post(`/trips/${id}/join-requests/${requestId}/accept`).then(r => r.data),
+  rejectJoinRequest: (id: number | string, requestId: number) => apiClient.post(`/trips/${id}/join-requests/${requestId}/reject`).then(r => r.data),
 }
 
 export const daysApi = {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { canAccessTrip, isOwner } from '../db/database';
+import { isTripViewer } from '../services/permissions';
 import { AuthRequest } from '../types';
 
 /** Middleware: verifies the authenticated user is an owner or member of the trip, then attaches trip to req. */
@@ -13,6 +14,10 @@ function requireTripAccess(req: Request, res: Response, next: NextFunction): voi
   const trip = canAccessTrip(Number(tripId), authReq.user.id);
   if (!trip) {
     res.status(404).json({ error: 'Trip not found' });
+    return;
+  }
+  if (isTripViewer(trip) && req.method !== 'GET' && req.method !== 'HEAD') {
+    res.status(403).json({ error: 'Read-only access' });
     return;
   }
   authReq.trip = trip;

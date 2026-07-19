@@ -156,6 +156,10 @@ function saveEndpoints(reservationId: number, endpoints: EndpointInput[]): void 
   tx(reservationId, endpoints);
 }
 
+export function redactReservationsForViewer(reservations: any[]): any[] {
+  return reservations.map(r => ({ ...r, confirmation_number: null, notes: null, metadata: null }));
+}
+
 export function listReservations(tripId: string | number) {
   const reservations = db.prepare(`
     SELECT r.*, d.day_number, p.name as place_name, r.assignment_id,

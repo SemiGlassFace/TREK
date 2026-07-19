@@ -30,6 +30,7 @@ import { writeAudit, getClientIp, logInfo } from '../../services/auditLog';
 import { isDemoEmail } from '../../services/demo';
 import { NotFoundError, ValidationError } from '../../services/tripService';
 import { saveUnsplashCover, isUnsplashCoverUrl } from '../../services/unsplashService';
+import { isTripViewer } from '../../services/permissions';
 
 const MAX_COVER_SIZE = 20 * 1024 * 1024;
 const coversDir = path.join(__dirname, '../../../uploads/covers');
@@ -126,6 +127,9 @@ export class TripsController {
     if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     const ownerId = access.user_id;
     const isMember = ownerId !== user.id;
     if (body.is_archived !== undefined && !this.trips.can('trip_archive', user.role, ownerId, user.id, isMember)) {
@@ -184,6 +188,9 @@ export class TripsController {
     if (!access?.user_id) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.trips.can('trip_cover_upload', user.role, access.user_id, user.id, access.user_id !== user.id)) {
       throw new HttpException({ error: 'No permission to change the cover image' }, 403);
     }
@@ -206,8 +213,12 @@ export class TripsController {
     if (!this.trips.can('trip_create', user.role, null, user.id, false)) {
       throw new HttpException({ error: 'No permission to create trips' }, 403);
     }
-    if (!this.trips.canAccessTrip(id, user.id)) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
     }
     try {
       const newTripId = this.trips.copy(id, user.id, title);
@@ -220,6 +231,13 @@ export class TripsController {
 
   @Delete(':id')
   remove(@CurrentUser() user: User, @Param('id') id: string, @Req() req: Request, @Headers('x-socket-id') socketId?: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     const owner = this.trips.getOwner(id);
     if (!owner) {
       throw new HttpException({ error: 'Trip not found' }, 404);
@@ -240,6 +258,9 @@ export class TripsController {
     if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     const { owner, members } = this.trips.listMembers(id, access.user_id);
     return { owner, members, current_user_id: user.id };
   }
@@ -250,6 +271,9 @@ export class TripsController {
     const access = this.trips.canAccessTrip(id, user.id);
     if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
     }
     if (!this.trips.can('member_manage', user.role, access.user_id, user.id, access.user_id !== user.id)) {
       throw new HttpException({ error: 'No permission to manage members' }, 403);
@@ -271,6 +295,9 @@ export class TripsController {
     if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     const targetId = parseInt(userId);
     if (targetId !== user.id && !this.trips.can('member_manage', user.role, access.user_id, user.id, access.user_id !== user.id)) {
       throw new HttpException({ error: 'No permission to remove members' }, 403);
@@ -290,6 +317,9 @@ export class TripsController {
     const access = this.trips.canAccessTrip(id, user.id);
     if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
     }
     // Owner-only: handing over a trip is reserved for its actual owner, not just
     // anyone who can manage members.
@@ -370,6 +400,13 @@ export class TripsController {
 
   @Get(':id/bundle')
   bundle(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     const trip = this.trips.get(id, user.id) as { user_id: number } | undefined;
     if (!trip) {
       throw new HttpException({ error: 'Trip not found' }, 404);
@@ -379,8 +416,12 @@ export class TripsController {
 
   @Get(':id/export.ics')
   exportIcs(@CurrentUser() user: User, @Param('id') id: string, @Res() res: Response) {
-    if (!this.trips.canAccessTrip(id, user.id)) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
       throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (isTripViewer(access)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
     }
     try {
       const { ics, filename } = this.trips.exportICS(id);
@@ -391,5 +432,96 @@ export class TripsController {
       if (e instanceof NotFoundError) throw new HttpException({ error: e.message }, 404);
       throw e;
     }
+  }
+
+  // ── Public visibility ──────────────────────────────────────────────────
+
+  @Get(':id/visibility')
+  getVisibility(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    return { is_public: this.trips.getVisibility(id), is_owner: access.user_id === user.id };
+  }
+
+  @Put(':id/visibility')
+  setVisibility(@CurrentUser() user: User, @Param('id') id: string, @Body('is_public') isPublic: boolean) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (access.user_id !== user.id) {
+      throw new HttpException({ error: 'Only the trip owner can change visibility' }, 403);
+    }
+    this.trips.setVisibility(id, isPublic, user.id);
+    return { is_public: isPublic };
+  }
+
+  // ── Join requests ─────────────────────────────────────────────────────
+
+  @Get(':id/join-request')
+  getJoinRequestStatus(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    return { status: this.trips.getJoinRequestStatus(id, user.id) };
+  }
+
+  @Post(':id/join-request')
+  submitJoinRequest(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    const result = this.trips.submitJoinRequest(id, user.id);
+    if (result === 'accepted') return { status: 'accepted' };
+    if (result === 'pending') return { status: 'pending' };
+    return { status: 'pending' };
+  }
+
+  @Get(':id/join-requests')
+  getJoinRequests(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (access.user_id !== user.id) {
+      throw new HttpException({ error: 'Only the owner can view join requests' }, 403);
+    }
+    return { requests: this.trips.getJoinRequests(id) };
+  }
+
+  @Post(':id/join-requests/:requestId/accept')
+  acceptJoinRequest(@CurrentUser() user: User, @Param('id') id: string, @Param('requestId') requestId: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (access.user_id !== user.id) {
+      throw new HttpException({ error: 'Only the owner can manage join requests' }, 403);
+    }
+    const userId = this.trips.acceptJoinRequest(id, Number(requestId));
+    if (userId === null) {
+      throw new HttpException({ error: 'Join request not found or already resolved' }, 404);
+    }
+    return { success: true, user_id: userId };
+  }
+
+  @Post(':id/join-requests/:requestId/reject')
+  rejectJoinRequest(@CurrentUser() user: User, @Param('id') id: string, @Param('requestId') requestId: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    if (access.user_id !== user.id) {
+      throw new HttpException({ error: 'Only the owner can manage join requests' }, 403);
+    }
+    const userId = this.trips.rejectJoinRequest(id, Number(requestId));
+    if (userId === null) {
+      throw new HttpException({ error: 'Join request not found or already resolved' }, 404);
+    }
+    return { success: true };
   }
 }

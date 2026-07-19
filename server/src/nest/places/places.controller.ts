@@ -21,6 +21,7 @@ import { PlacesService } from './places.service';
 import { isUpdateConflict } from '../../services/conflictResult';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { isTripViewer } from '../../services/permissions';
 
 const STRING_LIMITS: Record<string, number> = { name: 200, description: 2000, address: 500, notes: 2000 };
 const UPLOAD = { storage: memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } };
@@ -62,6 +63,9 @@ export class PlacesController {
   }
 
   private requireEdit(trip: NonNullable<ReturnType<PlacesService['verifyTripAccess']>>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.places.canEdit(trip, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }
@@ -75,8 +79,8 @@ export class PlacesController {
     @Query('category') category?: string,
     @Query('tag') tag?: string,
   ) {
-    this.requireTrip(tripId, user);
-    return { places: this.places.list(tripId, { search, category, tag }) };
+    const trip = this.requireTrip(tripId, user);
+    return { places: this.places.list(tripId, { search, category, tag }, (trip as any)?.is_viewer) };
   }
 
   @Post()

@@ -53,6 +53,18 @@ const ko: NotificationLocale = {
       body: 'Synology 계정 또는 URL이 변경되었습니다. Synology Photos에서 로그아웃되었습니다.',
     }),
     plugin_notification: (p) => ({ title: p.title ?? '', body: p.body ?? '' }),
+    trip_join_request: (p) => ({
+      title: `Join request for "${p.trip}"`,
+      body: `${p.actor} wants to join the trip "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Join request accepted`,
+      body: `Your request to join "${p.trip}" was accepted.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Join request rejected`,
+      body: `Your request to join "${p.trip}" was rejected.`,
+    }),
   },
   passwordReset: {
     subject: '비밀번호 재설정',

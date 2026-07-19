@@ -113,6 +113,10 @@ export function listPlaces(
 // Create place
 // ---------------------------------------------------------------------------
 
+export function redactPlacesForViewer(places: any[]): any[] {
+  return places.map(p => ({ ...p, notes: null }));
+}
+
 export function createPlace(
   tripId: string,
   body: {

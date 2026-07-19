@@ -3701,6 +3701,36 @@ function runMigrations(db: Database.Database): void {
       `);
       db.exec('CREATE INDEX IF NOT EXISTS idx_hidden_regions_user ON hidden_regions (user_id);');
     },
+
+    // Public trip visibility — any authenticated user can see these trips as a
+    // read-only viewer. The trip owner toggles this on/off in the trip settings.
+    () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS trip_public_visibility (
+          trip_id INTEGER PRIMARY KEY REFERENCES trips(id) ON DELETE CASCADE,
+          enabled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          enabled_by INTEGER REFERENCES users(id)
+        );
+      `);
+    },
+
+    // Trip join requests — authenticated viewers can request to join a public
+    // trip. The trip owner receives a boolean in-app notification to accept or
+    // reject. Accepted users are inserted into trip_members.
+    () => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS trip_join_requests (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+          user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','rejected')),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          resolved_at DATETIME,
+          UNIQUE(trip_id, user_id)
+        );
+      `);
+      db.exec('CREATE INDEX IF NOT EXISTS idx_trip_join_requests_trip ON trip_join_requests(trip_id);');
+    },
   ];
 
   if (currentVersion < migrations.length) {

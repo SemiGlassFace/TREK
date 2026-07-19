@@ -62,3 +62,7 @@ export function sortTrips(trips: DashboardTrip[]): DashboardTrip[] {
     return bd.localeCompare(ad)
   })
 }
+
+export function isReadOnlyTrip(trip: { is_viewer?: unknown }): boolean {
+  return trip.is_viewer === true || trip.is_viewer === 1
+}

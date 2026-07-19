@@ -31,7 +31,10 @@ export type NotifEventType =
   | 'packing_tagged'
   | 'version_available'
   | 'synology_session_cleared'
-  | 'plugin_notification';
+  | 'plugin_notification'
+  | 'trip_join_request'
+  | 'trip_join_accepted'
+  | 'trip_join_rejected';
 
 /** Every event, in the order the preferences UI lists them. */
 export const ALL_EVENT_TYPES: NotifEventType[] = [
@@ -47,6 +50,9 @@ export const ALL_EVENT_TYPES: NotifEventType[] = [
   'version_available',
   'synology_session_cleared',
   'plugin_notification',
+  'trip_join_request',
+  'trip_join_accepted',
+  'trip_join_rejected',
 ];
 
 /** One channel column in the preferences matrix. */

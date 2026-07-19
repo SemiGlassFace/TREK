@@ -5,7 +5,7 @@ import { useToast } from '../shared/Toast'
 import { useAuthStore } from '../../store/authStore'
 import { useCanDo } from '../../store/permissionsStore'
 import { useTripStore } from '../../store/tripStore'
-import { Crown, UserMinus, UserPlus, Users, LogOut, Link2, Trash2, Copy, Check, UserRound, Pencil, Plus } from 'lucide-react'
+import { Crown, UserMinus, UserPlus, Users, LogOut, Link2, Trash2, Copy, Check, UserRound, Pencil, Plus, Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from '../../i18n'
 import { getApiErrorMessage } from '../../types'
 import CustomSelect from '../shared/CustomSelect'
@@ -293,6 +293,64 @@ export default function TripMembersModal({ isOpen, onClose, tripId, tripTitle, o
   const loadBudgetItems = useTripStore((s) => s.loadBudgetItems)
   const canManageMembers = can('member_manage', trip)
   const canManageShare = can('share_manage', trip)
+
+  // ── Public visibility ──────────────────────────────────────────────────
+  const [isPublic, setIsPublic] = useState(false)
+  const [visibilityLoading, setVisibilityLoading] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && tripId) {
+      tripsApi.getVisibility(tripId).then(d => setIsPublic(!!d.is_public)).catch(() => {})
+    }
+  }, [isOpen, tripId])
+
+  const handleToggleVisibility = async () => {
+    setVisibilityLoading(true)
+    try {
+      const newVal = !isPublic
+      await tripsApi.setVisibility(tripId, newVal)
+      setIsPublic(newVal)
+    } catch {
+      toast.error(t('common.error'))
+    } finally {
+      setVisibilityLoading(false)
+    }
+  }
+
+  // ── Join requests ──────────────────────────────────────────────────────
+  const [joinRequests, setJoinRequests] = useState([])
+  const [joinRequestsLoading, setJoinRequestsLoading] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && tripId && data?.owner?.id === user?.id) {
+      tripsApi.getJoinRequests(tripId).then(d => setJoinRequests(d.requests || [])).catch(() => {})
+    }
+  }, [isOpen, tripId, data?.owner?.id, user?.id])
+
+  const handleAcceptJoinRequest = async (requestId) => {
+    setJoinRequestsLoading(true)
+    try {
+      await tripsApi.acceptJoinRequest(tripId, requestId)
+      setJoinRequests(prev => prev.filter(r => r.id !== requestId))
+      await loadMembers(true)
+    } catch {
+      toast.error(t('common.error'))
+    } finally {
+      setJoinRequestsLoading(false)
+    }
+  }
+
+  const handleRejectJoinRequest = async (requestId) => {
+    setJoinRequestsLoading(true)
+    try {
+      await tripsApi.rejectJoinRequest(tripId, requestId)
+      setJoinRequests(prev => prev.filter(r => r.id !== requestId))
+    } catch {
+      toast.error(t('common.error'))
+    } finally {
+      setJoinRequestsLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (isOpen && tripId) {
@@ -638,6 +696,72 @@ export default function TripMembersModal({ isOpen, onClose, tripId, tripTitle, o
               </button>
             </div>
           )}
+        </div>
+        )}
+
+        {/* Public visibility toggle */}
+        {isCurrentOwner && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            {isPublic ? <Eye size={13} style={{ color: '#16a34a' }} /> : <EyeOff size={13} className="text-content-faint" />}
+            <span className="text-content-secondary" style={{ fontSize: 'calc(12px * var(--fs-scale-body, 1))', fontWeight: 600 }}>
+              {t('trips.public.title') || 'Public trip'}
+            </span>
+          </div>
+          <p className="text-content-faint" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', marginBottom: 10, lineHeight: 1.5 }}>
+            {isPublic
+              ? (t('trips.public.enabled') || 'Anyone can discover and view this trip. They can request to join.')
+              : (t('trips.public.disabled') || 'Only invited members can see this trip.')}
+          </p>
+          <button onClick={handleToggleVisibility} disabled={visibilityLoading} className="border border-edge text-content" style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8,
+            background: isPublic ? 'rgba(239,68,68,0.06)' : 'rgba(22,163,74,0.06)',
+            borderColor: isPublic ? 'rgba(239,68,68,0.2)' : 'rgba(22,163,74,0.2)',
+            color: isPublic ? '#ef4444' : '#16a34a',
+            fontSize: 'calc(12px * var(--fs-scale-body, 1))', fontWeight: 600,
+            cursor: visibilityLoading ? 'default' : 'pointer', fontFamily: 'inherit', opacity: visibilityLoading ? 0.5 : 1,
+          }}>
+            {isPublic ? <EyeOff size={13} /> : <Eye size={13} />}
+            {isPublic ? (t('trips.public.makePrivate') || 'Make private') : (t('trips.public.makePublic') || 'Make public')}
+          </button>
+        </div>
+        )}
+
+        {/* Join requests (for owner) */}
+        {isCurrentOwner && joinRequests.length > 0 && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <UserPlus size={13} className="text-content-faint" />
+            <span className="text-content-secondary" style={{ fontSize: 'calc(12px * var(--fs-scale-body, 1))', fontWeight: 600 }}>
+              {t('trips.joinRequests.title') || 'Join requests'} ({joinRequests.length})
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {joinRequests.map(req => (
+              <div key={req.id} className="bg-surface-secondary border border-edge-secondary" style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 10,
+              }}>
+                <Avatar username={req.username} avatarUrl={null} />
+                <span className="text-content" style={{ flex: 1, fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 500 }}>{req.username}</span>
+                <button onClick={() => handleAcceptJoinRequest(req.id)} disabled={joinRequestsLoading} style={{
+                  display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6,
+                  background: 'var(--accent)', color: 'var(--accent-text)', border: 'none',
+                  fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600,
+                  cursor: joinRequestsLoading ? 'default' : 'pointer', fontFamily: 'inherit', opacity: joinRequestsLoading ? 0.5 : 1,
+                }}>
+                  <Check size={10} /> {t('trips.joinRequests.accept') || 'Accept'}
+                </button>
+                <button onClick={() => handleRejectJoinRequest(req.id)} disabled={joinRequestsLoading} style={{
+                  display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6,
+                  background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: 'none',
+                  fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600,
+                  cursor: joinRequestsLoading ? 'default' : 'pointer', fontFamily: 'inherit', opacity: joinRequestsLoading ? 0.5 : 1,
+                }}>
+                  {t('trips.joinRequests.reject') || 'Reject'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
         )}
 

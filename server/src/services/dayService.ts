@@ -128,6 +128,21 @@ export function listDays(tripId: string | number) {
   return { days: daysWithAssignments };
 }
 
+export function redactDaysForViewer(result: { days: any[] }): { days: any[] } {
+  return {
+    days: result.days.map(day => ({
+      ...day,
+      notes: null,
+      notes_items: [],
+      assignments: (day.assignments || []).map((a: any) => ({
+        ...a,
+        notes: null,
+        place_notes: null,
+      })),
+    })),
+  };
+}
+
 export function createDay(tripId: string | number, date?: string, notes?: string) {
   const maxDay = db.prepare('SELECT MAX(day_number) as max FROM days WHERE trip_id = ?').get(tripId) as { max: number | null };
   const dayNumber = (maxDay.max || 0) + 1;
@@ -469,6 +484,10 @@ export function listAccommodations(tripId: string | number) {
     WHERE a.trip_id = ?
     ORDER BY a.created_at ASC
   `).all(tripId);
+}
+
+export function redactAccommodationsForViewer(accommodations: any[]): any[] {
+  return accommodations.map(a => ({ ...a, confirmation: null, notes: null }));
 }
 
 export function validateAccommodationRefs(tripId: string | number, placeId?: number, startDayId?: number, endDayId?: number) {

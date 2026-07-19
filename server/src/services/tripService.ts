@@ -23,7 +23,8 @@ export const TRIP_SELECT = `
     (SELECT COUNT(*) FROM places p WHERE p.trip_id = t.id) as place_count,
     CASE WHEN t.user_id = :userId THEN 1 ELSE 0 END as is_owner,
     u.username as owner_username,
-    (SELECT COUNT(*) FROM trip_members tm WHERE tm.trip_id = t.id) as shared_count
+    (SELECT COUNT(*) FROM trip_members tm WHERE tm.trip_id = t.id) as shared_count,
+    EXISTS(SELECT 1 FROM trip_public_visibility WHERE trip_id = t.id) as is_public
   FROM trips t
   JOIN users u ON u.id = t.user_id
 `;
@@ -159,17 +160,33 @@ export function generateDays(tripId: number | bigint | string, startDate: string
 export function listTrips(userId: number, archived: number | null) {
   if (archived === null) {
     return db.prepare(`
-      ${TRIP_SELECT}
-      LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
-      WHERE (t.user_id = :userId OR m.user_id IS NOT NULL)
-      ORDER BY t.created_at DESC
+      SELECT sub.*,
+        CASE WHEN sub.user_id = :userId THEN 0
+             WHEN EXISTS(SELECT 1 FROM trip_members WHERE trip_id = sub.id AND user_id = :userId) THEN 0
+             ELSE 1 END as is_viewer,
+        (SELECT status FROM trip_join_requests WHERE trip_id = sub.id AND user_id = :userId) as join_request_status
+      FROM (
+        ${TRIP_SELECT}
+        LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
+        LEFT JOIN trip_public_visibility pv ON pv.trip_id = t.id
+        WHERE (t.user_id = :userId OR m.user_id IS NOT NULL OR pv.trip_id IS NOT NULL)
+        ORDER BY t.created_at DESC
+      ) sub
     `).all({ userId });
   }
   return db.prepare(`
-    ${TRIP_SELECT}
-    LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
-    WHERE (t.user_id = :userId OR m.user_id IS NOT NULL) AND t.is_archived = :archived
-    ORDER BY t.created_at DESC
+    SELECT sub.*,
+      CASE WHEN sub.user_id = :userId THEN 0
+           WHEN EXISTS(SELECT 1 FROM trip_members WHERE trip_id = sub.id AND user_id = :userId) THEN 0
+           ELSE 1 END as is_viewer,
+      (SELECT status FROM trip_join_requests WHERE trip_id = sub.id AND user_id = :userId) as join_request_status
+    FROM (
+      ${TRIP_SELECT}
+      LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
+      LEFT JOIN trip_public_visibility pv ON pv.trip_id = t.id
+      WHERE (t.user_id = :userId OR m.user_id IS NOT NULL OR pv.trip_id IS NOT NULL) AND t.is_archived = :archived
+      ORDER BY t.created_at DESC
+    ) sub
   `).all({ userId, archived });
 }
 
@@ -201,11 +218,15 @@ export function createTrip(userId: number, data: CreateTripData, maxDays?: numbe
 }
 
 export function getTrip(tripId: string | number, userId: number) {
-  return db.prepare(`
+  const trip = db.prepare(`
     ${TRIP_SELECT}
     LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
-    WHERE t.id = :tripId AND (t.user_id = :userId OR m.user_id IS NOT NULL)
-  `).get({ userId, tripId }) as Trip | undefined;
+    LEFT JOIN trip_public_visibility pv ON pv.trip_id = t.id
+    WHERE t.id = :tripId AND (t.user_id = :userId OR m.user_id IS NOT NULL OR pv.trip_id IS NOT NULL)
+  `).get({ userId, tripId }) as any;
+  if (!trip) return null;
+  const isViewer = trip.user_id !== userId && !db.prepare('SELECT 1 FROM trip_members WHERE trip_id = ? AND user_id = ?').get(tripId, userId);
+  return { ...trip, is_viewer: isViewer ? 1 : 0 };
 }
 
 interface UpdateTripData {
@@ -1057,6 +1078,72 @@ export function copyTripById(sourceTripId: string | number, newOwnerId: number, 
 }
 
 // ── Trip summary (used by MCP get_trip_summary tool) ──────────────────────
+
+// ── Public visibility ──────────────────────────────────────────────────────
+
+export function getTripPublicVisibility(tripId: string | number): boolean {
+  return !!db.prepare('SELECT 1 FROM trip_public_visibility WHERE trip_id = ?').get(tripId);
+}
+
+export function setTripPublicVisibility(tripId: string | number, isPublic: boolean, userId: number): void {
+  if (isPublic) {
+    db.prepare('INSERT OR IGNORE INTO trip_public_visibility (trip_id, enabled_by) VALUES (?, ?)').run(tripId, userId);
+  } else {
+    db.prepare('DELETE FROM trip_public_visibility WHERE trip_id = ?').run(tripId);
+  }
+}
+
+// ── Join requests ──────────────────────────────────────────────────────────
+
+export function getJoinRequestStatus(tripId: string | number, userId: number): string | null {
+  const row = db.prepare('SELECT status FROM trip_join_requests WHERE trip_id = ? AND user_id = ?').get(tripId, userId) as { status: string } | undefined;
+  return row?.status ?? null;
+}
+
+export interface JoinRequest {
+  id: number;
+  trip_id: number;
+  user_id: number;
+  username: string;
+  status: string;
+  created_at: string;
+}
+
+export function getJoinRequests(tripId: string | number): JoinRequest[] {
+  return db.prepare(`
+    SELECT jr.id, jr.trip_id, jr.user_id, jr.status, jr.created_at,
+      COALESCE(u.display_name, u.username) as username
+    FROM trip_join_requests jr
+    JOIN users u ON u.id = jr.user_id
+    WHERE jr.trip_id = ? AND jr.status = 'pending'
+    ORDER BY jr.created_at ASC
+  `).all(tripId) as JoinRequest[];
+}
+
+export function submitJoinRequest(tripId: string | number, userId: number): 'created' | 'pending' | 'accepted' {
+  const existing = db.prepare('SELECT status FROM trip_join_requests WHERE trip_id = ? AND user_id = ?').get(tripId, userId) as { status: string } | undefined;
+  if (existing) {
+    if (existing.status === 'accepted') return 'accepted';
+    if (existing.status === 'pending') return 'pending';
+  }
+  db.prepare('INSERT OR REPLACE INTO trip_join_requests (trip_id, user_id, status, created_at, resolved_at) VALUES (?, ?, \'pending\', CURRENT_TIMESTAMP, NULL)').run(tripId, userId);
+  return 'created';
+}
+
+export function acceptJoinRequest(tripId: string | number, requestId: number): number | null {
+  const req = db.prepare('SELECT user_id FROM trip_join_requests WHERE id = ? AND trip_id = ? AND status = \'pending\'').get(requestId, tripId) as { user_id: number } | undefined;
+  if (!req) return null;
+  db.prepare('INSERT OR IGNORE INTO trip_members (trip_id, user_id) VALUES (?, ?)').run(tripId, req.user_id);
+  db.prepare('UPDATE trip_join_requests SET status = \'accepted\', resolved_at = CURRENT_TIMESTAMP WHERE id = ?').run(requestId);
+  return req.user_id;
+}
+
+export function rejectJoinRequest(tripId: string | number, requestId: number): number | null {
+  const req = db.prepare('SELECT user_id FROM trip_join_requests WHERE id = ? AND trip_id = ? AND status = \'pending\'').get(requestId, tripId) as { user_id: number } | undefined;
+  if (!req) return null;
+  db.prepare('UPDATE trip_join_requests SET status = \'rejected\', resolved_at = CURRENT_TIMESTAMP WHERE id = ?').run(requestId);
+  return req.user_id;
+}
 
 export function getTripSummary(tripId: number, viewerUserId?: number) {
   const trip = db.prepare('SELECT * FROM trips WHERE id = ?').get(tripId) as Record<string, unknown> | undefined;

@@ -4,7 +4,7 @@ import { useAuthStore } from './authStore'
 export type PermissionLevel = 'admin' | 'trip_owner' | 'trip_member' | 'everybody'
 
 /** Minimal trip shape used by permission checks — accepts both Trip and DashboardTrip */
-type TripOwnerContext = { user_id?: unknown; owner_id?: unknown; is_owner?: unknown }
+type TripOwnerContext = { user_id?: unknown; owner_id?: unknown; is_owner?: unknown; is_viewer?: unknown }
 
 interface PermissionsState {
   permissions: Record<string, PermissionLevel>
@@ -30,6 +30,9 @@ export function useCanDo() {
   ): boolean {
     if (!user) return false
     if (user.role === 'admin') return true
+
+    const isViewer = trip?.is_viewer === true || trip?.is_viewer === 1
+    if (isViewer) return false
 
     const level = perms[actionKey]
     if (!level) return true // not configured = allow

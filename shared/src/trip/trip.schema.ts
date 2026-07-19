@@ -38,6 +38,10 @@ export const tripSchema = z.object({
   is_owner: z.number().optional(),
   owner_username: z.string().optional(),
   shared_count: z.number().optional(),
+  // public trip access (viewer / visibility / join request)
+  is_viewer: z.union([z.literal(0), z.literal(1)]).optional(),
+  is_public: z.union([z.boolean(), z.number()]).optional(),
+  join_request_status: z.string().nullable().optional(),
 });
 export type Trip = z.infer<typeof tripSchema>;
 

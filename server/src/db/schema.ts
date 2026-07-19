@@ -457,6 +457,24 @@ function createTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_collection_place_labels_place ON collection_place_labels(collection_place_id);
     CREATE INDEX IF NOT EXISTS idx_collection_place_labels_label ON collection_place_labels(label_id);
 
+    CREATE TABLE IF NOT EXISTS trip_public_visibility (
+      trip_id INTEGER PRIMARY KEY REFERENCES trips(id) ON DELETE CASCADE,
+      enabled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      enabled_by INTEGER REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS trip_join_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','rejected')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      resolved_at DATETIME,
+      UNIQUE(trip_id, user_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_trip_join_requests_trip ON trip_join_requests(trip_id);
+
     CREATE TABLE IF NOT EXISTS day_accommodations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,

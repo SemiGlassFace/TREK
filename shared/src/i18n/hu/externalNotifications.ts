@@ -53,6 +53,18 @@ const hu: NotificationLocale = {
       body: 'A Synology fiókja vagy URL-je megváltozott. Kijelentkeztek a Synology Photos-ból.',
     }),
     plugin_notification: (p) => ({ title: p.title ?? '', body: p.body ?? '' }),
+    trip_join_request: (p) => ({
+      title: `Join request for "${p.trip}"`,
+      body: `${p.actor} wants to join the trip "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Join request accepted`,
+      body: `Your request to join "${p.trip}" was accepted.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Join request rejected`,
+      body: `Your request to join "${p.trip}" was rejected.`,
+    }),
   },
   passwordReset: {
     subject: 'Jelszó visszaállítása',

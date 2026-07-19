@@ -19,4 +19,42 @@ registerAction('test_deny', async () => {
   console.log('[notifications] Test deny action executed');
 });
 
+// Join request actions
+registerAction('join_request_accept', async (payload, respondingUserId) => {
+  const tripId = payload.tripId as number;
+  const userId = payload.userId as number;
+  if (!tripId || !userId) return;
+  const { db } = require('../db/database');
+  const trip = db.prepare('SELECT user_id FROM trips WHERE id = ?').get(tripId) as { user_id: number } | undefined;
+  if (!trip || trip.user_id !== respondingUserId) return;
+  db.prepare('INSERT OR IGNORE INTO trip_members (trip_id, user_id) VALUES (?, ?)').run(tripId, userId);
+  db.prepare('UPDATE trip_join_requests SET status = \'accepted\', resolved_at = CURRENT_TIMESTAMP WHERE trip_id = ? AND user_id = ?').run(tripId, userId);
+  const { send } = require('./notificationService');
+  send({
+    event: 'trip_join_accepted',
+    actorId: respondingUserId,
+    scope: 'user',
+    targetId: userId,
+    params: { tripId: String(tripId), userId: String(userId) },
+  }).catch(() => {});
+});
+
+registerAction('join_request_reject', async (payload, respondingUserId) => {
+  const tripId = payload.tripId as number;
+  const userId = payload.userId as number;
+  if (!tripId || !userId) return;
+  const { db } = require('../db/database');
+  const trip = db.prepare('SELECT user_id FROM trips WHERE id = ?').get(tripId) as { user_id: number } | undefined;
+  if (!trip || trip.user_id !== respondingUserId) return;
+  db.prepare('UPDATE trip_join_requests SET status = \'rejected\', resolved_at = CURRENT_TIMESTAMP WHERE trip_id = ? AND user_id = ?').run(tripId, userId);
+  const { send } = require('./notificationService');
+  send({
+    event: 'trip_join_rejected',
+    actorId: respondingUserId,
+    scope: 'user',
+    targetId: userId,
+    params: { tripId: String(tripId) },
+  }).catch(() => {});
+});
+
 export { registerAction, getAction };

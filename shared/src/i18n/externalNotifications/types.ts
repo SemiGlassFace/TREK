@@ -33,7 +33,10 @@ export type NotificationEventKey =
   | 'packing_tagged'
   | 'version_available'
   | 'synology_session_cleared'
-  | 'plugin_notification';
+  | 'plugin_notification'
+  | 'trip_join_request'
+  | 'trip_join_accepted'
+  | 'trip_join_rejected';
 
 export interface NotificationLocale {
   email: EmailStrings;

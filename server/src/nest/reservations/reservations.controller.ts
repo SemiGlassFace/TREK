@@ -15,6 +15,7 @@ import { ReservationsService } from './reservations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { pushReservationToAirtrail } from '../../services/airtrail/airtrailSync';
+import { isTripViewer } from '../../services/permissions';
 
 type ReservationBody = Record<string, unknown> & {
   title?: string;
@@ -45,6 +46,9 @@ export class ReservationsController {
   }
 
   private requireEdit(trip: ReturnType<ReservationsService['verifyTripAccess']>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.reservations.canEdit(trip!, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }
@@ -52,8 +56,8 @@ export class ReservationsController {
 
   @Get()
   list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    this.requireTrip(tripId, user);
-    return { reservations: this.reservations.list(tripId) };
+    const trip = this.requireTrip(tripId, user);
+    return { reservations: this.reservations.list(tripId, (trip as any)?.is_viewer) };
   }
 
   @Post()

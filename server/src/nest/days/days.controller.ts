@@ -15,6 +15,7 @@ import { DaysService } from './days.service';
 import { DayReorderError } from '../../services/dayService';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { isTripViewer } from '../../services/permissions';
 
 /**
  * /api/trips/:tripId/days — trip itinerary days.
@@ -38,6 +39,9 @@ export class DaysController {
   }
 
   private requireEdit(trip: NonNullable<ReturnType<DaysService['verifyTripAccess']>>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.days.canEdit(trip, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }
@@ -45,8 +49,8 @@ export class DaysController {
 
   @Get()
   list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    this.requireTrip(tripId, user);
-    return this.days.list(tripId);
+    const trip = this.requireTrip(tripId, user);
+    return this.days.list(tripId, (trip as any)?.is_viewer);
   }
 
   @Post()

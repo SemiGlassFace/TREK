@@ -14,6 +14,7 @@ import type { User } from '../../types';
 import { AccommodationsService } from './accommodations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { isTripViewer } from '../../services/permissions';
 
 type AccommodationBody = {
   place_id?: number;
@@ -50,6 +51,9 @@ export class AccommodationsController {
   }
 
   private requireEdit(trip: NonNullable<ReturnType<AccommodationsService['verifyTripAccess']>>, user: User): void {
+    if (isTripViewer(trip)) {
+      throw new HttpException({ error: 'Read-only access' }, 403);
+    }
     if (!this.accommodations.canEdit(trip, user)) {
       throw new HttpException({ error: 'No permission' }, 403);
     }
@@ -57,8 +61,8 @@ export class AccommodationsController {
 
   @Get()
   list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    this.requireTrip(tripId, user);
-    return { accommodations: this.accommodations.list(tripId) };
+    const trip = this.requireTrip(tripId, user);
+    return { accommodations: this.accommodations.list(tripId, (trip as any)?.is_viewer) };
   }
 
   @Post()

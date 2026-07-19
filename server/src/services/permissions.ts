@@ -147,3 +147,26 @@ export function checkPermission(
       return false;
   }
 }
+
+export interface TripPermissionAccess {
+  user_id: number;
+  is_viewer?: boolean | number | null;
+}
+
+export function isTripViewer(access: TripPermissionAccess | null | undefined): boolean {
+  return access?.is_viewer === true || access?.is_viewer === 1;
+}
+
+export function isTripMember(access: TripPermissionAccess | null | undefined, userId: number): boolean {
+  return !!access && !isTripViewer(access) && access.user_id !== userId;
+}
+
+export function checkTripPermission(
+  actionKey: string,
+  userRole: string,
+  access: TripPermissionAccess,
+  userId: number
+): boolean {
+  if (isTripViewer(access)) return false;
+  return checkPermission(actionKey, userRole, access.user_id, userId, isTripMember(access, userId));
+}

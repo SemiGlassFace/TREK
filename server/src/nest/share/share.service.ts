@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { canAccessTrip } from '../../db/database';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as svc from '../../services/shareService';
 
@@ -17,6 +17,7 @@ export class ShareService {
   }
 
   canManage(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('share_manage', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 

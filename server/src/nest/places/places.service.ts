@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { broadcast } from '../../websocket';
 import { canAccessTrip } from '../../db/database';
-import { checkPermission } from '../../services/permissions';
+import { checkPermission, isTripViewer } from '../../services/permissions';
 import type { User } from '../../types';
 import * as svc from '../../services/placeService';
 import { onPlaceCreated, onPlaceUpdated, onPlaceDeleted } from '../../services/journeyService';
 
-type Trip = { user_id: number };
+type Trip = { user_id: number; is_viewer?: boolean | number | null };
 
 /**
  * Thin Nest wrapper around the existing place service. Trip access mirrors the
@@ -21,6 +21,7 @@ export class PlacesService {
   }
 
   canEdit(trip: Trip, user: User): boolean {
+    if (isTripViewer(trip)) return false;
     return checkPermission('place_edit', user.role, trip.user_id, user.id, trip.user_id !== user.id);
   }
 
@@ -28,8 +29,10 @@ export class PlacesService {
     broadcast(tripId, event, payload, socketId);
   }
 
-  list(tripId: string, filters: { search?: string; category?: string; tag?: string }) {
-    return svc.listPlaces(tripId, filters);
+  list(tripId: string, filters: { search?: string; category?: string; tag?: string }, isViewer?: boolean | number | null) {
+    const result = svc.listPlaces(tripId, filters);
+    if (isViewer) return svc.redactPlacesForViewer(result);
+    return result;
   }
 
   get(tripId: string, id: string) {
