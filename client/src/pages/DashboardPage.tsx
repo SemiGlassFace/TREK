@@ -418,15 +418,15 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
             {readOnly ? (
               joinStatus === 'pending' ? (
                 <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
-                  <Check size={14} /> {t('trips.joinRequests.pending') || 'Pending'}
+                  <Check size={14} /> {t('trips.joinRequests.pending')}
                 </span>
               ) : joinStatus === 'accepted' ? (
                 <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
-                  <Check size={14} /> {t('trips.joinRequests.accepted') || 'Accepted'}
+                  <Check size={14} /> {t('trips.joinRequests.accepted')}
                 </span>
               ) : (
-                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); setJoining(true); tripsApi.requestJoin(trip.id).then(() => toast.success(t('trips.joinRequests.sent') || 'Join request sent')).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false)) }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
-                  <UserPlus size={14} /> {joining ? '…' : (t('trips.joinRequests.request') || 'Request to Join')}
+                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); setJoining(true); tripsApi.requestJoin(trip.id).then(() => toast.success(t('trips.joinRequests.sent'))).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false)) }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                  <UserPlus size={14} /> {joining ? '…' : t('trips.joinRequests.request')}
                 </button>
               )
             ) : (
@@ -444,7 +444,7 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
           <h2 className="hero-title">{trip.title}</h2>
           {readOnly && (
             <span style={{ display: 'inline-block', fontSize: 'calc(10px * var(--fs-scale-caption, 1))', fontWeight: 600, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 99, marginLeft: 8 }}>
-              {t('trips.public.label') || 'Public trip'}
+              {t('trips.public.label')}
             </span>
           )}
         </div>
@@ -597,7 +597,7 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
     setJoining(true)
     try {
       await tripsApi.requestJoin(trip.id)
-      toast.success(t('trips.joinRequests.sent') || 'Join request sent')
+      toast.success(t('trips.joinRequests.sent'))
     } catch {
       toast.error(t('common.error'))
     } finally {
@@ -616,15 +616,15 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
           {readOnly ? (
             joinStatus === 'pending' ? (
               <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
-                <Check size={14} /> {t('trips.joinRequests.pending') || 'Pending'}
+                <Check size={14} /> {t('trips.joinRequests.pending')}
               </span>
             ) : joinStatus === 'accepted' ? (
               <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
-                <Check size={14} /> {t('trips.joinRequests.accepted') || 'Accepted'}
+                <Check size={14} /> {t('trips.joinRequests.accepted')}
               </span>
             ) : (
               <button className="trip-action-btn" onClick={handleJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'var(--accent)', color: 'var(--accent-text)', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
-                <UserPlus size={14} /> {joining ? '…' : (t('trips.joinRequests.request') || 'Request to Join')}
+                <UserPlus size={14} /> {joining ? '…' : t('trips.joinRequests.request')}
               </button>
             )
           ) : (
@@ -640,7 +640,7 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
           <h3 className="trip-name">{trip.title}</h3>
           {readOnly && (
             <span style={{ display: 'inline-block', fontSize: 'calc(10px * var(--fs-scale-caption, 1))', fontWeight: 600, color: 'var(--text-faint)', background: 'var(--bg-tertiary)', padding: '2px 8px', borderRadius: 99, marginTop: 4 }}>
-              {t('trips.public.label') || 'Public trip'}
+              {t('trips.public.label')}
             </span>
           )}
         </div>

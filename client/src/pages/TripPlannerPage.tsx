@@ -224,7 +224,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
     if (!tripId) return
     setJoining(true)
     tripsApi.requestJoin(tripId).then(() => {
-      toast.success(t('trips.joinRequests.sent') || 'Join request sent')
+      toast.success(t('trips.joinRequests.sent'))
     }).catch(() => {
       toast.error(t('common.error'))
     }).finally(() => setJoining(false))
@@ -294,7 +294,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', ...fontStyle }}>
-      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={readOnly ? handleJoinRequest : () => setShowMembersModal(true)} shareLabel={readOnly ? (t('trips.joinRequests.request') || 'Request to Join') : undefined} shareIcon={readOnly ? <UserPlus className="w-4 h-4" /> : undefined} />
+      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={readOnly ? handleJoinRequest : () => setShowMembersModal(true)} shareLabel={readOnly ? t('trips.joinRequests.request') : undefined} shareIcon={readOnly ? <UserPlus className="w-4 h-4" /> : undefined} />
 
       <div className="bg-surface-elevated border-b border-edge-faint" style={{
         position: 'fixed', top: 'var(--nav-h)', left: 0, right: 0, zIndex: 40,
