@@ -63,6 +63,7 @@ export function sortTrips(trips: DashboardTrip[]): DashboardTrip[] {
   })
 }
 
-export function isReadOnlyTrip(trip: { is_viewer?: unknown }): boolean {
+export function isReadOnlyTrip(trip: { is_viewer?: unknown } | null | undefined): boolean {
+  if (!trip) return false
   return trip.is_viewer === true || trip.is_viewer === 1
 }
