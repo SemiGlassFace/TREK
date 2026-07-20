@@ -187,6 +187,11 @@ export default function DayDetailPanel({ day, days, places, categories = [], tri
                     <Pencil size={12} strokeWidth={1.8} />
                   </button>
                 )}
+                {!canEditDays && onUpdateDayTitle && (
+                  <button disabled aria-label={t('common.edit')} title={t('common.edit')} className="text-content-faint" style={{ border: 'none', background: 'none', padding: 3, cursor: 'default', display: 'flex', flexShrink: 0, opacity: 0.3 }}>
+                    <Pencil size={12} strokeWidth={1.8} />
+                  </button>
+                )}
               </div>
             )}
             {!collapsed && formattedDate && <div className="text-content-muted" style={{ fontSize: 'calc(12px * var(--fs-scale-body, 1))', marginTop: 1 }}>{formattedDate}</div>}
@@ -478,13 +483,25 @@ function AccommodationList({ dayAccommodations, day, reservations, canEditDays, 
                           <div style={{ fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.place_name}</div>
                           {acc.place_address && <div style={{ fontSize: 'calc(10px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.place_address}</div>}
                         </div>
-                        {canEditDays && <button onClick={() => { setAccommodation(acc); setHotelForm({ check_in: acc.check_in || '', check_in_end: acc.check_in_end || '', check_out: acc.check_out || '', confirmation: acc.confirmation || '', place_id: acc.place_id }); setHotelDayRange({ start: acc.start_day_id, end: acc.end_day_id }); setShowHotelPicker('edit') }}
+                        {canEditDays ? (
+                          <button onClick={() => { setAccommodation(acc); setHotelForm({ check_in: acc.check_in || '', check_in_end: acc.check_in_end || '', check_out: acc.check_out || '', confirmation: acc.confirmation || '', place_id: acc.place_id }); setHotelDayRange({ start: acc.start_day_id, end: acc.end_day_id }); setShowHotelPicker('edit') }}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, flexShrink: 0 }}>
                           <Pencil size={12} style={{ color: 'var(--text-faint)' }} />
-                        </button>}
-                        {canEditDays && <button onClick={() => { setAccommodation(acc); handleRemoveAccommodation() }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, flexShrink: 0 }}>
+                        </button>
+                        ) : (
+                          <button disabled style={{ background: 'none', border: 'none', cursor: 'default', padding: 3, flexShrink: 0, opacity: 0.3 }}>
+                          <Pencil size={12} style={{ color: 'var(--text-faint)' }} />
+                        </button>
+                        )}
+                        {canEditDays ? (
+                          <button onClick={() => { setAccommodation(acc); handleRemoveAccommodation() }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, flexShrink: 0 }}>
                           <X size={12} style={{ color: 'var(--text-faint)' }} />
-                        </button>}
+                        </button>
+                        ) : (
+                          <button disabled style={{ background: 'none', border: 'none', cursor: 'default', padding: 3, flexShrink: 0, opacity: 0.3 }}>
+                          <X size={12} style={{ color: 'var(--text-faint)' }} />
+                        </button>
+                        )}
                       </div>
                       {/* Details grid */}
                       <div style={{ display: 'flex', gap: 0, margin: '0 12px 8px', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border-faint)' }}>
@@ -537,22 +554,22 @@ function AccommodationList({ dayAccommodations, day, reservations, canEditDays, 
                   )
                 })}
                 {/* Add another hotel */}
-                {canEditDays && <button onClick={() => setShowHotelPicker(true)} style={{
+                <button disabled={!canEditDays} onClick={() => setShowHotelPicker(true)} style={{
                   width: '100%', padding: 8, border: '1.5px dashed var(--border-primary)', borderRadius: 10,
-                  background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  fontSize: 'calc(10px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', fontFamily: 'inherit',
+                  background: 'none', cursor: canEditDays ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  fontSize: 'calc(10px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', fontFamily: 'inherit', opacity: canEditDays ? 1 : 0.3,
                 }}>
                   <Hotel size={10} /> {t('day.addAccommodation')}
-                </button>}
+                </button>
               </div>
             ) : (
-              canEditDays ? <button onClick={() => setShowHotelPicker(true)} style={{
+              <button disabled={!canEditDays} onClick={() => setShowHotelPicker(true)} style={{
                 width: '100%', padding: 10, border: '1.5px dashed var(--border-primary)', borderRadius: 10,
-                background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', fontFamily: 'inherit',
+                background: 'none', cursor: canEditDays ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', fontFamily: 'inherit', opacity: canEditDays ? 1 : 0.3,
               }}>
                 <Hotel size={12} /> {t('day.addAccommodation')}
-              </button> : null
+              </button>
             )}
     </>
   )

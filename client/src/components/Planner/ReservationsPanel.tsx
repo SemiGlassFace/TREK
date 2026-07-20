@@ -208,7 +208,7 @@ function ReservationCard({ r, tripId, onEdit, onDelete, files = [], onNavigateTo
             fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 600, marginRight: 6,
             maxWidth: 140, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{r.title}</span>
-          {canEdit && (
+          {canEdit ? (
             <button onClick={() => onEdit(r)} title={t('common.edit')} className="bg-transparent text-content-faint" style={{
               appearance: 'none', border: 'none',
               width: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center',
@@ -218,8 +218,16 @@ function ReservationCard({ r, tripId, onEdit, onDelete, files = [], onNavigateTo
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-faint)' }}>
               <Pencil size={13} />
             </button>
+          ) : (
+            <button disabled title={t('common.edit')} className="bg-transparent text-content-faint" style={{
+              appearance: 'none', border: 'none',
+              width: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center',
+              cursor: 'default', flexShrink: 0, opacity: 0.3,
+            }}>
+              <Pencil size={13} />
+            </button>
           )}
-          {canEdit && (
+          {canEdit ? (
             <button onClick={() => setShowDeleteConfirm(true)} title={t('common.delete')} className="bg-transparent text-content-faint" style={{
               appearance: 'none', border: 'none',
               width: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center',
@@ -227,6 +235,14 @@ function ReservationCard({ r, tripId, onEdit, onDelete, files = [], onNavigateTo
             }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#ef4444' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-faint)' }}>
+              <Trash2 size={13} />
+            </button>
+          ) : (
+            <button disabled title={t('common.delete')} className="bg-transparent text-content-faint" style={{
+              appearance: 'none', border: 'none',
+              width: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center',
+              cursor: 'default', flexShrink: 0, opacity: 0.3,
+            }}>
               <Trash2 size={13} />
             </button>
           )}
@@ -563,7 +579,7 @@ function TransitJourneyCard({ r, days, onOpen, onDelete, canEdit, tripId, contri
             ]} />
           </div>
         </div>
-        {canEdit && (
+        {canEdit ? (
           <button
             onClick={e => { e.stopPropagation(); setConfirmOpen(true) }}
             title={t('common.delete')}
@@ -572,6 +588,11 @@ function TransitJourneyCard({ r, days, onOpen, onDelete, canEdit, tripId, contri
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#ef4444' }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-faint)' }}
           >
+            <Trash2 size={13} />
+          </button>
+        ) : (
+          <button disabled title={t('common.delete')} className="bg-transparent text-content-faint"
+            style={{ appearance: 'none', border: 'none', width: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center', cursor: 'default', flexShrink: 0, opacity: 0.3 }}>
             <Trash2 size={13} />
           </button>
         )}
@@ -782,17 +803,16 @@ export default function ReservationsPanel({ tripId, reservations, days, assignme
             </>
           )}
 
-          {canEdit && (
-            <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexShrink: 0, opacity: canEdit ? 1 : 0.3 }}>
               {onImport && bookingImportAvailable && (
-                <button onClick={onImport} className="bg-surface-card text-content" style={{
-                  appearance: 'none', border: '1px solid var(--border-primary)', cursor: 'pointer', fontFamily: 'inherit',
+                <button disabled={!canEdit} onClick={onImport} className="bg-surface-card text-content" style={{
+                  appearance: 'none', border: '1px solid var(--border-primary)', cursor: canEdit ? 'pointer' : 'default', fontFamily: 'inherit',
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '8px 13px', borderRadius: 10, fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 500,
                   transition: 'opacity 0.15s ease',
                 }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                  onMouseEnter={canEdit ? e => e.currentTarget.style.opacity = '0.75' : undefined}
+                  onMouseLeave={canEdit ? e => e.currentTarget.style.opacity = '1' : undefined}
                   title={t('reservations.import.title')}
                 >
                   <Download size={14} strokeWidth={2} />
@@ -827,7 +847,6 @@ export default function ReservationsPanel({ tripId, reservations, days, assignme
                 <span className="hidden sm:inline">{t(addManualKey)}</span>
               </button>
             </div>
-          )}
         </div>
       </div>
 
