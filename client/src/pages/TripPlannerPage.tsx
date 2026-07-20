@@ -38,6 +38,7 @@ import { Map, X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 import { useTranslation } from '../i18n'
 import { addonsApi, accommodationsApi, authApi, tripsApi, assignmentsApi, mapsApi } from '../api/client'
 import { accommodationRepo } from '../repo/accommodationRepo'
+import { isReadOnlyTrip } from './dashboard/dashboardModel'
 import { useAuthStore } from '../store/authStore'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { useResizablePanels } from '../hooks/useResizablePanels'
@@ -46,7 +47,7 @@ import { useRouteCalculation } from '../hooks/useRouteCalculation'
 import { usePlaceSelection } from '../hooks/usePlaceSelection'
 import { usePlannerHistory } from '../hooks/usePlannerHistory'
 import type { Accommodation, TripMember, Day, Place, Reservation, PackingItem, TodoItem } from '../types'
-import { ListTodo, Upload, Plus, Trash2, FolderPlus } from 'lucide-react'
+import { ListTodo, Upload, Plus, Trash2, FolderPlus, UserPlus } from 'lucide-react'
 import { useTripPlanner } from './tripPlanner/useTripPlanner'
 import { usePoiExplore } from '../components/Map/usePoiExplore'
 import PoiCategoryPill from '../components/Map/PoiCategoryPill'
@@ -216,6 +217,19 @@ export default function TripPlannerPage(): React.ReactElement | null {
     mapTileUrl, fontStyle, splashDone,
   } = useTripPlanner()
 
+  const readOnly = isReadOnlyTrip(trip)
+  const [joining, setJoining] = useState(false)
+
+  const handleJoinRequest = () => {
+    if (!tripId) return
+    setJoining(true)
+    tripsApi.requestJoin(tripId).then(() => {
+      toast.success(t('trips.joinRequests.sent') || 'Join request sent')
+    }).catch(() => {
+      toast.error(t('common.error'))
+    }).finally(() => setJoining(false))
+  }
+
   const poi = usePoiExplore()
   const [glMap, setGlMap] = useState<CompassMap | null>(null)
   const poiPillEnabled = useSettingsStore(s => s.settings.map_poi_pill_enabled) !== false
@@ -280,7 +294,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', ...fontStyle }}>
-      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={() => setShowMembersModal(true)} />
+      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={readOnly ? handleJoinRequest : () => setShowMembersModal(true)} shareLabel={readOnly ? (t('trips.joinRequests.request') || 'Request to Join') : undefined} shareIcon={readOnly ? <UserPlus className="w-4 h-4" /> : undefined} />
 
       <div className="bg-surface-elevated border-b border-edge-faint" style={{
         position: 'fixed', top: 'var(--nav-h)', left: 0, right: 0, zIndex: 40,

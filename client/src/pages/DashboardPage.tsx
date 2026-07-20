@@ -8,15 +8,17 @@ import CopyTripDialog from '../components/shared/CopyTripDialog'
 import CustomSelect from '../components/shared/CustomSelect'
 import PlaceAvatar from '../components/shared/PlaceAvatar'
 import MobileTopBar from '../components/Layout/MobileTopBar'
+import { useToast } from '../components/shared/Toast'
 import { useDashboard } from './dashboard/useDashboard'
 import {
   type DashboardTrip, type HeroBundle, type TravelStats, type UpcomingReservation,
-  MS_PER_DAY, daysUntil, getTripStatus,
+  MS_PER_DAY, daysUntil, getTripStatus, isReadOnlyTrip,
 } from './dashboard/dashboardModel'
+import { tripsApi } from '../api/client'
 import {
   Plus, Edit2, Trash2, Archive, Copy, ArrowRight, MapPin,
   Plane, Hotel, Utensils, Clock, RefreshCw, ArrowRightLeft, Calendar,
-  LayoutGrid, List, Ticket, X, CalendarPlus,
+  LayoutGrid, List, Ticket, X, CalendarPlus, UserPlus, Check,
 } from 'lucide-react'
 import { IcsSubscribeModal } from '../components/Planner/IcsSubscribeModal'
 import CollectionsWidget from '../components/Dashboard/CollectionsWidget'
@@ -304,8 +306,12 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
   onEdit: () => void; onCopy: () => void; onArchive: () => void; onDelete: () => void
 }): React.ReactElement {
   const { t } = useTranslation()
+  const toast = useToast()
   const mobile = useIsMobile()
   const heroPlugins = usePluginStore(s => s.plugins).filter(p => p.type === 'widget' && p.slot === 'hero')
+  const [joining, setJoining] = useState(false)
+  const readOnly = isReadOnlyTrip(trip)
+  const joinStatus = trip.join_request_status
   const stop = (e: React.MouseEvent, fn: () => void) => { e.stopPropagation(); fn() }
   const status = getTripStatus(trip)
   const start = splitDate(trip.start_date, locale)
@@ -409,15 +415,38 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
             {badge}
           </div>
           <div className="hero-tools">
-            <button className="hero-tool" aria-label={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={16} /></button>
-            <button className="hero-tool" aria-label={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={16} /></button>
-            <button className="hero-tool" aria-label={trip.is_archived ? t('dashboard.restore') : t('dashboard.archive')} onClick={(e) => stop(e, onArchive)}><Archive size={16} /></button>
-            <button className="hero-tool" aria-label={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={16} /></button>
+            {readOnly ? (
+              joinStatus === 'pending' ? (
+                <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
+                  <Check size={14} /> {t('trips.joinRequests.pending') || 'Pending'}
+                </span>
+              ) : joinStatus === 'accepted' ? (
+                <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
+                  <Check size={14} /> {t('trips.joinRequests.accepted') || 'Accepted'}
+                </span>
+              ) : (
+                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); setJoining(true); tripsApi.requestJoin(trip.id).then(() => toast.success(t('trips.joinRequests.sent') || 'Join request sent')).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false)) }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                  <UserPlus size={14} /> {joining ? '…' : (t('trips.joinRequests.request') || 'Request to Join')}
+                </button>
+              )
+            ) : (
+              <>
+                <button className="hero-tool" aria-label={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={16} /></button>
+                <button className="hero-tool" aria-label={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={16} /></button>
+                <button className="hero-tool" aria-label={trip.is_archived ? t('dashboard.restore') : t('dashboard.archive')} onClick={(e) => stop(e, onArchive)}><Archive size={16} /></button>
+                <button className="hero-tool" aria-label={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={16} /></button>
+              </>
+            )}
           </div>
         </div>
 
         <div className="hero-title-block">
           <h2 className="hero-title">{trip.title}</h2>
+          {readOnly && (
+            <span style={{ display: 'inline-block', fontSize: 'calc(10px * var(--fs-scale-caption, 1))', fontWeight: 600, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 99, marginLeft: 8 }}>
+              {t('trips.public.label') || 'Public trip'}
+            </span>
+          )}
         </div>
 
         {!mobile && (
@@ -544,6 +573,10 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
   onEdit: () => void; onCopy: () => void; onArchive: () => void; onDelete: () => void
 }): React.ReactElement {
   const { t } = useTranslation()
+  const toast = useToast()
+  const [joining, setJoining] = useState(false)
+  const readOnly = isReadOnlyTrip(trip)
+  const joinStatus = trip.join_request_status
   const status = getTripStatus(trip)
   const start = splitDate(trip.start_date, locale)
   const end = splitDate(trip.end_date, locale)
@@ -559,6 +592,19 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
 
   const stop = (e: React.MouseEvent, fn: () => void) => { e.stopPropagation(); fn() }
 
+  const handleJoinRequest = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setJoining(true)
+    try {
+      await tripsApi.requestJoin(trip.id)
+      toast.success(t('trips.joinRequests.sent') || 'Join request sent')
+    } catch {
+      toast.error(t('common.error'))
+    } finally {
+      setJoining(false)
+    }
+  }
+
   return (
     <article className="trip-card" onClick={onOpen}>
       <div className="trip-cover">
@@ -567,13 +613,36 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
           : <div style={{ width: '100%', height: '100%', background: tripGradient(trip.id) }} />}
         <div className={`trip-status ${statusClass}`}><span className="indicator" /> {statusLabel}</div>
         <div className="trip-actions">
-          <button className="trip-action-btn" aria-label={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={16} /></button>
-          <button className="trip-action-btn" aria-label={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={16} /></button>
-          <button className="trip-action-btn" aria-label={trip.is_archived ? t('dashboard.restore') : t('dashboard.archive')} onClick={(e) => stop(e, onArchive)}><Archive size={16} /></button>
-          <button className="trip-action-btn" aria-label={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={16} /></button>
+          {readOnly ? (
+            joinStatus === 'pending' ? (
+              <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
+                <Check size={14} /> {t('trips.joinRequests.pending') || 'Pending'}
+              </span>
+            ) : joinStatus === 'accepted' ? (
+              <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
+                <Check size={14} /> {t('trips.joinRequests.accepted') || 'Accepted'}
+              </span>
+            ) : (
+              <button className="trip-action-btn" onClick={handleJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'var(--accent)', color: 'var(--accent-text)', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                <UserPlus size={14} /> {joining ? '…' : (t('trips.joinRequests.request') || 'Request to Join')}
+              </button>
+            )
+          ) : (
+            <>
+              <button className="trip-action-btn" aria-label={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={16} /></button>
+              <button className="trip-action-btn" aria-label={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={16} /></button>
+              <button className="trip-action-btn" aria-label={trip.is_archived ? t('dashboard.restore') : t('dashboard.archive')} onClick={(e) => stop(e, onArchive)}><Archive size={16} /></button>
+              <button className="trip-action-btn" aria-label={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={16} /></button>
+            </>
+          )}
         </div>
         <div className="trip-cover-content">
           <h3 className="trip-name">{trip.title}</h3>
+          {readOnly && (
+            <span style={{ display: 'inline-block', fontSize: 'calc(10px * var(--fs-scale-caption, 1))', fontWeight: 600, color: 'var(--text-faint)', background: 'var(--bg-tertiary)', padding: '2px 8px', borderRadius: 99, marginTop: 4 }}>
+              {t('trips.public.label') || 'Public trip'}
+            </span>
+          )}
         </div>
       </div>
       <div className="trip-body">

@@ -1523,25 +1523,22 @@ const DayPlanSidebar = React.memo(function DayPlanSidebar(props: DayPlanSidebarP
                   )}
                 </div>
 
-                {canEditDays ? (
-                  (() => {
+                {(() => {
                     const cell = { padding: 7, cursor: 'pointer', display: 'grid', placeItems: 'center' } as const
                     const div = '1px solid var(--border-faint)'
                     return (
                       <div className="dp-day-actions" style={{ alignSelf: 'flex-start', flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', border: div, borderRadius: 9, overflow: 'hidden' }}>
-                        {/* Public transit search (#1065) — replaced the rename pencil,
-                            which moved next to the day name in the day detail view. */}
                         {onPlanTransit ? (
-                          <button onClick={e => { e.stopPropagation(); onPlanTransit(day.id) }} title={t('transit.title')} aria-label={t('transit.title')} style={{ ...cell, border: 'none', borderRight: div, borderBottom: div }}>
+                          <button disabled={!canEditDays} onClick={e => { e.stopPropagation(); onPlanTransit(day.id) }} title={t('transit.title')} aria-label={t('transit.title')} style={{ ...cell, border: 'none', borderRight: div, borderBottom: div, opacity: canEditDays ? 1 : 0.4, cursor: canEditDays ? 'pointer' : 'default' }}>
                             <TramFront size={14} strokeWidth={1.8} />
                           </button>
                         ) : <div style={{ borderRight: div, borderBottom: div }} />}
                         {onAddTransport ? (
-                          <button onClick={e => { e.stopPropagation(); onAddTransport(day.id) }} title={t('transport.addTransport')} style={{ ...cell, border: 'none', borderBottom: div }}>
+                          <button disabled={!canEditDays} onClick={e => { e.stopPropagation(); onAddTransport(day.id) }} title={t('transport.addTransport')} style={{ ...cell, border: 'none', borderBottom: div, opacity: canEditDays ? 1 : 0.4, cursor: canEditDays ? 'pointer' : 'default' }}>
                             <Plus size={14} strokeWidth={1.8} />
                           </button>
                         ) : <div style={{ borderBottom: div }} />}
-                        <button onClick={e => openAddNote(day.id, e)} aria-label={t('dayplan.addNote')} style={{ ...cell, border: 'none', borderRight: div }}>
+                        <button disabled={!canEditDays} onClick={e => openAddNote(day.id, e)} aria-label={t('dayplan.addNote')} style={{ ...cell, border: 'none', borderRight: div, opacity: canEditDays ? 1 : 0.4, cursor: canEditDays ? 'pointer' : 'default' }}>
                           <FileText size={14} strokeWidth={1.8} />
                         </button>
                         <button onClick={e => toggleDay(day.id, e)} title={isExpanded ? t('common.collapse') : t('common.expand')} style={{ ...cell, border: 'none' }}>
@@ -1549,12 +1546,7 @@ const DayPlanSidebar = React.memo(function DayPlanSidebar(props: DayPlanSidebarP
                         </button>
                       </div>
                     )
-                  })()
-                ) : (
-                  <button onClick={e => toggleDay(day.id, e)} className="text-content-faint" style={{ alignSelf: 'flex-start', flexShrink: 0, background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    {isExpanded ? <ChevronDown size={16} strokeWidth={1.8} /> : <ChevronRight size={16} strokeWidth={1.8} />}
-                  </button>
-                )}
+                  })()}
               </div>
 
               {/* Aufgeklappte Orte + Notizen */}
