@@ -427,15 +427,15 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
           <div className="hero-tools">
             {readOnly ? (
               joinStatus === 'pending' ? (
-                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); handleHeroCancelJoin() }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button onClick={(e) => { e.stopPropagation(); handleHeroCancelJoin() }} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, color: '#fff', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 20, padding: '6px 14px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0, backdropFilter: 'blur(14px)' }}>
                   <X size={12} /> {t('trips.joinRequests.pending')}
                 </button>
               ) : joinStatus === 'accepted' ? (
-                <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 12px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   <Check size={14} /> {t('trips.joinRequests.accepted')}
                 </span>
               ) : (
-                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); handleHeroJoinRequest() }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                <button onClick={(e) => { e.stopPropagation(); handleHeroJoinRequest() }} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, color: '#fff', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 20, padding: '6px 14px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0, backdropFilter: 'blur(14px)' }}>
                   <UserPlus size={14} /> {joining ? '…' : t('trips.joinRequests.request')}
                 </button>
               )
@@ -638,15 +638,15 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
         <div className="trip-actions">
           {readOnly ? (
             joinStatus === 'pending' ? (
-              <button className="trip-action-btn" onClick={handleCancelJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, color: 'var(--text-faint)', background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', borderRadius: 6, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+              <button onClick={handleCancelJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, color: 'var(--text-faint)', background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', borderRadius: 20, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
                 <X size={12} /> {t('trips.joinRequests.pending')}
               </button>
             ) : joinStatus === 'accepted' ? (
-              <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                 <Check size={14} /> {t('trips.joinRequests.accepted')}
               </span>
             ) : (
-              <button className="trip-action-btn" onClick={handleJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'var(--accent)', color: 'var(--accent-text)', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+              <button onClick={handleJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'var(--accent)', color: 'var(--accent-text)', border: 'none', borderRadius: 20, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
                 <UserPlus size={14} /> {joining ? '…' : t('trips.joinRequests.request')}
               </button>
             )
