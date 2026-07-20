@@ -207,4 +207,8 @@ export class TripsService {
   rejectJoinRequest(tripId: string, requestId: number): number | null {
     return tripSvc.rejectJoinRequest(tripId, requestId);
   }
+
+  cancelJoinRequest(tripId: string, userId: number): boolean {
+    return tripSvc.cancelJoinRequest(tripId, userId);
+  }
 }

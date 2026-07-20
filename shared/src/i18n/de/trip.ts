@@ -34,6 +34,7 @@ const trip: TranslationStrings = {
   'trips.joinRequests.pending': 'Pending',
   'trips.joinRequests.accepted': 'Accepted',
   'trips.joinRequests.sent': 'Join request sent',
+  'trips.joinRequests.cancelled': 'Request cancelled',
   'trips.joinRequests.accept': 'Accept',
   'trips.joinRequests.reject': 'Reject',
   'trips.joinRequests.title': 'Join requests',

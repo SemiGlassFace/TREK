@@ -481,6 +481,19 @@ export class TripsController {
     return { status: 'pending' };
   }
 
+  @Delete(':id/join-request')
+  cancelJoinRequest(@CurrentUser() user: User, @Param('id') id: string) {
+    const access = this.trips.canAccessTrip(id, user.id);
+    if (!access) {
+      throw new HttpException({ error: 'Trip not found' }, 404);
+    }
+    const deleted = this.trips.cancelJoinRequest(id, user.id);
+    if (!deleted) {
+      throw new HttpException({ error: 'No pending join request' }, 404);
+    }
+    return { success: true };
+  }
+
   @Get(':id/join-requests')
   getJoinRequests(@CurrentUser() user: User, @Param('id') id: string) {
     const access = this.trips.canAccessTrip(id, user.id);

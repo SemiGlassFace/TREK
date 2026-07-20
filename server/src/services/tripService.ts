@@ -1145,6 +1145,11 @@ export function rejectJoinRequest(tripId: string | number, requestId: number): n
   return req.user_id;
 }
 
+export function cancelJoinRequest(tripId: string | number, userId: number): boolean {
+  const result = db.prepare('DELETE FROM trip_join_requests WHERE trip_id = ? AND user_id = ? AND status = \'pending\'').run(tripId, userId);
+  return result.changes > 0;
+}
+
 export function getTripSummary(tripId: number, viewerUserId?: number) {
   const trip = db.prepare('SELECT * FROM trips WHERE id = ?').get(tripId) as Record<string, unknown> | undefined;
   if (!trip) return null;

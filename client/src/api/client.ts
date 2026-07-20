@@ -385,6 +385,7 @@ export const tripsApi = {
   getVisibility: (id: number | string) => apiClient.get(`/trips/${id}/visibility`).then(r => r.data),
   setVisibility: (id: number | string, isPublic: boolean) => apiClient.put(`/trips/${id}/visibility`, { is_public: isPublic }).then(r => r.data),
   requestJoin: (id: number | string) => apiClient.post(`/trips/${id}/join-request`).then(r => r.data),
+  cancelJoinRequest: (id: number | string) => apiClient.delete(`/trips/${id}/join-request`).then(r => r.data),
   getJoinRequestStatus: (id: number | string) => apiClient.get(`/trips/${id}/join-request`).then(r => r.data),
   getJoinRequests: (id: number | string) => apiClient.get(`/trips/${id}/join-requests`).then(r => r.data),
   acceptJoinRequest: (id: number | string, requestId: number) => apiClient.post(`/trips/${id}/join-requests/${requestId}/accept`).then(r => r.data),

@@ -313,6 +313,16 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
   const readOnly = isReadOnlyTrip(trip)
   const joinStatus = trip.join_request_status
   const stop = (e: React.MouseEvent, fn: () => void) => { e.stopPropagation(); fn() }
+
+  const handleHeroJoinRequest = () => {
+    setJoining(true)
+    tripsApi.requestJoin(trip.id).then(() => toast.success(t('trips.joinRequests.sent'))).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false))
+  }
+
+  const handleHeroCancelJoin = () => {
+    setJoining(true)
+    tripsApi.cancelJoinRequest(trip.id).then(() => toast.success(t('trips.joinRequests.cancelled') || 'Request cancelled')).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false))
+  }
   const status = getTripStatus(trip)
   const start = splitDate(trip.start_date, locale)
   const end = splitDate(trip.end_date, locale)
@@ -417,15 +427,15 @@ function BoardingPassHero({ trip, bundle, locale, onOpen, onEdit, onCopy, onArch
           <div className="hero-tools">
             {readOnly ? (
               joinStatus === 'pending' ? (
-                <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
-                  <Check size={14} /> {t('trips.joinRequests.pending')}
-                </span>
+                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); handleHeroCancelJoin() }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <X size={12} /> {t('trips.joinRequests.pending')}
+                </button>
               ) : joinStatus === 'accepted' ? (
                 <span className="hero-tool" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'rgba(255,255,255,0.6)', padding: '4px 10px' }}>
                   <Check size={14} /> {t('trips.joinRequests.accepted')}
                 </span>
               ) : (
-                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); setJoining(true); tripsApi.requestJoin(trip.id).then(() => toast.success(t('trips.joinRequests.sent'))).catch(() => toast.error(t('common.error'))).finally(() => setJoining(false)) }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                <button className="hero-tool" onClick={(e) => { e.stopPropagation(); handleHeroJoinRequest() }} disabled={joining} style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '4px 12px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
                   <UserPlus size={14} /> {joining ? '…' : t('trips.joinRequests.request')}
                 </button>
               )
@@ -605,6 +615,19 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
     }
   }
 
+  const handleCancelJoinRequest = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setJoining(true)
+    try {
+      await tripsApi.cancelJoinRequest(trip.id)
+      toast.success(t('trips.joinRequests.cancelled') || 'Request cancelled')
+    } catch {
+      toast.error(t('common.error'))
+    } finally {
+      setJoining(false)
+    }
+  }
+
   return (
     <article className="trip-card" onClick={onOpen}>
       <div className="trip-cover">
@@ -615,9 +638,9 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
         <div className="trip-actions">
           {readOnly ? (
             joinStatus === 'pending' ? (
-              <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
-                <Check size={14} /> {t('trips.joinRequests.pending')}
-              </span>
+              <button className="trip-action-btn" onClick={handleCancelJoinRequest} disabled={joining} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 500, color: 'var(--text-faint)', background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', borderRadius: 6, padding: '4px 10px', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.5 : 1 }}>
+                <X size={12} /> {t('trips.joinRequests.pending')}
+              </button>
             ) : joinStatus === 'accepted' ? (
               <span className="trip-action-btn" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'calc(11px * var(--fs-scale-caption, 1))', color: 'var(--text-faint)', padding: '4px 10px' }}>
                 <Check size={14} /> {t('trips.joinRequests.accepted')}
