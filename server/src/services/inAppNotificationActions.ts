@@ -25,7 +25,7 @@ registerAction('join_request_accept', async (payload, respondingUserId) => {
   const userId = payload.userId as number;
   if (!tripId || !userId) return;
   const { db } = require('../db/database');
-  const trip = db.prepare('SELECT user_id FROM trips WHERE id = ?').get(tripId) as { user_id: number } | undefined;
+  const trip = db.prepare('SELECT user_id, title FROM trips WHERE id = ?').get(tripId) as { user_id: number; title: string } | undefined;
   if (!trip || trip.user_id !== respondingUserId) return;
   db.prepare('INSERT OR IGNORE INTO trip_members (trip_id, user_id) VALUES (?, ?)').run(tripId, userId);
   db.prepare('UPDATE trip_join_requests SET status = \'accepted\', resolved_at = CURRENT_TIMESTAMP WHERE trip_id = ? AND user_id = ?').run(tripId, userId);
@@ -35,7 +35,7 @@ registerAction('join_request_accept', async (payload, respondingUserId) => {
     actorId: respondingUserId,
     scope: 'user',
     targetId: userId,
-    params: { tripId: String(tripId), userId: String(userId) },
+    params: { tripId: String(tripId), userId: String(userId), trip: trip.title || 'Untitled' },
   }).catch(() => {});
 });
 
@@ -44,7 +44,7 @@ registerAction('join_request_reject', async (payload, respondingUserId) => {
   const userId = payload.userId as number;
   if (!tripId || !userId) return;
   const { db } = require('../db/database');
-  const trip = db.prepare('SELECT user_id FROM trips WHERE id = ?').get(tripId) as { user_id: number } | undefined;
+  const trip = db.prepare('SELECT user_id, title FROM trips WHERE id = ?').get(tripId) as { user_id: number; title: string } | undefined;
   if (!trip || trip.user_id !== respondingUserId) return;
   db.prepare('UPDATE trip_join_requests SET status = \'rejected\', resolved_at = CURRENT_TIMESTAMP WHERE trip_id = ? AND user_id = ?').run(tripId, userId);
   const { send } = require('./notificationService');
@@ -53,7 +53,7 @@ registerAction('join_request_reject', async (payload, respondingUserId) => {
     actorId: respondingUserId,
     scope: 'user',
     targetId: userId,
-    params: { tripId: String(tripId) },
+    params: { tripId: String(tripId), trip: trip.title || 'Untitled' },
   }).catch(() => {});
 });
 

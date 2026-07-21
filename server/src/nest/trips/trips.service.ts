@@ -183,12 +183,13 @@ export class TripsService {
     import('../../services/notificationService').then(({ send }) => {
       const trip = tripSvc.getTripRaw(tripId);
       if (!trip) return;
+      const requester = db.prepare('SELECT COALESCE(display_name, username) as name FROM users WHERE id = ?').get(requesterId) as { name: string } | undefined;
       send({
         event: 'trip_join_request',
         actorId: requesterId,
         scope: 'user',
         targetId: trip.user_id,
-        params: { tripId: String(tripId), userId: String(requesterId) },
+        params: { tripId: String(tripId), userId: String(requesterId), trip: (trip as any).title || 'Untitled', actor: requester?.name || 'Someone' },
         inApp: {
           type: 'boolean',
           positiveTextKey: 'notif.action.accept',
