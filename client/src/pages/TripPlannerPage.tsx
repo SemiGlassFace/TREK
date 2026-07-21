@@ -219,12 +219,26 @@ export default function TripPlannerPage(): React.ReactElement | null {
 
   const readOnly = isReadOnlyTrip(trip)
   const [joining, setJoining] = useState(false)
+  const [localJoinStatus, setLocalJoinStatus] = useState<string | null>(null)
+  const effectiveJoinStatus = localJoinStatus ?? (trip as any)?.join_request_status
 
   const handleJoinRequest = () => {
     if (!tripId) return
     setJoining(true)
     tripsApi.requestJoin(tripId).then(() => {
+      setLocalJoinStatus('pending')
       toast.success(t('trips.joinRequests.sent'))
+    }).catch(() => {
+      toast.error(t('common.error'))
+    }).finally(() => setJoining(false))
+  }
+
+  const handleCancelJoinRequest = () => {
+    if (!tripId) return
+    setJoining(true)
+    tripsApi.cancelJoinRequest(tripId).then(() => {
+      setLocalJoinStatus(null)
+      toast.success(t('trips.joinRequests.cancelled'))
     }).catch(() => {
       toast.error(t('common.error'))
     }).finally(() => setJoining(false))
@@ -294,7 +308,13 @@ export default function TripPlannerPage(): React.ReactElement | null {
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', ...fontStyle }}>
-      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={readOnly ? handleJoinRequest : () => setShowMembersModal(true)} shareLabel={readOnly ? t('trips.joinRequests.request') : undefined} shareIcon={readOnly ? <UserPlus className="w-4 h-4" /> : undefined} />
+      {readOnly && effectiveJoinStatus === 'pending' ? (
+        <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={handleCancelJoinRequest} shareLabel={t('trips.joinRequests.pending')} shareIcon={<X className="w-4 h-4" />} />
+      ) : readOnly && effectiveJoinStatus === 'accepted' ? (
+        <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} />
+      ) : (
+        <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={readOnly ? handleJoinRequest : () => setShowMembersModal(true)} shareLabel={readOnly ? t('trips.joinRequests.request') : undefined} shareIcon={readOnly ? <UserPlus className="w-4 h-4" /> : undefined} />
+      )}
 
       <div className="bg-surface-elevated border-b border-edge-faint" style={{
         position: 'fixed', top: 'var(--nav-h)', left: 0, right: 0, zIndex: 40,

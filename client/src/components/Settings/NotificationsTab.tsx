@@ -43,6 +43,9 @@ const EVENT_LABEL_KEYS: Record<string, string> = {
   collab_message: 'settings.notifyCollabMessage',
   packing_tagged: 'settings.notifyPackingTagged',
   version_available: 'settings.notifyVersionAvailable',
+  trip_join_request: 'settings.notifyTripJoinRequest',
+  trip_join_accepted: 'settings.notifyTripJoinAccepted',
+  trip_join_rejected: 'settings.notifyTripJoinRejected',
 }
 
 export default function NotificationsTab(): React.ReactElement {
