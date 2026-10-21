@@ -367,7 +367,7 @@ describe('useDashboard', () => {
       await act(async () => { await result.current.handleRequestJoin(result.current.gridTrips.find(t => t.id === 201)!); });
 
       expect(result.current.gridTrips.find(t => t.id === 201)?.join_request_status).toBe('pending');
-      expect(toastCalls.at(-1)?.[1]).toBe('success');
+      expect(toastCalls[toastCalls.length - 1]?.[1]).toBe('success');
     });
 
     it('FE-HOOK-DASH-033: withdrawing the request clears the pending state', async () => {
@@ -388,7 +388,7 @@ describe('useDashboard', () => {
       await act(async () => { await result.current.handleRequestJoin(result.current.gridTrips.find(t => t.id === 201)!); });
 
       expect(result.current.gridTrips.find(t => t.id === 201)?.join_request_status).toBeNull();
-      expect(toastCalls.at(-1)).toEqual(['You are already a member of this trip', 'error']);
+      expect(toastCalls[toastCalls.length - 1]).toEqual(['You are already a member of this trip', 'error']);
     });
   });
 });

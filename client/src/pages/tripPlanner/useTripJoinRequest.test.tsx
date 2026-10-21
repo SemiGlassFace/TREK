@@ -41,7 +41,7 @@ describe('useTripJoinRequest', () => {
 
     expect(asked).toBe(1);
     expect(result.current.joinStatus).toBe('pending');
-    expect(toasts.at(-1)?.[1]).toBe('success');
+    expect(toasts[toasts.length - 1]?.[1]).toBe('success');
     expect(result.current.joinBusy).toBe(false);
   });
 
@@ -61,7 +61,7 @@ describe('useTripJoinRequest', () => {
     await act(async () => { await result.current.requestJoin(); });
 
     expect(result.current.joinStatus).toBeNull();
-    expect(toasts.at(-1)).toEqual(['You are already a member of this trip', 'error']);
+    expect(toasts[toasts.length - 1]).toEqual(['You are already a member of this trip', 'error']);
   });
 
   it('FE-HOOK-TJR-006: a second tap while one is in flight is ignored', async () => {
