@@ -82,6 +82,8 @@ const RESET_TABLES = [
   // Trip
   'share_tokens',
   'trip_invite_tokens',
+  'trip_join_requests',
+  'trip_public_visibility',
   'trip_members',
   'trips',
   // Journey

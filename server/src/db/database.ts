@@ -154,6 +154,8 @@ interface TripAccess {
   id: number;
   user_id: number;
   currency: string | null;
+  /** Set only by canViewPublicTrip: a read-only visitor of a public trip, not a member. */
+  is_viewer?: boolean;
 }
 
 function canAccessTrip(tripId: number | string, userId: number): TripAccess | undefined {

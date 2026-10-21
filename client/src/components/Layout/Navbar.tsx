@@ -20,6 +20,9 @@ interface NavbarProps {
   onBack?: () => void
   showBack?: boolean
   onShare?: () => void
+  /** Replaces the "Share" label and icon, e.g. for a visitor's "Request to join". */
+  shareLabel?: string
+  shareIcon?: React.ReactNode
 }
 
 interface Addon {
@@ -30,7 +33,7 @@ interface Addon {
   enabled: boolean
 }
 
-export default function Navbar({ tripTitle, tripId, onBack, showBack, onShare }: NavbarProps): React.ReactElement {
+export default function Navbar({ tripTitle, tripId, onBack, showBack, onShare, shareLabel, shareIcon }: NavbarProps): React.ReactElement {
   const { user, logout, isPrerelease, appVersion } = useAuthStore()
   const { settings, updateSetting } = useSettingsStore()
   const { addons: allAddons, loadAddons } = useAddonStore()
@@ -219,8 +222,8 @@ export default function Navbar({ tripTitle, tripId, onBack, showBack, onShare }:
           className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg border transition-colors text-sm font-medium flex-shrink-0 border-edge text-content-secondary bg-surface-card"
           onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
           onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}>
-          <Users className="w-4 h-4" />
-          <span className="hidden sm:inline">{t('nav.share')}</span>
+          {shareIcon || <Users className="w-4 h-4" />}
+          <span className="hidden sm:inline">{shareLabel || t('nav.share')}</span>
         </button>
       )}
 

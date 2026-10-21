@@ -28,7 +28,10 @@ import { isDirectionsUrl } from './maps-dir.helpers';
 import { isUpdateConflict } from '../common/conflictResult';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
+import type { TripAccess } from '../database/database.service';
+import { redactPlacesForViewer } from '../trip-public/viewer-redaction';
 import { PLACE_IMAGE_FILE_FILTER } from '../common/place-image-upload';
 import { StorageService } from '../storage/storage.service';
 import { placeImageUrl } from './place-image';
@@ -138,14 +141,17 @@ export class PlacesController {
 
   @Get()
   @UseGuards(TripAccessGuard)
+  @ViewerReadable()
   list(
     @CurrentUser() user: User,
     @Param('tripId') tripId: string,
+    @Trip() trip: TripAccess,
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('tag') tag?: string,
   ) {
-    return { places: this.places.list(tripId, { search, category, tag }) };
+    const places = this.places.list(tripId, { search, category, tag });
+    return { places: trip.is_viewer ? redactPlacesForViewer(places) : places };
   }
 
   @Post()

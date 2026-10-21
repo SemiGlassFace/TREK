@@ -20,6 +20,19 @@ export const TRIP_PERMISSION_KEY = 'trekTripPermission';
  */
 export const RequirePermission = (action: string) => SetMetadata(TRIP_PERMISSION_KEY, action);
 
+/** The metadata key `@ViewerReadable()` writes and the guard reads. */
+export const TRIP_VIEWER_READABLE_KEY = 'trekTripViewerReadable';
+
+/**
+ * Marks a GET handler as safe to serve to a read-only visitor of a public trip.
+ *
+ * Opt-in on purpose: a visitor who is not a member reaches nothing by default,
+ * so a new endpoint added later is private until somebody decides otherwise. A
+ * handler carrying this must redact whatever the owner would not publish (notes,
+ * confirmation numbers) when `@Trip()` has `is_viewer` set.
+ */
+export const ViewerReadable = () => SetMetadata(TRIP_VIEWER_READABLE_KEY, true);
+
 type TripRequest = Request & { user?: User; [TRIP_REQUEST_KEY]?: TripAccess };
 
 /**
@@ -56,10 +69,24 @@ export class TripAccessGuard implements CanActivate {
     if (!user) throw new HttpException({ error: 'Unauthorized' }, 401);
 
     const tripId = Number((request.params as Record<string, string>)?.tripId);
-    const trip = Number.isFinite(tripId) ? this.db.canAccessTrip(tripId, user.id) : undefined;
+    const member = Number.isFinite(tripId) ? this.db.canAccessTrip(tripId, user.id) : undefined;
     // A trip the user may not see is reported as absent, never as forbidden: a 403
     // would confirm the id exists to someone who has no business knowing.
-    if (!trip) throw new HttpException({ error: 'Trip not found' }, 404);
+    //
+    // The one exception is a trip its owner published: it is discoverable by design,
+    // so there is nothing to hide, and "read-only" tells the client why a write failed.
+    const viewer = !member && Number.isFinite(tripId) ? this.db.canViewPublicTrip(tripId) : undefined;
+    if (!member && !viewer) throw new HttpException({ error: 'Trip not found' }, 404);
+    if (viewer) {
+      const readable = this.reflector.getAllAndOverride<boolean | undefined>(TRIP_VIEWER_READABLE_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
+      if (request.method !== 'GET' || !readable) throw new HttpException({ error: 'Read-only access' }, 403);
+      request[TRIP_REQUEST_KEY] = viewer;
+      return true;
+    }
+    const trip = member as TripAccess;
 
     const action = this.reflector.getAllAndOverride<string | undefined>(TRIP_PERMISSION_KEY, [
       context.getHandler(),

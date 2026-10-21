@@ -52,6 +52,24 @@ export class DatabaseService {
     return canAccessTrip(tripId, userId);
   }
 
+  /**
+   * Read-only access to a trip its owner made public.
+   *
+   * Deliberately NOT folded into canAccessTrip: that predicate is called from ~130
+   * places (writes, files, MCP, plugin RPC, realtime) and every one of them would
+   * start treating any logged-in user as a member. Only TripAccessGuard and
+   * TripPublicController ask this, and the guard only for handlers that opted in
+   * with @ViewerReadable(). Runs on the connection, like rosterUserIds, so it does
+   * not depend on a db/database export the test mocks would each have to repeat.
+   */
+  canViewPublicTrip(tripId: number | string): TripAccess | undefined {
+    // Two lookups rather than a join: on the common path (a private trip a stranger
+    // asked for) only the one-column flag table is touched.
+    if (!this.get('SELECT 1 FROM trip_public_visibility WHERE trip_id = ?', tripId)) return undefined;
+    const row = this.get<TripAccess>('SELECT id, user_id, currency FROM trips WHERE id = ?', tripId);
+    return row ? { ...row, is_viewer: true } : undefined;
+  }
+
   isOwner(tripId: number | string, userId: number): boolean {
     return isOwner(tripId, userId);
   }

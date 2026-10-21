@@ -53,6 +53,8 @@ const { db } = vi.hoisted(() => {
   // StorageRegistryService (behind StorageModule, now in this module chain) reads
   // this at onModuleInit.
   tmp.exec('CREATE TABLE app_settings (key TEXT PRIMARY KEY, value TEXT);');
+  // TripAccessGuard asks whether a trip is public before it answers 404.
+  tmp.exec('CREATE TABLE trip_public_visibility (trip_id INTEGER PRIMARY KEY, enabled_at TEXT, enabled_by INTEGER);');
   return { db: tmp };
 });
 

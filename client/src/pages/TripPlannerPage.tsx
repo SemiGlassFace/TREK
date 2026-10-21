@@ -47,7 +47,7 @@ import { useRouteCalculation } from '../hooks/useRouteCalculation'
 import { usePlaceSelection } from '../hooks/usePlaceSelection'
 import { usePlannerHistory } from '../hooks/usePlannerHistory'
 import type { Accommodation, TripMember, Day, Place, Reservation, PackingItem, TodoItem } from '../types'
-import { ListTodo, Download, Plus, Trash2, FolderPlus } from 'lucide-react'
+import { ListTodo, Download, Plus, Trash2, FolderPlus, UserPlus } from 'lucide-react'
 import { useTripPlanner } from './tripPlanner/useTripPlanner'
 import { usePoiExplore } from '../components/Map/usePoiExplore'
 import { useMergedMapPois } from '../components/Map/useMergedMapPois'
@@ -284,7 +284,7 @@ function TripPlannerPageDesktop(): React.ReactElement | null {
     highlightedAlternative, setHighlightedAlternative,
     moveRoadtripStopToDay,
     dropPoiOnRoute,
-    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal,
+    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal, tripJoin,
     showReservationModal, setShowReservationModal, editingReservation, setEditingReservation,
     showBookingImport, setShowBookingImport, bookingImportKind, setBookingImportKind, bookingImportAvailable,
     airTrailAvailable, showAirTrailImport, setShowAirTrailImport,
@@ -382,7 +382,18 @@ function TripPlannerPageDesktop(): React.ReactElement | null {
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', ...fontStyle }}>
-      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={() => setShowMembersModal(true)} />
+      {tripJoin.readOnly ? (
+        // A visitor of a public trip has no members to manage: the header's one action is
+        // to ask the owner to add them, or to withdraw that request while it is pending.
+        <Navbar
+          tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')}
+          onShare={tripJoin.joinBusy ? undefined : tripJoin.joinStatus === 'pending' ? tripJoin.cancelJoin : tripJoin.requestJoin}
+          shareLabel={tripJoin.joinStatus === 'pending' ? t('trips.joinRequests.pending') : t('trips.joinRequests.request')}
+          shareIcon={tripJoin.joinStatus === 'pending' ? <X className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+        />
+      ) : (
+        <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onShare={() => setShowMembersModal(true)} />
+      )}
 
       <div className="bg-surface-elevated border-b border-edge-faint" style={{
         position: 'fixed', top: 'var(--nav-h)', left: 0, right: 0, zIndex: 40,

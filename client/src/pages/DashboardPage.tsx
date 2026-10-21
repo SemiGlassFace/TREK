@@ -13,12 +13,12 @@ import MobileTopBar from '../components/Layout/MobileTopBar'
 import { useDashboard } from './dashboard/useDashboard'
 import {
   type DashboardTrip, type HeroBundle, type TravelStats, type UpcomingReservation,
-  MS_PER_DAY, daysUntil, getTripStatus, upcomingKey,
+  MS_PER_DAY, daysUntil, getTripStatus, isReadOnlyTrip, upcomingKey,
 } from './dashboard/dashboardModel'
 import {
   Plus, Edit2, Trash2, Archive, ArchiveRestore, Copy, ArrowRight, MapPin,
   Plane, Hotel, Utensils, Clock, RefreshCw, ArrowRightLeft, Calendar,
-  LayoutGrid, List, Ticket, X, CalendarPlus, ParkingSquare, LogIn, LogOut,
+  LayoutGrid, List, Ticket, X, CalendarPlus, ParkingSquare, LogIn, LogOut, UserPlus,
 } from 'lucide-react'
 import { IcsSubscribeModal } from '../components/Planner/IcsSubscribeModal'
 import CollectionsWidget from '../components/Dashboard/CollectionsWidget'
@@ -119,6 +119,7 @@ function DashboardPageDesktop(): React.ReactElement {
     showForm, setShowForm, editingTrip, setEditingTrip,
     deleteTrip, setDeleteTrip, copyTrip, setCopyTrip, applyCoverUpdate,
     handleCreate, handleUpdate, confirmDelete, handleArchive, handleUnarchive, confirmCopy,
+    handleRequestJoin, handleCancelJoin,
     allSubOpen, setAllSubOpen,
   } = useDashboard()
 
@@ -238,6 +239,8 @@ function DashboardPageDesktop(): React.ReactElement {
                     onCopy={() => setCopyTrip(trip)}
                     onArchive={() => trip.is_archived ? handleUnarchive(trip.id) : handleArchive(trip.id)}
                     onDelete={() => setDeleteTrip(trip)}
+                    onRequestJoin={() => handleRequestJoin(trip)}
+                    onCancelJoin={() => handleCancelJoin(trip)}
                   />
                 ))}
                 {isLoading && gridTrips.length === 0 && (
@@ -573,11 +576,13 @@ function AtlasStats({ stats }: { stats: TravelStats | null }): React.ReactElemen
 }
 
 // ── Trip card ────────────────────────────────────────────────────────────────
-function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onDelete }: {
+function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onDelete, onRequestJoin, onCancelJoin }: {
   trip: DashboardTrip; locale: string; badges?: TripCardBadge[]; onOpen: () => void
   onEdit: () => void; onCopy: () => void; onArchive: () => void; onDelete: () => void
+  onRequestJoin: () => void; onCancelJoin: () => void
 }): React.ReactElement {
   const { t } = useTranslation()
+  const readOnly = isReadOnlyTrip(trip)
   const status = getTripStatus(trip)
   const archiveLabel = trip.is_archived ? t('dashboard.restore') : t('dashboard.archive')
   const start = splitDate(trip.start_date, locale)
@@ -610,12 +615,23 @@ function TripCard({ trip, locale, badges, onOpen, onEdit, onCopy, onArchive, onD
           : <div style={{ width: '100%', height: '100%', background: tripGradient(trip.id) }} />}
         <div className={`trip-status ${statusClass}`}><span className="indicator" /> {statusLabel}</div>
         <div className="trip-actions">
-          <button type="button" className="trip-action-btn" aria-label={t('common.edit')} title={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={17} strokeWidth={2.2} /></button>
-          <button type="button" className="trip-action-btn" aria-label={t('dashboard.aria.duplicate')} title={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={17} strokeWidth={2.2} /></button>
-          <button type="button" className="trip-action-btn" aria-label={archiveLabel} title={archiveLabel} onClick={(e) => stop(e, onArchive)}>{trip.is_archived ? <ArchiveRestore size={17} strokeWidth={2.2} /> : <Archive size={17} strokeWidth={2.2} />}</button>
-          <button type="button" className="trip-action-btn" aria-label={t('common.delete')} title={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={17} strokeWidth={2.2} /></button>
+          {readOnly ? (
+            // Someone else's public trip: it can be opened and read, and the owner can be
+            // asked to add you. Pending is a button because the request can be withdrawn.
+            trip.join_request_status === 'pending'
+              ? <button type="button" className="trip-join-btn" onClick={(e) => stop(e, onCancelJoin)} title={t('trips.joinRequests.cancel')}><X /> {t('trips.joinRequests.pending')}</button>
+              : <button type="button" className="trip-join-btn" onClick={(e) => stop(e, onRequestJoin)}><UserPlus /> {t('trips.joinRequests.request')}</button>
+          ) : (
+            <>
+              <button type="button" className="trip-action-btn" aria-label={t('common.edit')} title={t('common.edit')} onClick={(e) => stop(e, onEdit)}><Edit2 size={17} strokeWidth={2.2} /></button>
+              <button type="button" className="trip-action-btn" aria-label={t('dashboard.aria.duplicate')} title={t('dashboard.aria.duplicate')} onClick={(e) => stop(e, onCopy)}><Copy size={17} strokeWidth={2.2} /></button>
+              <button type="button" className="trip-action-btn" aria-label={archiveLabel} title={archiveLabel} onClick={(e) => stop(e, onArchive)}>{trip.is_archived ? <ArchiveRestore size={17} strokeWidth={2.2} /> : <Archive size={17} strokeWidth={2.2} />}</button>
+              <button type="button" className="trip-action-btn" aria-label={t('common.delete')} title={t('common.delete')} onClick={(e) => stop(e, onDelete)}><Trash2 size={17} strokeWidth={2.2} /></button>
+            </>
+          )}
         </div>
         <div className="trip-cover-content">
+          {readOnly && <span className="trip-public-tag">{t('trips.public.label')}</span>}
           <h3 className="trip-name">{trip.title}</h3>
         </div>
       </div>

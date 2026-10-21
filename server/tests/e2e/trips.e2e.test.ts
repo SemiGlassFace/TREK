@@ -104,6 +104,9 @@ const { db } = vi.hoisted(() => {
   // A trip created without a currency takes the owner's display currency, read
   // off the per-user settings rows.
   tmp.exec('CREATE TABLE settings (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, key TEXT NOT NULL, value TEXT, UNIQUE(user_id, key));');
+  // TripAccessGuard asks whether a trip is public before it answers 404.
+  tmp.exec('CREATE TABLE trip_public_visibility (trip_id INTEGER PRIMARY KEY, enabled_at TEXT, enabled_by INTEGER);');
+  tmp.exec('CREATE TABLE trip_join_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, trip_id INTEGER NOT NULL, user_id INTEGER NOT NULL, status TEXT NOT NULL DEFAULT \'pending\', created_at TEXT, resolved_at TEXT);');
   return { db: tmp };
 });
 

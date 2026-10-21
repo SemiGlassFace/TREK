@@ -14,6 +14,7 @@ import {
   type UpcomingReservation,
   type HeroBundle,
   getTripStatus,
+  isReadOnlyTrip,
   sortTrips,
 } from './dashboardModel'
 
@@ -97,13 +98,18 @@ export function useDashboard() {
   // A trip the hero features on its own merit: one that is running, else the next
   // one coming up. Only that one is taken out of the grid below, so the same trip
   // isn't shown twice.
-  const featured = trips.find(t => t.start_date && t.end_date && t.start_date <= today && t.end_date >= today)
-    || trips.find(t => t.start_date && t.start_date >= today)
+  //
+  // Only trips the user belongs to can be featured: someone else's public trip is
+  // listed in the grid to be found, not promoted to the user's own boarding pass
+  // (and its members/places bundle is not readable by a visitor anyway).
+  const mine = trips.filter(t => !isReadOnlyTrip(t))
+  const featured = mine.find(t => t.start_date && t.end_date && t.start_date <= today && t.end_date >= today)
+    || mine.find(t => t.start_date && t.start_date >= today)
     || null
   // With neither, the hero still shows something rather than sitting empty — but
   // that trip is only borrowed for the header and must stay in the grid, or a user
   // whose trips are all finished (or undated) sees "No trips yet". #1706
-  const spotlight = featured || trips[0] || null
+  const spotlight = featured || mine[0] || null
   const rest = featured ? trips.filter(t => t.id !== featured.id) : trips
 
   // Pull the spotlight trip's members + places so the boarding pass can show
@@ -116,6 +122,34 @@ export function useDashboard() {
       .catch(() => { if (!cancelled) setHeroBundle(null) })
     return () => { cancelled = true }
   }, [spotlight?.id])
+
+  // Public trips: ask the owner to be added, or take the request back. Both keep the
+  // card's state in step locally; the server sends the owner the notification.
+  const setJoinStatus = (tripId: number, status: string | null) => {
+    const patch = (list: DashboardTrip[]) => list.map(t => t.id === tripId ? { ...t, join_request_status: status } : t)
+    setTrips(patch)
+    setArchivedTrips(patch)
+  }
+
+  const handleRequestJoin = async (trip: DashboardTrip) => {
+    try {
+      await tripsApi.requestJoin(trip.id)
+      setJoinStatus(trip.id, 'pending')
+      toast.success(t('trips.joinRequests.sent'))
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, t('common.error')))
+    }
+  }
+
+  const handleCancelJoin = async (trip: DashboardTrip) => {
+    try {
+      await tripsApi.cancelJoinRequest(trip.id)
+      setJoinStatus(trip.id, null)
+      toast.success(t('trips.joinRequests.cancelled'))
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, t('common.error')))
+    }
+  }
 
   const handleCreate = async (tripData: TripCreateRequest) => {
     try {
@@ -210,5 +244,6 @@ export function useDashboard() {
     allSubOpen, setAllSubOpen,
     // actions
     handleCreate, handleUpdate, confirmDelete, handleArchive, handleUnarchive, confirmCopy,
+    handleRequestJoin, handleCancelJoin,
   }
 }

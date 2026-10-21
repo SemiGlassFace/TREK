@@ -15,7 +15,9 @@ import {
   RequirePermission,
   TRIP_PERMISSION_KEY,
   TRIP_REQUEST_KEY,
+  TRIP_VIEWER_READABLE_KEY,
   TripAccessGuard,
+  ViewerReadable,
 } from '../../../src/nest/permissions/trip-access.guard';
 import { Trip } from '../../../src/nest/permissions/trip.decorator';
 import type { DatabaseService } from '../../../src/nest/database/database.service';
@@ -27,18 +29,25 @@ const member = { id: 7, role: 'user' } as User;
 /** Trip 5 belongs to user 42; user 7 is a member of it. Nothing else is reachable. */
 const TRIP = { id: 5, user_id: 42 };
 
-function makeGuard(options: { checkPermission?: ReturnType<typeof vi.fn>; action?: string } = {}) {
+/** Trip 6 is public (its owner is user 42): everyone may look, nobody but 42 and 7 may touch. */
+const PUBLIC_TRIP = { id: 6, user_id: 42, is_viewer: true };
+
+function makeGuard(options: { checkPermission?: ReturnType<typeof vi.fn>; action?: string; viewerReadable?: boolean } = {}) {
   const canAccessTrip = vi.fn((tripId: number, userId: number) =>
     tripId === 5 && (userId === 42 || userId === 7) ? TRIP : undefined,
   );
+  const canViewPublicTrip = vi.fn((tripId: number) => (tripId === 6 ? PUBLIC_TRIP : undefined));
   const checkPermission = options.checkPermission ?? vi.fn(() => true);
-  const reflector = { getAllAndOverride: vi.fn(() => options.action) } as unknown as Reflector;
+  // Keyed, because the guard now reads two pieces of metadata.
+  const reflector = {
+    getAllAndOverride: vi.fn((key: string) => (key === TRIP_VIEWER_READABLE_KEY ? options.viewerReadable : options.action)),
+  } as unknown as Reflector;
   const guard = new TripAccessGuard(
-    { canAccessTrip } as unknown as DatabaseService,
+    { canAccessTrip, canViewPublicTrip } as unknown as DatabaseService,
     { checkPermission } as unknown as PermissionsService,
     reflector,
   );
-  return { guard, canAccessTrip, checkPermission, reflector };
+  return { guard, canAccessTrip, canViewPublicTrip, checkPermission, reflector };
 }
 
 /** The slice of ExecutionContext the guard reads. */
@@ -149,6 +158,57 @@ describe('TripAccessGuard', () => {
       handler() {}
     }
     expect(Reflect.getMetadata(TRIP_PERMISSION_KEY, Probe.prototype.handler)).toBe('budget_edit');
+  });
+});
+
+describe('TripAccessGuard — public trips (read-only visitors)', () => {
+  const visitor = { id: 99, role: 'user' } as User;
+  const get = (tripId: string, user: User = visitor) => ({ user, method: 'GET', params: { tripId } }) as Record<string, unknown>;
+
+  it('TRIPGUARD-020 a visitor reads a @ViewerReadable GET and the row is flagged is_viewer', () => {
+    const { guard } = makeGuard({ viewerReadable: true });
+    const request = get('6');
+    expect(guard.canActivate(ctx(request))).toBe(true);
+    expect(request[TRIP_REQUEST_KEY]).toEqual(PUBLIC_TRIP);
+  });
+
+  it('TRIPGUARD-021 a GET that did not opt in is 403 "Read-only access" — the allowlist is the default', () => {
+    const { guard } = makeGuard({ viewerReadable: false });
+    expect(thrown(() => guard.canActivate(ctx(get('6'))))).toEqual({ status: 403, body: { error: 'Read-only access' } });
+  });
+
+  it('TRIPGUARD-022 a write is refused even on a handler marked readable', () => {
+    const { guard, checkPermission } = makeGuard({ viewerReadable: true, action: 'day_edit' });
+    for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+      expect(thrown(() => guard.canActivate(ctx({ ...get('6'), method })))).toEqual({
+        status: 403,
+        body: { error: 'Read-only access' },
+      });
+    }
+    // The visitor never reaches the permission matrix, so no setting can lower the bar for them.
+    expect(checkPermission).not.toHaveBeenCalled();
+  });
+
+  it('TRIPGUARD-023 a trip that is not public stays an existence-hiding 404 for the same visitor', () => {
+    const { guard } = makeGuard({ viewerReadable: true });
+    expect(thrown(() => guard.canActivate(ctx(get('5'))))).toEqual({ status: 404, body: { error: 'Trip not found' } });
+  });
+
+  it('TRIPGUARD-024 a member of a public trip is a member, not a visitor', () => {
+    // Trip 5 is not public; this pins that a real member never gets the viewer shape.
+    const { guard, canViewPublicTrip } = makeGuard({ viewerReadable: true });
+    const request = get('5', member);
+    expect(guard.canActivate(ctx(request))).toBe(true);
+    expect(request[TRIP_REQUEST_KEY]).toBe(TRIP);
+    expect(canViewPublicTrip).not.toHaveBeenCalled();
+  });
+
+  it('TRIPGUARD-025 @ViewerReadable writes the metadata the guard reads', () => {
+    class Probe {
+      @ViewerReadable()
+      handler() {}
+    }
+    expect(Reflect.getMetadata(TRIP_VIEWER_READABLE_KEY, Probe.prototype.handler)).toBe(true);
   });
 });
 

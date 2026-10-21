@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { daysUntil, getTripStatus, sortTrips, localIsoToday } from './dashboardModel'
+import { daysUntil, getTripStatus, isReadOnlyTrip, sortTrips, localIsoToday } from './dashboardModel'
 
 /**
  * The dashboard classifies trips against the user's WALL CLOCK — `daysUntil`
@@ -47,5 +47,19 @@ describe('dashboardModel — "today" is the user\'s local date', () => {
     const startsToday = { id: 2, start_date: '2026-08-25', end_date: '2026-08-26' }
     const sorted = sortTrips([endedYesterday, startsToday] as never[])
     expect(sorted.map((t: { id: number }) => t.id)).toEqual([2, 1])
+  })
+})
+
+describe('isReadOnlyTrip', () => {
+  it('is true only for the server\'s viewer flag (1 or true)', () => {
+    expect(isReadOnlyTrip({ is_viewer: 1 })).toBe(true)
+    expect(isReadOnlyTrip({ is_viewer: true })).toBe(true)
+  })
+
+  it('is false for owners and members, a missing flag, and a missing trip', () => {
+    expect(isReadOnlyTrip({ is_viewer: 0 })).toBe(false)
+    expect(isReadOnlyTrip({})).toBe(false)
+    expect(isReadOnlyTrip(null)).toBe(false)
+    expect(isReadOnlyTrip(undefined)).toBe(false)
   })
 })

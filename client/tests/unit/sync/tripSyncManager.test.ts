@@ -135,6 +135,26 @@ describe('tripSyncManager.syncAll — trip filtering', () => {
     expect(cached!.id).toBe(tripId);
   });
 
+  it('never syncs someone else\'s public trip: its bundle is members-only and nobody asked to keep it', async () => {
+    const mine = 110, theirs = 111;
+    const bundleCalls: number[] = [];
+
+    server.use(
+      http.get('/api/trips', () =>
+        HttpResponse.json({ trips: [buildTrip({ id: mine, end_date: dateOffset(2) }), buildTrip({ id: theirs, end_date: dateOffset(2), is_viewer: 1 })] }),
+      ),
+      http.get('/api/trips/:id/bundle', ({ params }) => {
+        bundleCalls.push(Number(params.id));
+        return HttpResponse.json(makeBundle(Number(params.id)));
+      }),
+    );
+
+    await tripSyncManager.syncAll();
+
+    expect(bundleCalls).toEqual([mine]);
+    expect(await offlineDb.trips.get(theirs)).toBeUndefined();
+  });
+
   it('caches trips with no end_date', async () => {
     const tripId = 101;
     const bundle = makeBundle(tripId);

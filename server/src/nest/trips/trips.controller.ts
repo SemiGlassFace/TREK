@@ -71,7 +71,7 @@ export class TripsController {
 
   @Get()
   list(@CurrentUser() user: User, @Query('archived') archived?: string) {
-    return { trips: this.trips.list(user.id, archived === '1' ? 1 : 0) };
+    return { trips: this.trips.listWithPublic(user.id, archived === '1' ? 1 : 0) };
   }
 
   /**
@@ -130,7 +130,7 @@ export class TripsController {
 
   @Get(':id')
   get(@CurrentUser() user: User, @Param('id') id: string) {
-    const trip = this.trips.get(id, user.id);
+    const trip = this.trips.getWithPublic(id, user.id);
     if (!trip) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }

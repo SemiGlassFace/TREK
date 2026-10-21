@@ -63,6 +63,18 @@ const pl: NotificationLocale = {
       body: 'Twoje konto lub URL Synology uległo zmianie. Zostałeś wylogowany z Synology Photos.',
     }),
     plugin_notification: (p) => ({ title: p.title ?? '', body: p.body ?? '' }),
+    trip_join_request: (p) => ({
+      title: `Prośba o dołączenie do "${p.trip}"`,
+      body: `${p.actor} chce dołączyć do podróży "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Prośba o dołączenie zaakceptowana`,
+      body: `Twoja prośba o dołączenie do "${p.trip}" została zaakceptowana.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Prośba o dołączenie odrzucona`,
+      body: `Twoja prośba o dołączenie do "${p.trip}" została odrzucona.`,
+    }),
   },
   passwordReset: {
     subject: 'Zresetuj hasło',

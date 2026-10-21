@@ -251,6 +251,65 @@ export class TripsService {
     `).all({ userId, archived });
   }
 
+  // ── Dashboard / planner view of trips, including other people's public ones ──
+  //
+  // Separate from list()/get() on purpose: those two are also what the MCP tools and
+  // the plugin RPC call, and "which trips can this principal reach" must stay
+  // members-only there. Only the HTTP controller asks for the wider view.
+  //
+  // TRIP_SELECT is used as is, never wrapped in a subquery: its `NULL AS feed_token`
+  // only blanks the credential because it is the outermost select list. The viewer
+  // flags are added to the rows afterwards for the same reason.
+
+  /** Everything `list` returns plus public trips of other owners, flagged `is_viewer`. */
+  listWithPublic(userId: number, archived: number | null) {
+    const rows = this.db.prepare(`
+      ${TRIP_SELECT}
+      LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
+      LEFT JOIN trip_public_visibility pv ON pv.trip_id = t.id
+      WHERE (t.user_id = :userId OR m.user_id IS NOT NULL OR pv.trip_id IS NOT NULL)
+        ${archived === null ? '' : 'AND t.is_archived = :archived'}
+      ORDER BY t.created_at DESC
+    `).all(archived === null ? { userId } : { userId, archived }) as Array<{ id: number; user_id: number }>;
+    return this.withViewerFlags(rows, userId);
+  }
+
+  /** `get` that also opens a public trip of another owner, flagged `is_viewer`. */
+  getWithPublic(tripId: string | number, userId: number) {
+    const row = this.db.prepare(`
+      ${TRIP_SELECT}
+      LEFT JOIN trip_members m ON m.trip_id = t.id AND m.user_id = :userId
+      LEFT JOIN trip_public_visibility pv ON pv.trip_id = t.id
+      WHERE t.id = :tripId AND (t.user_id = :userId OR m.user_id IS NOT NULL OR pv.trip_id IS NOT NULL)
+    `).get({ userId, tripId }) as { id: number; user_id: number } | undefined;
+    return row ? this.withViewerFlags([row], userId)[0] : undefined;
+  }
+
+  /**
+   * `is_viewer` (neither owner nor member), `is_public` (the owner's flag) and the
+   * caller's own `join_request_status`. An accepted request reads as none: it is only
+   * ever stale — the user is a member now, or was removed since and may ask again.
+   */
+  private withViewerFlags<T extends { id: number; user_id: number }>(rows: T[], userId: number) {
+    if (rows.length === 0) return [];
+    const memberOf = new Set(
+      (this.db.prepare('SELECT trip_id FROM trip_members WHERE user_id = ?').all(userId) as { trip_id: number }[]).map(r => r.trip_id),
+    );
+    const published = new Set(
+      (this.db.prepare('SELECT trip_id FROM trip_public_visibility').all() as { trip_id: number }[]).map(r => r.trip_id),
+    );
+    const requests = new Map(
+      (this.db.prepare("SELECT trip_id, status FROM trip_join_requests WHERE user_id = ? AND status != 'accepted'").all(userId) as { trip_id: number; status: string }[])
+        .map(r => [r.trip_id, r.status]),
+    );
+    return rows.map(row => ({
+      ...row,
+      is_viewer: row.user_id === userId || memberOf.has(row.id) ? 0 : 1,
+      is_public: published.has(row.id) ? 1 : 0,
+      join_request_status: requests.get(row.id) ?? null,
+    }));
+  }
+
   create(userId: number, data: CreateTripData) {
     if (data.start_date && data.end_date) assertTripSpan(data.start_date, data.end_date);
     const rd = data.reminder_days !== undefined

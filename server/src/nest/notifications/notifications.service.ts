@@ -223,6 +223,27 @@ const EVENT_NOTIFICATION_CONFIG: Record<string, EventNotifConfig> = {
     textKey: 'notifications.synologySessionCleared.text',
     navigateTarget: () => null,
   },
+  // Public trips: the owner is asked (boolean, with accept/reject callbacks supplied
+  // by the sender), the requester is told the outcome.
+  trip_join_request: {
+    inAppType: 'simple',
+    titleKey: 'notif.trip_join_request.title',
+    textKey: 'notif.trip_join_request.text',
+    navigateTarget: (p) => (p.tripId ? `/trips/${p.tripId}` : null),
+  },
+  trip_join_accepted: {
+    inAppType: 'navigate',
+    titleKey: 'notif.trip_join_accepted.title',
+    textKey: 'notif.trip_join_accepted.text',
+    navigateTextKey: 'notif.action.view_trip',
+    navigateTarget: (p) => (p.tripId ? `/trips/${p.tripId}` : null),
+  },
+  trip_join_rejected: {
+    inAppType: 'simple',
+    titleKey: 'notif.trip_join_rejected.title',
+    textKey: 'notif.trip_join_rejected.text',
+    navigateTarget: () => null,
+  },
 };
 
 // ── Fallback config for unknown event types ────────────────────────────────

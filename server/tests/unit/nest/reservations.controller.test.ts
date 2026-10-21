@@ -50,7 +50,14 @@ describe('ReservationsController (parity with the legacy /api/trips/:tripId/rese
 
   it('GET / returns reservations', () => {
     const svc = makeService({ list: vi.fn().mockReturnValue([{ id: 1 }]) } as Partial<ReservationsService>);
-    expect(new ReservationsController(svc, airtrailLink).list(user, '5')).toEqual({ reservations: [{ id: 1 }] });
+    expect(new ReservationsController(svc, airtrailLink).list(user, '5', { id: 5, user_id: 1, currency: null })).toEqual({ reservations: [{ id: 1 }] });
+  });
+
+  it('GET / strips booking codes, notes, links and traveller names for a read-only visitor', () => {
+    const row = { id: 1, title: 'Flight', reservation_time: '2026-08-01T09:00', confirmation_number: 'XY12', notes: 'n', metadata: '{"seat":"4A"}', url: 'https://x', external_id: 'e', external_hash: 'h', external_owner_user_id: 3, travelers: [{ id: 3 }] };
+    const svc = makeService({ list: vi.fn().mockReturnValue([row]) } as Partial<ReservationsService>);
+    const [out] = (new ReservationsController(svc, airtrailLink).list(user, '5', { id: 5, user_id: 1, currency: null, is_viewer: true }) as { reservations: Record<string, unknown>[] }).reservations;
+    expect(out).toMatchObject({ id: 1, title: 'Flight', reservation_time: '2026-08-01T09:00', confirmation_number: null, notes: null, metadata: null, url: null, external_id: null, external_hash: null, external_owner_user_id: null, travelers: [] });
   });
 
   describe('POST /', () => {

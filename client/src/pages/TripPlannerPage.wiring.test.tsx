@@ -239,6 +239,7 @@ function baseState(): HookState {
     setShowTripForm: vi.fn(),
     showMembersModal: false,
     setShowMembersModal: vi.fn(),
+    tripJoin: { readOnly: false, joinStatus: null, joinBusy: false, requestJoin: vi.fn(), cancelJoin: vi.fn() },
     showReservationModal: false,
     setShowReservationModal: vi.fn(),
     editingReservation: null,

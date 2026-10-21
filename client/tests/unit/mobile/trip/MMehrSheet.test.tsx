@@ -175,4 +175,46 @@ describe('MMehrSheet', () => {
       expect(screen.getByRole('button', { name: 'Share Trip' }).parentElement).not.toHaveClass('mt-2')
     })
   })
+
+  describe('visitor of a public trip', () => {
+    const joinOf = (overrides: Partial<TripPlanner['tripJoin']> = {}): TripPlanner['tripJoin'] => ({
+      readOnly: true, joinStatus: null, joinBusy: false, requestJoin: vi.fn(), cancelJoin: vi.fn(), ...overrides,
+    })
+
+    it('FE-MOB-MEHR-020: offers only "Request to Join" — no share, export or edit', () => {
+      renderSheet({ tripJoin: joinOf() })
+
+      expect(screen.getByRole('button', { name: 'Request to Join' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Share Trip' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Export/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Edit trip' })).not.toBeInTheDocument()
+    })
+
+    it('FE-MOB-MEHR-021: asking closes the sheet and sends the request', () => {
+      const tripJoin = joinOf()
+      const { shell } = renderSheet({ tripJoin })
+
+      fireEvent.click(screen.getByRole('button', { name: 'Request to Join' }))
+
+      expect(tripJoin.requestJoin).toHaveBeenCalledTimes(1)
+      expect(shell.closeSheet).toHaveBeenCalled()
+    })
+
+    it('FE-MOB-MEHR-022: while pending the one action takes the request back', () => {
+      const tripJoin = joinOf({ joinStatus: 'pending' })
+      renderSheet({ tripJoin })
+
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel join request' }))
+
+      expect(tripJoin.cancelJoin).toHaveBeenCalledTimes(1)
+      expect(tripJoin.requestJoin).not.toHaveBeenCalled()
+    })
+
+    it('FE-MOB-MEHR-023: a member of the trip still gets the full set', () => {
+      renderSheet({ tripJoin: joinOf({ readOnly: false }) })
+
+      expect(screen.getByRole('button', { name: 'Share Trip' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Request to Join' })).not.toBeInTheDocument()
+    })
+  })
 })

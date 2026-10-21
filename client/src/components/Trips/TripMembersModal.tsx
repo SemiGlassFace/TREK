@@ -5,7 +5,7 @@ import { useToast } from '../shared/Toast'
 import { useAuthStore } from '../../store/authStore'
 import { useCanDo } from '../../store/permissionsStore'
 import { useTripStore } from '../../store/tripStore'
-import { Crown, UserMinus, UserPlus, Users, LogOut, Link2, Trash2, Copy, Check, UserRound, Pencil, Plus } from 'lucide-react'
+import { Crown, UserMinus, UserPlus, Users, LogOut, Link2, Trash2, Copy, Check, UserRound, Pencil, Plus, Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from '../../i18n'
 import { getApiErrorMessage } from '../../types'
 import CustomSelect from '../shared/CustomSelect'
@@ -262,6 +262,120 @@ function TripInviteLinkSection({ tripId, t }: { tripId: number; t: (key: string,
   )
 }
 
+/**
+ * Owner-only switch that makes the trip visible, read-only, to every signed-in user.
+ * Visitors can then ask to join; those requests land in JoinRequestsSection below.
+ */
+function PublicTripSection({ tripId, t }: { tripId: number; t: (key: string, params?: Record<string, string | number>) => string }) {
+  const [isPublic, setIsPublic] = useState<boolean | null>(null)
+  const [busy, setBusy] = useState(false)
+  const toast = useToast()
+
+  useEffect(() => {
+    tripsApi.getVisibility(tripId).then(d => setIsPublic(!!d.is_public)).catch(() => {})
+  }, [tripId])
+
+  if (isPublic === null) return null
+
+  const toggle = async () => {
+    setBusy(true)
+    try {
+      await tripsApi.setVisibility(tripId, !isPublic)
+      setIsPublic(!isPublic)
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, t('common.error')))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border-faint)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        {isPublic ? <Eye size={14} className="text-content-muted" /> : <EyeOff size={14} className="text-content-muted" />}
+        <span className="text-content" style={{ fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 600 }}>{t('trips.public.title')}</span>
+      </div>
+      <p className="text-content-faint" style={{ fontSize: 'calc(11px * var(--fs-scale-caption, 1))', marginBottom: 12, lineHeight: 1.5 }}>
+        {isPublic ? t('trips.public.enabled') : t('trips.public.disabled')}
+      </p>
+      <button type="button" onClick={toggle} disabled={busy} className="border border-edge text-content-muted" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        width: '100%', padding: '8px 0', borderRadius: 8, background: 'none',
+        fontSize: 'calc(12px * var(--fs-scale-body, 1))', fontWeight: 500,
+        cursor: busy ? 'default' : 'pointer', fontFamily: 'inherit', opacity: busy ? 0.5 : 1,
+      }}>
+        {isPublic ? <EyeOff size={12} /> : <Eye size={12} />}
+        {isPublic ? t('trips.public.makePrivate') : t('trips.public.makePublic')}
+      </button>
+    </div>
+  )
+}
+
+interface JoinRequest { id: number; user_id: number; username: string }
+
+/** Pending requests to join a public trip. Renders nothing while there are none. */
+function JoinRequestsSection({ tripId, t, onAccepted }: {
+  tripId: number
+  t: (key: string, params?: Record<string, string | number>) => string
+  onAccepted: () => void
+}) {
+  const [requests, setRequests] = useState<JoinRequest[]>([])
+  const [busyId, setBusyId] = useState<number | null>(null)
+  const toast = useToast()
+
+  useEffect(() => {
+    tripsApi.getJoinRequests(tripId).then((d: { requests: JoinRequest[] }) => setRequests(d.requests || [])).catch(() => {})
+  }, [tripId])
+
+  if (requests.length === 0) return null
+
+  const decide = async (req: JoinRequest, accept: boolean) => {
+    setBusyId(req.id)
+    try {
+      await (accept ? tripsApi.acceptJoinRequest(tripId, req.id) : tripsApi.rejectJoinRequest(tripId, req.id))
+      setRequests(prev => prev.filter(r => r.id !== req.id))
+      if (accept) onAccepted()
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, t('common.error')))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <UserPlus size={14} className="text-content-muted" />
+        <span className="text-content" style={{ fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 600 }}>
+          {t('trips.joinRequests.title')} ({requests.length})
+        </span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {requests.map(req => (
+          <div key={req.id} className="bg-surface-secondary border border-edge-secondary" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 10 }}>
+            <Avatar username={req.username} avatarUrl={null} />
+            <span className="text-content" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 'calc(13px * var(--fs-scale-body, 1))', fontWeight: 500 }}>{req.username}</span>
+            <button type="button" onClick={() => decide(req, true)} disabled={busyId !== null} style={{
+              display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: 'none',
+              background: 'var(--accent)', color: 'var(--accent-text)', fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600,
+              cursor: busyId !== null ? 'default' : 'pointer', fontFamily: 'inherit', opacity: busyId !== null ? 0.5 : 1,
+            }}>
+              <Check size={10} /> {t('trips.joinRequests.accept')}
+            </button>
+            <button type="button" onClick={() => decide(req, false)} disabled={busyId !== null} style={{
+              padding: '4px 10px', borderRadius: 6, border: 'none',
+              background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontSize: 'calc(11px * var(--fs-scale-caption, 1))', fontWeight: 600,
+              cursor: busyId !== null ? 'default' : 'pointer', fontFamily: 'inherit', opacity: busyId !== null ? 0.5 : 1,
+            }}>
+              {t('trips.joinRequests.reject')}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 interface TripMembersModalProps {
   isOpen: boolean
   onClose: () => void
@@ -437,7 +551,7 @@ export default function TripMembersModal({ isOpen, onClose, tripId, tripTitle, o
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={t('members.shareTrip')} size="3xl">
-      <div style={{ display: 'grid', gridTemplateColumns: canManageShare ? '1fr 1fr' : '1fr', gap: 24, fontFamily: "var(--font-system)" }} className="share-modal-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: (canManageShare || isCurrentOwner) ? '1fr 1fr' : '1fr', gap: 24, fontFamily: "var(--font-system)" }} className="share-modal-grid">
         <style>{`@media (max-width: 640px) { .share-modal-grid { grid-template-columns: 1fr !important; } }`}</style>
 
         {/* Left column: Members */}
@@ -556,6 +670,9 @@ export default function TripMembersModal({ isOpen, onClose, tripId, tripTitle, o
           )}
         </div>
 
+        {/* People asking to join a public trip — the owner decides */}
+        {isCurrentOwner && <JoinRequestsSection tripId={tripId} t={t} onAccepted={() => loadMembers(true)} />}
+
         {/* Guests (#1362) — accountless participants, managed by the owner */}
         {(isCurrentOwner || guests.length > 0) && (
         <div>
@@ -649,10 +766,11 @@ export default function TripMembersModal({ isOpen, onClose, tripId, tripTitle, o
 
         </div>
 
-        {/* Right column: Share Link */}
-        {canManageShare && <div className="border-l border-edge-faint" style={{ paddingLeft: 24 }}>
-        <ShareLinkSection tripId={tripId} t={t} />
-        <TripInviteLinkSection tripId={tripId} t={t} />
+        {/* Right column: public visibility (owner), then the share and invite links */}
+        {(canManageShare || isCurrentOwner) && <div className="border-l border-edge-faint" style={{ paddingLeft: 24 }}>
+        {isCurrentOwner && <PublicTripSection tripId={tripId} t={t} />}
+        {canManageShare && <ShareLinkSection tripId={tripId} t={t} />}
+        {canManageShare && <TripInviteLinkSection tripId={tripId} t={t} />}
         </div>}
 
         <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>

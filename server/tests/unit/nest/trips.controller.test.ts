@@ -80,18 +80,18 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('TripsController (parity with the legacy /api/trips route)', () => {
   it('GET / lists for the user with the archived flag', () => {
-    const list = vi.fn().mockReturnValue([{ id: 1 }]);
-    expect(tc(svc({ list } as Partial<TripsService>)).list(user, '1')).toEqual({ trips: [{ id: 1 }] });
-    expect(list).toHaveBeenCalledWith(1, 1);
+    const listWithPublic = vi.fn().mockReturnValue([{ id: 1 }]);
+    expect(tc(svc({ listWithPublic } as Partial<TripsService>)).list(user, '1')).toEqual({ trips: [{ id: 1 }] });
+    expect(listWithPublic).toHaveBeenCalledWith(1, 1);
   });
 
   it('GET / defaults the archived flag to 0 when not "1"', () => {
-    const list = vi.fn().mockReturnValue([]);
-    const c = tc(svc({ list } as Partial<TripsService>));
+    const listWithPublic = vi.fn().mockReturnValue([]);
+    const c = tc(svc({ listWithPublic } as Partial<TripsService>));
     c.list(user, undefined);
-    expect(list).toHaveBeenLastCalledWith(1, 0);
+    expect(listWithPublic).toHaveBeenLastCalledWith(1, 0);
     c.list(user, '0');
-    expect(list).toHaveBeenLastCalledWith(1, 0);
+    expect(listWithPublic).toHaveBeenLastCalledWith(1, 0);
   });
 
   describe('GET /active (startup destination)', () => {
@@ -205,11 +205,11 @@ describe('TripsController (parity with the legacy /api/trips route)', () => {
   });
 
   it('GET /:id 404 when missing', () => {
-    expect(thrown(() => tc(svc({ get: vi.fn().mockReturnValue(undefined) } as Partial<TripsService>)).get(user, '9'))).toEqual({ status: 404, body: { error: 'Trip not found' } });
+    expect(thrown(() => tc(svc({ getWithPublic: vi.fn().mockReturnValue(undefined) } as Partial<TripsService>)).get(user, '9'))).toEqual({ status: 404, body: { error: 'Trip not found' } });
   });
 
   it('GET /:id returns the trip when present', () => {
-    const s = svc({ get: vi.fn().mockReturnValue({ id: 9 }) } as Partial<TripsService>);
+    const s = svc({ getWithPublic: vi.fn().mockReturnValue({ id: 9 }) } as Partial<TripsService>);
     expect(tc(s).get(user, '9')).toEqual({ trip: { id: 9 } });
   });
 

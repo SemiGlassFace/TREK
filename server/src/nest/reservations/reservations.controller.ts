@@ -14,7 +14,10 @@ import type { User } from '../../types';
 import { ReservationsService } from './reservations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
+import type { TripAccess } from '../database/database.service';
+import { redactReservationsForViewer } from '../trip-public/viewer-redaction';
 import { AirtrailLinkService } from '../integrations/airtrail-link.service';
 import {
   ReservationCreateDto,
@@ -55,8 +58,10 @@ export class ReservationsController {
 
 
   @Get()
-  list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return { reservations: this.reservations.list(tripId) };
+  @ViewerReadable()
+  list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: TripAccess) {
+    const reservations = this.reservations.list(tripId);
+    return { reservations: trip.is_viewer ? redactReservationsForViewer(reservations) : reservations };
   }
 
   @RequirePermission('reservation_edit')

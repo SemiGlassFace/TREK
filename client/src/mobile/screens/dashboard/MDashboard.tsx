@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import {
   Archive, ArchiveRestore, ArrowRight, Bell, CalendarDays, CalendarPlus, Copy,
-  LayoutGrid, List, MapPin, Pencil, Plus, RefreshCw, Trash2, Users,
+  LayoutGrid, List, MapPin, Pencil, Plus, RefreshCw, Trash2, UserPlus, Users, X,
 } from 'lucide-react'
 import { useTranslation } from '../../../i18n'
 import MDancingTrek from '../../components/MDancingTrek'
 import { useDashboard } from '../../../pages/dashboard/useDashboard'
 import {
-  type DashboardTrip, MS_PER_DAY, daysUntil, getTripStatus,
+  type DashboardTrip, MS_PER_DAY, daysUntil, getTripStatus, isReadOnlyTrip,
 } from '../../../pages/dashboard/dashboardModel'
 import { useAuthStore } from '../../../store/authStore'
 import { useInAppNotificationStore } from '../../../store/inAppNotificationStore'
@@ -60,6 +60,7 @@ export default function MDashboard(): React.ReactElement {
     showForm, setShowForm, editingTrip, setEditingTrip,
     deleteTrip, setDeleteTrip, copyTrip, setCopyTrip, applyCoverUpdate,
     handleCreate, handleUpdate, confirmDelete, handleArchive, handleUnarchive, confirmCopy,
+    handleRequestJoin, handleCancelJoin,
   } = useDashboard()
 
   const user = useAuthStore(s => s.user)
@@ -91,6 +92,12 @@ export default function MDashboard(): React.ReactElement {
   // Archived cards swap edit/archive for restore + permanent delete (audit);
   // the grid variant leaves archiving to the edit sheet like the design.
   const actionsFor = (trip: DashboardTrip, layout: 'grid' | 'list'): CardAction[] => {
+    // Someone else's public trip: the only thing to do is ask to join, or take that back.
+    if (isReadOnlyTrip(trip)) {
+      return trip.join_request_status === 'pending'
+        ? [{ key: 'cancel-join', label: t('trips.joinRequests.cancel'), icon: <X size={15} strokeWidth={2.1} />, onClick: () => handleCancelJoin(trip) }]
+        : [{ key: 'join', label: t('trips.joinRequests.request'), icon: <UserPlus size={15} strokeWidth={2.1} />, onClick: () => handleRequestJoin(trip) }]
+    }
     if (isArchivedFilter) {
       return [
         { key: 'copy', label: t('dashboard.aria.duplicate'), icon: <Copy size={15} strokeWidth={2.1} />, onClick: () => setCopyTrip(trip) },
@@ -110,6 +117,7 @@ export default function MDashboard(): React.ReactElement {
   }
 
   const statusLabel = (trip: DashboardTrip): string => {
+    if (isReadOnlyTrip(trip)) return t('trips.public.label')
     if (trip.is_archived) return t('dashboard.archived')
     const status = getTripStatus(trip)
     const until = daysUntil(trip.start_date)

@@ -58,6 +58,8 @@ const { db } = vi.hoisted(() => {
   tmp.exec(`CREATE TABLE addons (id TEXT PRIMARY KEY, enabled INTEGER NOT NULL DEFAULT 0,
     name TEXT, description TEXT, category TEXT, sort_order INTEGER DEFAULT 0);`);
   tmp.exec('CREATE TABLE app_settings (key TEXT PRIMARY KEY, value TEXT);');
+  // TripAccessGuard asks whether a trip is public before it answers 404.
+  tmp.exec('CREATE TABLE trip_public_visibility (trip_id INTEGER PRIMARY KEY, enabled_at TEXT, enabled_by INTEGER);');
   return { db: tmp };
 });
 

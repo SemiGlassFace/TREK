@@ -23,6 +23,7 @@ import {
   type MfaVerifyLoginRequest, type MfaEnableRequest, type McpTokenCreateRequest,
   type ApiTokenCreateRequest, type PublicApiScope,
   type TripAddMemberRequest, type TripTransferOwnershipRequest,
+  TripVisibilityRequest,
   type TripCreateGuestRequest, type TripRenameGuestRequest, type AssignmentReorderRequest,
   type PackingReorderRequest, type PackingCreateBagRequest, type TodoReorderRequest,
   type TripCreateRequest, type TripUpdateRequest, type TripCopyRequest, type ActiveTripResponse,
@@ -432,6 +433,14 @@ export const tripsApi = {
   deleteGuest: (id: number | string, userId: number) => apiClient.delete(`/trips/${id}/guests/${userId}`).then(r => r.data),
   copy: (id: number | string, data?: TripCopyRequest) => apiClient.post(`/trips/${id}/copy`, data || {}).then(r => r.data),
   bundle: (id: number | string) => apiClient.get(`/trips/${id}/bundle`).then(r => r.data),
+  // Public trips: the owner's publish switch, and a visitor's request to join.
+  getVisibility: (id: number | string): Promise<{ is_public: boolean; is_owner: boolean }> => apiClient.get(`/trips/${id}/visibility`).then(r => r.data),
+  setVisibility: (id: number | string, isPublic: boolean) => apiClient.put(`/trips/${id}/visibility`, { is_public: isPublic } satisfies TripVisibilityRequest).then(r => r.data),
+  requestJoin: (id: number | string) => apiClient.post(`/trips/${id}/join-request`).then(r => r.data),
+  cancelJoinRequest: (id: number | string) => apiClient.delete(`/trips/${id}/join-request`).then(r => r.data),
+  getJoinRequests: (id: number | string) => apiClient.get(`/trips/${id}/join-requests`).then(r => r.data),
+  acceptJoinRequest: (id: number | string, requestId: number) => apiClient.post(`/trips/${id}/join-requests/${requestId}/accept`).then(r => r.data),
+  rejectJoinRequest: (id: number | string, requestId: number) => apiClient.post(`/trips/${id}/join-requests/${requestId}/reject`).then(r => r.data),
 }
 
 export const daysApi = {

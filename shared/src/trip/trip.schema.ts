@@ -57,6 +57,11 @@ export const tripSchema = z.object({
   is_owner: z.number().optional(),
   owner_username: z.string().optional(),
   shared_count: z.number().optional(),
+  // public trips (list/get only): 1 when the caller is a read-only visitor rather
+  // than the owner or a member; the owner's publish flag; the caller's own request.
+  is_viewer: z.union([z.literal(0), z.literal(1)]).optional(),
+  is_public: z.union([z.boolean(), z.number()]).optional(),
+  join_request_status: z.string().nullable().optional(),
 });
 export type Trip = z.infer<typeof tripSchema>;
 
@@ -126,6 +131,12 @@ export const tripCopyRequestSchema = z.object({
   title: z.string().optional(),
 });
 export type TripCopyRequest = z.infer<typeof tripCopyRequestSchema>;
+
+// Publish or unpublish a trip (owner only).
+export const tripVisibilityRequestSchema = z.object({
+  is_public: z.boolean(),
+});
+export type TripVisibilityRequest = z.infer<typeof tripVisibilityRequestSchema>;
 
 export const tripAddMemberRequestSchema = z.object({
   identifier: z.string(),

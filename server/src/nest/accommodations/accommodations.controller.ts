@@ -16,7 +16,10 @@ import { AccommodationsService, type MirrorSender } from './accommodations.servi
 import { AccommodationCreateDto, AccommodationUpdateDto } from './accommodations.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
+import type { TripAccess } from '../database/database.service';
+import { redactAccommodationsForViewer } from '../trip-public/viewer-redaction';
 
 type AccommodationBody = {
   place_id?: number;
@@ -68,8 +71,10 @@ export class AccommodationsController {
   }
 
   @Get()
-  list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return { accommodations: this.accommodations.list(tripId) };
+  @ViewerReadable()
+  list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: TripAccess) {
+    const accommodations = this.accommodations.list(tripId);
+    return { accommodations: trip.is_viewer ? redactAccommodationsForViewer(accommodations) : accommodations };
   }
 
   @RequirePermission('day_edit')

@@ -4,7 +4,7 @@ import { useAuthStore } from './authStore'
 export type PermissionLevel = 'admin' | 'trip_owner' | 'trip_member' | 'everybody'
 
 /** Minimal trip shape used by permission checks — accepts both Trip and DashboardTrip */
-type TripOwnerContext = { user_id?: unknown; owner_id?: unknown; is_owner?: unknown }
+type TripOwnerContext = { user_id?: unknown; owner_id?: unknown; is_owner?: unknown; is_viewer?: unknown }
 
 interface PermissionsState {
   permissions: Record<string, PermissionLevel>
@@ -29,6 +29,9 @@ export function useCanDo() {
     trip?: TripOwnerContext | null,
   ): boolean {
     if (!user) return false
+    // A visitor of someone's public trip edits nothing — admins included, which is
+    // why this sits above the admin shortcut: the server refuses their writes too.
+    if (trip?.is_viewer === 1 || trip?.is_viewer === true) return false
     if (user.role === 'admin') return true
 
     const level = perms[actionKey]

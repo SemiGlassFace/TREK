@@ -26,6 +26,9 @@ const NTFY_EVENT_META: Partial<Record<NotifEventType, { priority: 1 | 2 | 3 | 4 
   version_available: { priority: 4, tags: ['package'] },
   replica_failure: { priority: 5, tags: ['warning', 'floppy_disk'] },
   synology_session_cleared: { priority: 3, tags: ['warning'] },
+  trip_join_request: { priority: 4, tags: ['raising_hand'] },
+  trip_join_accepted: { priority: 3, tags: ['white_check_mark'] },
+  trip_join_rejected: { priority: 3, tags: ['no_entry_sign'] },
 };
 const NTFY_DEFAULT_META = { priority: 3 as const, tags: [] as string[] };
 

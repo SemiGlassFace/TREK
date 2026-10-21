@@ -48,8 +48,14 @@ describe('PlacesController (parity with the legacy /api/trips/:tripId/places rou
   // by calling the method directly.
   it('GET / lists with filters', () => {
     const list = vi.fn().mockReturnValue([{ id: 1 }]);
-    expect(new PlacesController(svc({ list } as Partial<PlacesService>), new RuntimeEnvService(), storageStub).list(user, '5', 'beach', 'cat', 'tag')).toEqual({ places: [{ id: 1 }] });
+    expect(new PlacesController(svc({ list } as Partial<PlacesService>), new RuntimeEnvService(), storageStub).list(user, '5', { id: 5, user_id: 1, currency: null }, 'beach', 'cat', 'tag')).toEqual({ places: [{ id: 1 }] });
     expect(list).toHaveBeenCalledWith('5', { search: 'beach', category: 'cat', tag: 'tag' });
+  });
+
+  it('GET / blanks place notes for a read-only visitor and leaves the rest', () => {
+    const list = vi.fn().mockReturnValue([{ id: 1, name: 'Louvre', notes: 'ask for Marie' }]);
+    const out = new PlacesController(svc({ list } as Partial<PlacesService>), new RuntimeEnvService(), storageStub).list(user, '5', { id: 5, user_id: 1, currency: null, is_viewer: true });
+    expect(out).toEqual({ places: [{ id: 1, name: 'Louvre', notes: null }] });
   });
 
   describe('POST / (create)', () => {

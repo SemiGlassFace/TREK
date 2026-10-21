@@ -4,6 +4,7 @@ import {
   tripUpdateRequestSchema,
   tripCopyRequestSchema,
   tripAddMemberRequestSchema,
+  tripVisibilityRequestSchema,
   tripTransferOwnershipRequestSchema,
   tripCreateGuestRequestSchema,
   tripRenameGuestRequestSchema,
@@ -18,6 +19,7 @@ import {
 export class TripCreateDto extends createZodDto(tripCreateRequestSchema) {}
 export class TripUpdateDto extends createZodDto(tripUpdateRequestSchema) {}
 export class TripCopyDto extends createZodDto(tripCopyRequestSchema) {}
+export class TripVisibilityDto extends createZodDto(tripVisibilityRequestSchema) {}
 export class TripAddMemberDto extends createZodDto(tripAddMemberRequestSchema) {}
 export class TripTransferOwnershipDto extends createZodDto(tripTransferOwnershipRequestSchema) {}
 export class TripCreateGuestDto extends createZodDto(tripCreateGuestRequestSchema) {}

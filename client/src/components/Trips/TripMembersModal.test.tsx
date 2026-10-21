@@ -1056,4 +1056,130 @@ describe('TripMembersModal', () => {
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/join/inv9'));
     view.unmount();
   });
+
+  describe('public trip (owner)', () => {
+    it('FE-COMP-MEMBERS-060: offers to make a private trip public and says what that means', async () => {
+      asShareOwner();
+      server.use(http.get('/api/trips/1/visibility', () => HttpResponse.json({ is_public: false, is_owner: true })));
+      render(<TripMembersModal {...defaultProps} />);
+
+      expect(await screen.findByText('Only invited members can see this trip.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Make public/ })).toBeInTheDocument();
+    });
+
+    it('FE-COMP-MEMBERS-061: publishing sends is_public and flips the button to "Make private"', async () => {
+      asShareOwner();
+      let body: unknown;
+      server.use(
+        http.get('/api/trips/1/visibility', () => HttpResponse.json({ is_public: false, is_owner: true })),
+        http.put('/api/trips/1/visibility', async ({ request }) => { body = await request.json(); return HttpResponse.json({ is_public: true }); }),
+      );
+      render(<TripMembersModal {...defaultProps} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Make public/ }));
+
+      expect(await screen.findByRole('button', { name: /Make private/ })).toBeInTheDocument();
+      expect(body).toEqual({ is_public: true });
+    });
+
+    it('FE-COMP-MEMBERS-062: a failed switch keeps the old state and shows the server\'s reason', async () => {
+      asShareOwner();
+      server.use(
+        http.get('/api/trips/1/visibility', () => HttpResponse.json({ is_public: false, is_owner: true })),
+        http.put('/api/trips/1/visibility', () => HttpResponse.json({ error: 'Only the trip owner can change visibility' }, { status: 403 })),
+      );
+      render(<TripMembersModal {...defaultProps} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Make public/ }));
+
+      await waitFor(() => expect(addToast).toHaveBeenCalledWith('Only the trip owner can change visibility', 'error', undefined));
+      expect(screen.getByRole('button', { name: /Make public/ })).toBeInTheDocument();
+    });
+
+    it('FE-COMP-MEMBERS-063: a member who is not the owner sees neither the switch nor the requests', async () => {
+      seedStore(useAuthStore, { user: memberUser, isAuthenticated: true });
+      seedStore(usePermissionsStore, { permissions: { share_manage: 'trip_member' } });
+      seedStore(useTripStore, { trip: buildTrip({ id: 1, user_id: ownerUser.id }) });
+      server.use(
+        http.get('/api/trips/1/invite-link', () => HttpResponse.json({ token: null })),
+        http.get('/api/trips/1/visibility', () => HttpResponse.json({ is_public: true, is_owner: false })),
+        http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: [{ id: 5, user_id: 9, username: 'zoe' }] })),
+      );
+      render(<TripMembersModal {...defaultProps} />);
+
+      await screen.findByText('owner');
+      expect(screen.queryByRole('button', { name: /Make private|Make public/ })).not.toBeInTheDocument();
+      expect(screen.queryByText('zoe')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('join requests (owner)', () => {
+    const request = { id: 5, user_id: 9, username: 'zoe' };
+
+    it('FE-COMP-MEMBERS-064: lists who is asking, and nothing when no one is', async () => {
+      asShareOwner();
+      server.use(http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: [request] })));
+      const view = render(<TripMembersModal {...defaultProps} />);
+      expect(await screen.findByText('Join requests (1)')).toBeInTheDocument();
+      expect(screen.getByText('zoe')).toBeInTheDocument();
+      view.unmount();
+
+      server.use(http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: [] })));
+      render(<TripMembersModal {...defaultProps} />);
+      await screen.findByText('owner');
+      expect(screen.queryByText(/Join requests/)).not.toBeInTheDocument();
+    });
+
+    it('FE-COMP-MEMBERS-065: accepting removes the row and reloads the roster so the new member shows', async () => {
+      asShareOwner();
+      let accepted = false;
+      server.use(
+        http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: accepted ? [] : [request] })),
+        http.post('/api/trips/1/join-requests/5/accept', () => { accepted = true; return HttpResponse.json({ success: true, user_id: 9 }); }),
+        http.get('/api/trips/1/members', () => HttpResponse.json({
+          owner: { id: ownerUser.id, username: 'owner', avatar_url: null },
+          members: accepted ? [{ id: 9, username: 'zoe', avatar_url: null }] : [],
+          current_user_id: ownerUser.id,
+        })),
+      );
+      const onMembersChanged = vi.fn();
+      render(<TripMembersModal {...defaultProps} onMembersChanged={onMembersChanged} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Accept/ }));
+
+      await waitFor(() => expect(screen.queryByText(/Join requests/)).not.toBeInTheDocument());
+      expect(await screen.findByText('zoe')).toBeInTheDocument();
+      expect(onMembersChanged).toHaveBeenCalled();
+    });
+
+    it('FE-COMP-MEMBERS-066: rejecting removes the row and leaves the roster alone', async () => {
+      asShareOwner();
+      const onMembersChanged = vi.fn();
+      let rejected = false;
+      server.use(
+        http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: rejected ? [] : [request] })),
+        http.post('/api/trips/1/join-requests/5/reject', () => { rejected = true; return HttpResponse.json({ success: true }); }),
+      );
+      render(<TripMembersModal {...defaultProps} onMembersChanged={onMembersChanged} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Reject/ }));
+
+      await waitFor(() => expect(screen.queryByText(/Join requests/)).not.toBeInTheDocument());
+      expect(onMembersChanged).not.toHaveBeenCalled();
+    });
+
+    it('FE-COMP-MEMBERS-067: a request someone else already resolved keeps its row and shows the reason', async () => {
+      asShareOwner();
+      server.use(
+        http.get('/api/trips/1/join-requests', () => HttpResponse.json({ requests: [request] })),
+        http.post('/api/trips/1/join-requests/5/accept', () => HttpResponse.json({ error: 'Join request not found or already resolved' }, { status: 404 })),
+      );
+      render(<TripMembersModal {...defaultProps} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Accept/ }));
+
+      await waitFor(() => expect(addToast).toHaveBeenCalledWith('Join request not found or already resolved', 'error', undefined));
+      expect(screen.getByText('zoe')).toBeInTheDocument();
+    });
+  });
 });

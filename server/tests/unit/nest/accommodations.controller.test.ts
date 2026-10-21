@@ -34,7 +34,12 @@ describe('AccommodationsController (parity with the legacy accommodations sub-ro
 
   it('GET / lists (no permission gate)', () => {
     const svc = makeService({ list: vi.fn().mockReturnValue([{ id: 1 }]) } as Partial<AccommodationsService>);
-    expect(new AccommodationsController(svc).list(user, '5')).toEqual({ accommodations: [{ id: 1 }] });
+    expect(new AccommodationsController(svc).list(user, '5', { id: 5, user_id: 1, currency: null })).toEqual({ accommodations: [{ id: 1 }] });
+  });
+
+  it('GET / hides the confirmation code and notes from a read-only visitor', () => {
+    const svc = makeService({ list: vi.fn().mockReturnValue([{ id: 1, confirmation: 'ABC123', notes: 'late arrival', check_in: '15:00' }]) } as Partial<AccommodationsService>);
+    expect(new AccommodationsController(svc).list(user, '5', { id: 5, user_id: 1, currency: null, is_viewer: true })).toEqual({ accommodations: [{ id: 1, confirmation: null, notes: null, check_in: '15:00' }] });
   });
 
   describe('POST /', () => {

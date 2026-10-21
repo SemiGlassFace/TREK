@@ -1056,4 +1056,65 @@ describe('DashboardPage', () => {
       expect(card.querySelector('[aria-label="Archive"]')).toBeNull();
     });
   });
+
+  describe('FE-PAGE-DASH-PUB: public trips of other owners', () => {
+    const theirs = (overrides = {}) => buildTrip({
+      id: 777, user_id: 42, title: 'Their Iceland', start_date: '2026-09-01', end_date: '2026-09-05',
+      is_viewer: 1, is_public: 1, join_request_status: null, ...overrides,
+    });
+    const serve = (trip: ReturnType<typeof theirs>) => server.use(
+      http.get('/api/trips', ({ request }) => HttpResponse.json({ trips: new URL(request.url).searchParams.get('archived') ? [] : [trip] })),
+    );
+
+    it('FE-PAGE-DASH-PUB-001: shows a "Public trip" card with a join button and none of the owner tools', async () => {
+      serve(theirs());
+      render(<DashboardPage />);
+
+      expect(await screen.findByText('Their Iceland')).toBeInTheDocument();
+      expect(screen.getByText('Public trip')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Request to Join' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
+    });
+
+    it('FE-PAGE-DASH-PUB-002: asking to join sends the request and the card turns into "Pending"', async () => {
+      serve(theirs());
+      let asked = 0;
+      server.use(http.post('/api/trips/777/join-request', () => { asked += 1; return HttpResponse.json({ status: 'pending' }); }));
+      render(<DashboardPage />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Request to Join' }));
+
+      expect(await screen.findByRole('button', { name: 'Pending' })).toBeInTheDocument();
+      expect(asked).toBe(1);
+      // asking must not open the trip
+      expect(screen.queryByRole('button', { name: 'Request to Join' })).not.toBeInTheDocument();
+    });
+
+    it('FE-PAGE-DASH-PUB-003: a pending card can be withdrawn', async () => {
+      serve(theirs({ join_request_status: 'pending' }));
+      let cancelled = 0;
+      server.use(http.delete('/api/trips/777/join-request', () => { cancelled += 1; return HttpResponse.json({ success: true }); }));
+      render(<DashboardPage />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Pending' }));
+
+      expect(await screen.findByRole('button', { name: 'Request to Join' })).toBeInTheDocument();
+      expect(cancelled).toBe(1);
+    });
+
+    it('FE-PAGE-DASH-PUB-004: the user\'s own trips keep their tools next to a public one', async () => {
+      server.use(
+        http.get('/api/trips', ({ request }) => HttpResponse.json({
+          trips: new URL(request.url).searchParams.get('archived') ? [] : [buildTrip({ title: 'My Own Trip', start_date: '2026-10-01', end_date: '2026-10-03' }), theirs()],
+        })),
+      );
+      render(<DashboardPage />);
+
+      await screen.findByText('Their Iceland');
+      expect(screen.getAllByText('My Own Trip').length).toBeGreaterThan(0);
+      expect(screen.getAllByRole('button', { name: 'Delete' }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole('button', { name: 'Request to Join' })).toHaveLength(1);
+    });
+  });
 });

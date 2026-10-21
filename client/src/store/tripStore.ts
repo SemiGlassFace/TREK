@@ -81,6 +81,19 @@ export interface TripStoreState
   addCategory: (data: Partial<Category> & { name: string }) => Promise<Category>
 }
 
+/**
+ * A visitor of a public trip may read the itinerary but not its packing list or
+ * to-dos; the server answers those with 403 "Read-only access". That is an empty
+ * list to show, not a failed load — any other error still fails the load.
+ */
+function emptyWhenReadOnly<T>(empty: T) {
+  return (err: unknown): T => {
+    const res = (err as { response?: { status?: number; data?: { error?: string } } } | null)?.response
+    if (res?.status === 403 && res.data?.error === 'Read-only access') return empty
+    throw err
+  }
+}
+
 export const useTripStore = create<TripStoreState>((set, get) => ({
   trip: null,
   days: [],
@@ -134,8 +147,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         tripRepo.get(tripId),
         dayRepo.list(tripId),
         placeRepo.list(tripId),
-        packingRepo.list(tripId),
-        todoRepo.list(tripId),
+        packingRepo.list(tripId).catch(emptyWhenReadOnly({ items: [] as PackingItem[] })),
+        todoRepo.list(tripId).catch(emptyWhenReadOnly({ items: [] as TodoItem[] })),
         // Budget / reservations / files are hydrated here too so the offline
         // path is uniform (no separate tab-gated effects). Non-fatal: a failure
         // in any of these must not blank the whole trip.

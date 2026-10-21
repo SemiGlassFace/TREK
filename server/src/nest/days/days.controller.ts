@@ -16,7 +16,10 @@ import { DayRemovalService, DayDeleteError, type DayRemoval } from './day-remova
 import { DayCreateDto, DayReorderDto, DayTransportDto, DayUpdateDto } from './days.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
+import type { TripAccess } from '../database/database.service';
+import { redactDaysForViewer } from '../trip-public/viewer-redaction';
 
 /**
  * /api/trips/:tripId/days — trip itinerary days.
@@ -36,8 +39,10 @@ export class DaysController {
   constructor(private readonly days: DaysService, private readonly removal: DayRemovalService) {}
 
   @Get()
-  list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return this.days.list(tripId);
+  @ViewerReadable()
+  list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: TripAccess) {
+    const result = this.days.list(tripId);
+    return trip.is_viewer ? redactDaysForViewer(result) : result;
   }
 
   @RequirePermission('day_edit')

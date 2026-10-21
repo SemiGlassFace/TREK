@@ -107,4 +107,35 @@ describe('permissionsStore', () => {
       expect(result.current('admin_action')).toBe(false);
     });
   });
+
+  describe('Visitor of a public trip (is_viewer)', () => {
+    const publicTrip = { user_id: 99, is_owner: 0, is_viewer: 1 };
+
+    it('can do nothing, whatever the setting says', () => {
+      useAuthStore.setState({ user: buildUser(), isAuthenticated: true });
+      usePermissionsStore.getState().setPermissions({ day_edit: 'everybody', place_edit: 'trip_member' });
+
+      const { result } = renderHook(() => useCanDo());
+      expect(result.current('day_edit', publicTrip)).toBe(false);
+      expect(result.current('place_edit', publicTrip)).toBe(false);
+      // not configured = allow, except for a visitor
+      expect(result.current('budget_edit', publicTrip)).toBe(false);
+    });
+
+    it('is refused even as an admin — the server refuses their writes on it too', () => {
+      useAuthStore.setState({ user: buildAdmin(), isAuthenticated: true });
+      const { result } = renderHook(() => useCanDo());
+      expect(result.current('day_edit', publicTrip)).toBe(false);
+      // …while the same admin keeps their reach everywhere else
+      expect(result.current('day_edit', { user_id: 99, is_viewer: 0 })).toBe(true);
+      expect(result.current('trip_create')).toBe(true);
+    });
+
+    it('does not affect a member of the same trip', () => {
+      useAuthStore.setState({ user: buildUser(), isAuthenticated: true });
+      usePermissionsStore.getState().setPermissions({ day_edit: 'trip_member' });
+      const { result } = renderHook(() => useCanDo());
+      expect(result.current('day_edit', { user_id: 99, is_owner: 0, is_viewer: 0 })).toBe(true);
+    });
+  });
 });

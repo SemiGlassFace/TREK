@@ -445,6 +445,9 @@ export const PLUGIN_CHANNEL_EVENTS = [
   'collab_message',
   'packing_tagged',
   'plugin_notification',
+  'trip_join_request',
+  'trip_join_accepted',
+  'trip_join_rejected',
 ] as const;
 
 // Compile-time guard: every id above must still be a real notification event.

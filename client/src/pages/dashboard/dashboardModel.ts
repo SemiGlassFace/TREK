@@ -38,6 +38,14 @@ export function upcomingKey(r: UpcomingReservation): string {
   return `${r.type}:${r.id}`
 }
 
+/**
+ * A public trip someone else owns: readable, not editable. The server flags it
+ * `is_viewer` on the list/get payloads; owners and members always get 0.
+ */
+export function isReadOnlyTrip(trip: { is_viewer?: unknown } | null | undefined): boolean {
+  return trip?.is_viewer === 1 || trip?.is_viewer === true
+}
+
 export const MS_PER_DAY = 86400000
 
 /**

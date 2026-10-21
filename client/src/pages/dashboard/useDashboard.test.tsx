@@ -335,4 +335,60 @@ describe('useDashboard', () => {
     act(() => result.current.setTripFilter('archive'));
     expect(result.current.gridTrips[0].cover_image).toBe('/uploads/covers/new-rome.jpg');
   });
+
+  describe('public trips of other owners', () => {
+    // Starts before TOKYO: it would be the hero if it were the user's own.
+    const SOON = buildTrip({ id: 201, user_id: 9, title: 'Their Iceland', start_date: '2027-03-02', end_date: '2027-03-04', is_viewer: 1, is_public: 1, join_request_status: null });
+
+    it('FE-HOOK-DASH-030: are listed in the grid but never become the hero', async () => {
+      tripsHandler([SOON, TOKYO]);
+      const { result } = await mountLoaded();
+
+      expect(result.current.spotlight?.title).toBe('Tokyo Trip');
+      expect(result.current.gridTrips.map(t => t.id)).toContain(201);
+    });
+
+    it('FE-HOOK-DASH-031: with only public trips there is no hero, and no bundle is requested for them', async () => {
+      let bundleCalls = 0;
+      server.use(http.get('/api/trips/:id/bundle', () => { bundleCalls += 1; return HttpResponse.json({}); }));
+      tripsHandler([SOON]);
+      const { result } = await mountLoaded();
+
+      expect(result.current.spotlight).toBeNull();
+      expect(result.current.gridTrips.map(t => t.id)).toEqual([201]);
+      expect(bundleCalls).toBe(0);
+    });
+
+    it('FE-HOOK-DASH-032: asking to join marks the card pending and confirms', async () => {
+      tripsHandler([SOON, TOKYO]);
+      server.use(http.post('/api/trips/201/join-request', () => HttpResponse.json({ status: 'pending' })));
+      const { result } = await mountLoaded();
+
+      await act(async () => { await result.current.handleRequestJoin(result.current.gridTrips.find(t => t.id === 201)!); });
+
+      expect(result.current.gridTrips.find(t => t.id === 201)?.join_request_status).toBe('pending');
+      expect(toastCalls.at(-1)?.[1]).toBe('success');
+    });
+
+    it('FE-HOOK-DASH-033: withdrawing the request clears the pending state', async () => {
+      tripsHandler([{ ...SOON, join_request_status: 'pending' } as DashboardTrip, TOKYO]);
+      server.use(http.delete('/api/trips/201/join-request', () => HttpResponse.json({ success: true })));
+      const { result } = await mountLoaded();
+
+      await act(async () => { await result.current.handleCancelJoin(result.current.gridTrips.find(t => t.id === 201)!); });
+
+      expect(result.current.gridTrips.find(t => t.id === 201)?.join_request_status).toBeNull();
+    });
+
+    it('FE-HOOK-DASH-034: a refused request leaves the card as it was and shows the server\'s reason', async () => {
+      tripsHandler([SOON, TOKYO]);
+      server.use(http.post('/api/trips/201/join-request', () => HttpResponse.json({ error: 'You are already a member of this trip' }, { status: 400 })));
+      const { result } = await mountLoaded();
+
+      await act(async () => { await result.current.handleRequestJoin(result.current.gridTrips.find(t => t.id === 201)!); });
+
+      expect(result.current.gridTrips.find(t => t.id === 201)?.join_request_status).toBeNull();
+      expect(toastCalls.at(-1)).toEqual(['You are already a member of this trip', 'error']);
+    });
+  });
 });
