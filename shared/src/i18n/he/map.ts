@@ -1,0 +1,32 @@
+import type { TranslationStrings } from '../types';
+
+const map: TranslationStrings = {
+  'map.connections': 'חיבורים',
+  'map.showConnections': 'הצגת מסלולי הזמנות',
+  'map.hideConnections': 'הסתרת מסלולי הזמנות',
+  'poi.searchThisArea': 'חיפוש באזור זה',
+  'poi.cat.restaurants': 'מסעדות',
+  'poi.cat.cafes': 'בתי קפה',
+  'poi.cat.bars': 'ברים וחיי לילה',
+  'poi.cat.hotels': 'לינה',
+  'poi.cat.sights': 'אתרים',
+  'poi.cat.museums': 'מוזיאונים ותרבות',
+  'poi.cat.nature': 'טבע ופארקים',
+  'poi.cat.activities': 'פעילויות',
+  'map.showAllConnections': 'הצגת כל מסלולי ההזמנות',
+  'map.hideAllConnections': 'הסתרת כל מסלולי ההזמנות',
+  'map.baseLayer.default': 'מפה',
+  'map.baseLayer.satellite': 'לוויין',
+  'map.baseLayer.switchToSatellite': 'מעבר לתצוגת לוויין',
+  'map.baseLayer.switchToDefault': 'מעבר לתצוגת מפה',
+  'map.location.denied': 'הגישה למיקום חסומה. בדקו את הגדרות המכשיר; לאפליקציה מותקנת יש הרשאת מיקום משלה, נפרדת מהדפדפן.',
+  'map.location.unavailable': 'לא ניתן היה לקבוע את המיקום שלכם.',
+  'map.location.timeout': 'איתור המיקום לקח יותר מדי זמן. נסו שוב עם שמיים פתוחים יותר.',
+  'map.overview.show': 'הצגת כל הטיול',
+  'map.overview.hide': 'הסתרת כל הטיול',
+  'map.overview.total': 'מרחק כולל',
+  'map.attribution': 'קרדיטים למפה',
+  'map.overview.unrouted': 'לא ניתן היה לחשב מסלול ל-{count} קטעים, ולכן המרחקים חלקיים.',
+  'map.overview.dayUnrouted': 'לא ניתן היה לחשב מסלול ל-{count} קטעים ביום זה',
+};
+export default map;
