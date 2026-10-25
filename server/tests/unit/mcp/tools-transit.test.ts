@@ -1,4 +1,5 @@
 import { db as testDb } from '../../../src/db/database';
+import { BudgetItems } from '../../../src/db/entities/BudgetItems.entity';
 import { Days } from '../../../src/db/entities/Days.entity';
 import { Reservations } from '../../../src/db/entities/Reservations.entity';
 import { invalidatePermissionsCache } from '../../../src/nest/permissions/permissions-cache';
@@ -256,7 +257,49 @@ describe('MCP transit tools', () => {
       expect(metadata.transit.walk_seconds).toBe(300);
       expect(metadata.transit.legs[1].line_color).toBe('#E5171F');
       expect(broadcastMock).toHaveBeenCalledWith(trip.id, 'reservation:created', expect.anything());
-      expect(notifyBookingChangeMock).toHaveBeenCalledWith(trip.id, user.id, 'Namba → Umeda', 'transit');
+      expect(notifyBookingChangeMock).toHaveBeenCalledWith(String(trip.id), user.id, 'Namba → Umeda', 'transit');
+    });
+  });
+
+  it('files the fare as a linked expense and mirrors it in the metadata', async () => {
+    const { user } = createUser(testDb);
+    const trip = createTrip(testDb, user.id, { start_date: '2026-12-03', end_date: '2026-12-04' });
+    const day = await dayOf(trip.id, '2026-12-03');
+    await withHarness(user.id, ['reservations:write'], async (harness) => {
+      const result = parseToolResult(
+        await harness.client.callTool({
+          name: 'create_transit_journey',
+          arguments: { tripId: trip.id, dayId: day.id, from, to, itinerary, price: 240 },
+        }),
+      ) as { reservation: { id: number; metadata: string } };
+      const item = await findRow(orm, BudgetItems, { reservation: result.reservation.id });
+      expect(item).toMatchObject({ name: 'Namba → Umeda', category: 'transit', total_price: 240 });
+      expect(JSON.parse(result.reservation.metadata).price).toBe('240');
+      expect(broadcastMock.mock.calls.some((c) => c[1] === 'budget:created')).toBe(true);
+      expect(broadcastMock.mock.calls.some((c) => c[1] === 'reservation:created')).toBe(true);
+    });
+  });
+
+  it('files the fare under the given budget category, and records none for a free journey', async () => {
+    const { user } = createUser(testDb);
+    const trip = createTrip(testDb, user.id, { start_date: '2026-12-03', end_date: '2026-12-04' });
+    const day = await dayOf(trip.id, '2026-12-03');
+    await withHarness(user.id, ['reservations:write'], async (harness) => {
+      const paid = parseToolResult(
+        await harness.client.callTool({
+          name: 'create_transit_journey',
+          arguments: { tripId: trip.id, dayId: day.id, from, to, itinerary, price: 230, budget_category: 'Transport' },
+        }),
+      ) as { reservation: { id: number; metadata: string } };
+      expect((await findRow(orm, BudgetItems, { reservation: paid.reservation.id }))?.category).toBe('Transport');
+
+      const free = parseToolResult(
+        await harness.client.callTool({
+          name: 'create_transit_journey',
+          arguments: { tripId: trip.id, dayId: day.id, from, to, itinerary, price: 0 },
+        }),
+      ) as { reservation: { id: number; metadata: string } };
+      expect(await findRow(orm, BudgetItems, { reservation: free.reservation.id })).toBeNull();
     });
   });
 

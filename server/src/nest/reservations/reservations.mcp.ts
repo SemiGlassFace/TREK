@@ -15,7 +15,7 @@ import { findByIata } from '../airports/airports.data';
 import type { EndpointInput } from './reservations.service';
 import { AssignmentsService } from '../assignments/assignments.service';
 import {
-  idSchema, transportLegInputSchema, reservationUrlSchema, type TransportLegInput,
+  idSchema, transportLegInputSchema, reservationUrlSchema, type TransportLegInput, bookingPriceSchema, bookingBudgetCategorySchema,
   TRANSPORT_RESERVATION_TYPES, MCP_CREATABLE_TRANSPORT_TYPES, LEG_RESERVATION_TYPES, BOOKING_RESERVATION_TYPES,
   RESERVATION_STATUSES, type ReservationStatus,
 } from '@trek/shared';
@@ -366,8 +366,8 @@ export class ReservationsMcp {
       check_in: z.string().max(10).optional().describe('Check-in time (e.g. "15:00", hotel type only)'),
       check_out: z.string().max(10).optional().describe('Check-out time (e.g. "11:00", hotel type only)'),
       assignment_id: idSchema.optional().describe('Link to a day assignment (restaurant, train, car, cruise, event, tour, activity, other)'),
-      price: z.number().nonnegative().optional().describe(PRICE_FIELD),
-      budget_category: z.string().max(100).optional().describe('Budget category for the price entry (defaults to reservation type)'),
+      price: bookingPriceSchema.optional().describe(PRICE_FIELD),
+      budget_category: bookingBudgetCategorySchema.optional().describe('Budget category for the price entry (defaults to reservation type)'),
     },
     annotations: TOOL_ANNOTATIONS_NON_IDEMPOTENT,
     access: { group: 'reservations', mode: 'write' },
@@ -673,8 +673,8 @@ export class ReservationsMcp {
       endpoints: endpointSchema,
       legs: legsSchema,
       needs_review: z.boolean().optional(),
-      price: z.number().nonnegative().optional().describe(PRICE_FIELD),
-      budget_category: z.string().max(100).optional().describe('Budget category for the price entry (defaults to transport type)'),
+      price: bookingPriceSchema.optional().describe(PRICE_FIELD),
+      budget_category: bookingBudgetCategorySchema.optional().describe('Budget category for the price entry (defaults to transport type)'),
     },
     annotations: TOOL_ANNOTATIONS_NON_IDEMPOTENT,
     access: { group: 'reservations', mode: 'write' },

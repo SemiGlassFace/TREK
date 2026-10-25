@@ -230,6 +230,11 @@ export class BudgetMcp {
         .describe(
           'Place on this trip the expense belongs to (the museum ticket for that museum), linking it in the planner',
         ),
+      reservation_id: idSchema
+        .optional()
+        .describe(
+          'Booking or transport on this trip the expense belongs to (a booking can carry several), linking it in the planner',
+        ),
       note: z.string().max(500).optional(),
     },
     annotations: TOOL_ANNOTATIONS_NON_IDEMPOTENT,
@@ -248,6 +253,7 @@ export class BudgetMcp {
       payers,
       expense_date,
       place_id,
+      reservation_id,
       note,
     }: {
       tripId: number;
@@ -260,6 +266,7 @@ export class BudgetMcp {
       payers?: { user_id: number; amount: number }[];
       expense_date?: string | null;
       place_id?: number;
+      reservation_id?: number;
       note?: string;
     },
     ctx: McpContext,
@@ -270,6 +277,8 @@ export class BudgetMcp {
       return errorResult('Pass either members (uneven split) or member_ids (equal split), not both.');
     if (place_id != null && !(await this.placeOnTrip(tripId, place_id)))
       return errorResult('place_id does not belong to this trip.');
+    const linkRefusal = await this.budget.linkRefusal(tripId, { reservation_id });
+    if (linkRefusal) return errorResult(linkRefusal);
     if (members !== undefined) {
       const refusal = await this.splitRefusal(
         tripId,
@@ -293,13 +302,12 @@ export class BudgetMcp {
       payers,
       expense_date,
       place_id,
+      reservation_id,
       note,
     };
-    // Freeze the live FX rate at entry time so a settled position isn't re-opened
-    // when live rates drift (#1445) — same as the REST create path.
-    await this.budget.freezeForeignRate(tripId, itemData);
-    const item = await this.budget.createBudgetItem(tripId, itemData);
-    this.guards.safeBroadcast(tripId, 'budget:created', { item });
+    // The REST create's use case: it freezes the live FX rate at entry time
+    // (#1445), works out a linked booking's price again and sends budget:created.
+    const item = await this.writes.createItem(tripId, itemData, await this.guards.tripWriter(tripId, ctx.userId));
     return ok({ item });
   }
 
@@ -486,6 +494,11 @@ export class BudgetMcp {
         .describe(
           'Place on this trip the expense belongs to (the museum ticket for that museum), linking it in the planner',
         ),
+      reservation_id: idSchema
+        .optional()
+        .describe(
+          'Booking or transport on this trip the expense belongs to (a booking can carry several), linking it in the planner',
+        ),
     },
     annotations: TOOL_ANNOTATIONS_NON_IDEMPOTENT,
     when: budgetAddonOn,
@@ -500,6 +513,7 @@ export class BudgetMcp {
       note,
       userIds,
       place_id,
+      reservation_id,
     }: {
       tripId: number;
       name: string;
@@ -508,6 +522,7 @@ export class BudgetMcp {
       note?: string;
       userIds?: number[];
       place_id?: number;
+      reservation_id?: number;
     },
     ctx: McpContext,
   ) {
@@ -520,7 +535,7 @@ export class BudgetMcp {
     try {
       // The REST create's use case: the trip gate, the place check (#2084) and
       // budget:created alone, since the item it sends already carries its members.
-      const data = { category, name, total_price, note, member_ids: members, place_id };
+      const data = { category, name, total_price, note, member_ids: members, place_id, reservation_id };
       return ok({ item: await this.writes.createItem(tripId, data, writer) });
     } catch (err) {
       if (err instanceof DomainError) throw err;

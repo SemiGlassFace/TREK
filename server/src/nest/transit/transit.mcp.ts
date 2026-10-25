@@ -10,7 +10,7 @@ import {
 import { RateLimitService } from '../common/rate-limit.service';
 import { DaysService } from '../days/days.service';
 import { McpToolGuardsService } from '../mcp-shared/mcp-tool-guards.service';
-import { ReservationsService } from '../reservations/reservations.service';
+import { ReservationWritesService } from '../reservations/reservation-writes.service';
 import { TripAccessService } from '../trip-membership/trip-access.service';
 import {
   buildTransitReservationParts,
@@ -22,7 +22,13 @@ import {
 } from './transit-itinerary.helpers';
 import { SCHEDULED_TRANSIT_MODES, type TransitItinerary } from './transit.helpers';
 import { TransitService } from './transit.service';
-import { adminTransitProviderRequestSchema, idSchema, type TransitProvider } from '@trek/shared';
+import {
+  adminTransitProviderRequestSchema,
+  bookingBudgetCategorySchema,
+  bookingPriceSchema,
+  idSchema,
+  type TransitProvider,
+} from '@trek/shared';
 
 import { z } from 'zod';
 
@@ -66,7 +72,7 @@ export class TransitMcp {
   constructor(
     private readonly transit: TransitService,
     private readonly days: DaysService,
-    private readonly reservations: ReservationsService,
+    private readonly writes: ReservationWritesService,
     // Plan 4 Task 2 — canAccessTrip's own DatabaseService delegation is gone:
     // this injects TripAccessService (trip-membership) (same constructor slot) and
     // calls findAccessible.
@@ -178,7 +184,7 @@ export class TransitMcp {
   @Tool({
     name: 'create_transit_journey',
     description:
-      'Add one itinerary returned by search_transit_routes to a trip day as a first-class automated public-transit journey. Pass the search response provider unchanged so fallback routes retain their source.',
+      'Add one itinerary returned by search_transit_routes to a trip day as a first-class automated public-transit journey. Pass the search response provider unchanged so fallback routes retain their source. Set price to record the fare; it will appear on the journey and in the Budget tab.',
     inputSchema: {
       tripId: idSchema,
       dayId: idSchema.describe('Trip day on which the journey departs'),
@@ -189,6 +195,10 @@ export class TransitMcp {
         .optional()
         .describe('Provider returned by search_transit_routes'),
       notes: z.string().max(1000).optional(),
+      price: bookingPriceSchema.optional().describe('Fare — shown on the journey and linked in the Budget tab'),
+      budget_category: bookingBudgetCategorySchema
+        .optional()
+        .describe('Budget category for the fare entry (defaults to transit)'),
     },
     annotations: TOOL_ANNOTATIONS_OPEN_WORLD_NON_IDEMPOTENT,
     access: { group: 'reservations', mode: 'write' },
@@ -202,6 +212,8 @@ export class TransitMcp {
       itinerary,
       provider,
       notes,
+      price,
+      budget_category,
     }: {
       tripId: number;
       dayId: number;
@@ -212,6 +224,8 @@ export class TransitMcp {
       itinerary: TransitItinerary;
       provider?: TransitProvider;
       notes?: string;
+      price?: number;
+      budget_category?: string;
     },
     ctx: McpContext,
   ) {
@@ -268,21 +282,28 @@ export class TransitMcp {
         isError: true,
       };
     }
-    const { reservation } = await this.reservations.create(tripId, {
-      title: `${from.name} → ${to.name}`,
-      type: 'transit',
-      status: 'confirmed',
-      day_id: dayId,
-      end_day_id: endDay.id,
-      reservation_time: `${departure.local_date}T${departure.local_time}`,
-      reservation_end_time: `${arrival.local_date}T${arrival.local_time}`,
-      notes,
-      metadata,
-      endpoints,
-      needs_review: false,
-    });
-    this.guards.safeBroadcast(tripId, 'reservation:created', { reservation });
-    await this.reservations.notifyBookingChange(tripId, ctx.userId, reservation.title, reservation.type || '');
+    // The fare files the linked expense in the booking's own transaction and
+    // rides along in the metadata, as create_transport's price does.
+    const linkedCost =
+      price != null && price > 0 ? { total_price: price, category: budget_category || 'transit' } : undefined;
+    const { reservation } = await this.writes.createBooking(
+      String(tripId),
+      {
+        title: `${from.name} → ${to.name}`,
+        type: 'transit',
+        status: 'confirmed',
+        day_id: dayId,
+        end_day_id: endDay.id,
+        reservation_time: `${departure.local_date}T${departure.local_time}`,
+        reservation_end_time: `${arrival.local_date}T${arrival.local_time}`,
+        notes,
+        metadata: price != null ? { ...metadata, price: String(price) } : metadata,
+        endpoints,
+        needs_review: false,
+      },
+      linkedCost,
+      await this.guards.tripWriter(tripId, ctx.userId),
+    );
     return ok({ reservation });
   }
 }
