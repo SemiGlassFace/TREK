@@ -273,7 +273,7 @@ describe('MCP transit tools', () => {
         }),
       ) as { reservation: { id: number; metadata: string } };
       const item = await findRow(orm, BudgetItems, { reservation: result.reservation.id });
-      expect(item).toMatchObject({ name: 'Namba → Umeda', category: 'transit', total_price: 240 });
+      expect(item).toMatchObject({ name: 'Namba → Umeda', category: 'transport', total_price: 240 });
       expect(JSON.parse(result.reservation.metadata).price).toBe('240');
       expect(broadcastMock.mock.calls.some((c) => c[1] === 'budget:created')).toBe(true);
       expect(broadcastMock.mock.calls.some((c) => c[1] === 'reservation:created')).toBe(true);

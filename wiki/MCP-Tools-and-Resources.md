@@ -134,7 +134,7 @@ Transit search is powered by the configured transit provider (Transitous by defa
 |---|---|---|
 | `search_transit_stops` | `geo:read` | Search real public-transit stops and stations, optionally biased around coordinates. |
 | `search_transit_routes` | `geo:read` | Search scheduled routes between two coordinates with time, mode, and transfer filters. Also returns `provider` (`transitous` or `google`, the backend that answered) and `dropped`, the number of provider itineraries that failed validation and are absent from the results. |
-| `create_transit_journey` | `reservations:write` | Save a selected route as a first-class automated transit journey on a trip day. Pass `provider` from `search_transit_routes` to preserve the actual source, including fallback results. Older callers that omit it retain the configured-provider behavior. `price` records the fare as an expense linked to the journey (`budget_category`, `transit` by default). |
+| `create_transit_journey` | `reservations:write` | Save a selected route as a first-class automated transit journey on a trip day. Pass `provider` from `search_transit_routes` to preserve the actual source, including fallback results. Older callers that omit it retain the configured-provider behavior. `price` records the fare as an expense linked to the journey (`budget_category`, `transport` by default). |
 
 ### Reservations
 
