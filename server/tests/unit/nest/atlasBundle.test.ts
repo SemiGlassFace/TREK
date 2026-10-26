@@ -27,12 +27,42 @@ describe('Atlas admin0 country bundle (#1609)', () => {
 });
 
 describe('Atlas admin1 region bundle (#1217)', () => {
-  const bundlePath = path.join(__dirname, '..', '..', '..', 'assets', 'atlas', 'admin1.geojson.gz');
-  const features = JSON.parse(zlib.gunzipSync(fs.readFileSync(bundlePath)).toString()).features as {
+  const dir = path.join(__dirname, '..', '..', '..', 'assets', 'atlas', 'admin1');
+  const files = fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith('.geojson.gz'))
+    .map((name) => ({ name, text: zlib.gunzipSync(fs.readFileSync(path.join(dir, name))).toString() }));
+  const features = files.flatMap(({ text }) => JSON.parse(text).features) as {
     properties: { iso_a2: string | null; iso_3166_2: string };
   }[];
 
   const regions = (a2: string) => features.filter((f) => f.properties.iso_a2 === a2);
+
+  // The server joins countries for /regions/geo?countries= by cutting each file's
+  // features out between these two, and a lookup reads the file its name points at.
+  it('ATLAS-BUNDLE-007 — one compact FeatureCollection per country, named by its ISO_A2', () => {
+    expect(files.length).toBeGreaterThan(150);
+    for (const { name, text } of files) {
+      expect(text.startsWith('{"type":"FeatureCollection","features":[{'), name).toBe(true);
+      expect(text.endsWith('}]}'), name).toBe(true);
+      const a2s = new Set(
+        JSON.parse(text).features.map((f: { properties: { iso_a2: string } }) => f.properties.iso_a2),
+      );
+      expect(
+        [...a2s].map((a2) => `${a2}.geojson.gz`),
+        name,
+      ).toEqual([name]);
+    }
+  });
+
+  // admin1.geojson.gz stays for the two shipped migrations that read it; the server reads
+  // the per-country files. Both have to carry the same regions.
+  it('ATLAS-BUNDLE-008 — the per-country files hold exactly the features of admin1.geojson.gz', () => {
+    const bundle = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(dir, '..', 'admin1.geojson.gz'))).toString())
+      .features as unknown[];
+    const key = (f: unknown) => JSON.stringify(f);
+    expect(features.map(key).sort()).toEqual(bundle.map(key).sort());
+  });
 
   it('ATLAS-BUNDLE-001 — previously-broken countries now have distinct region codes', () => {
     for (const a2 of ['ES', 'CN', 'CL', 'OM']) {

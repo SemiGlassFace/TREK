@@ -28,7 +28,6 @@ import {
   getCountryFromCoords,
   getCountryGeoGz,
   getRegionFromCoords,
-  getRegionGeo,
   geocodingInFlight,
   resolveCountryCodeSync,
   resolveRegionFromBundle,
@@ -875,10 +874,6 @@ export class AtlasService {
       region_code: region?.region_code ?? null,
       region_name: region?.region_name ?? null,
     };
-  }
-
-  regionGeo(countries: string[]) {
-    return getRegionGeo(countries);
   }
 
   countryGeoGz(): Buffer | null {

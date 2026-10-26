@@ -11,8 +11,8 @@ import zlib from 'zlib';
 // for the country an index suggestion names. Importing it from atlas tied maps into
 // an import cycle with atlas (lint:boundaries).
 //
-// atlas-geo builds its admin-1 region index on the asset path, the feature splitter
-// and the ring test exported here. The admin0 gz bytes and the country poly/box
+// atlas-geo resolves admin-1 regions with the per-country asset path and the ring test
+// exported here. The admin0 gz bytes and the country poly/box
 // indexes below are file-scoped for the reason atlas-geo gives: their lifetime stays
 // process-global however many callers there are, so the indexes are built once per
 // process, which the #1576 OOM fix depends on.
@@ -20,16 +20,22 @@ import zlib from 'zlib';
 // ── Bundled boundary GeoJSON (admin-0 countries + admin-1 regions) ─────────
 //
 // Sourced from geoBoundaries (CC BY 4.0), normalized + quantized offline by
-// scripts/build-atlas-geo.mjs into gzipped FeatureCollections under server/assets.
-// They are read + decompressed once and cached in memory — no network at runtime.
+// scripts/build-atlas-geo.mjs into gzipped FeatureCollections under server/assets:
+// admin0 as one file, admin1 as one file per country (the whole admin1 bundle ships
+// too, for two migrations that read it). No network at runtime.
 // (Replaces the previous runtime fetch of Natural Earth, which was stale for recent
 // sub-national reforms and depicts some contested borders in unwanted ways.)
 //
 // __dirname is server/dist/utils at runtime and server/src/utils under vitest;
 // both resolve ../../assets to server/assets.
 
-export function assetPath(name: 'admin0' | 'admin1'): string {
+function assetPath(name: 'admin0'): string {
   return path.join(__dirname, '..', '..', 'assets', 'atlas', `${name}.geojson.gz`);
+}
+
+/** One country's admin-1 regions, a FeatureCollection of its own, named by ISO_A2. */
+export function admin1AssetPath(countryCode: string): string {
+  return path.join(__dirname, '..', '..', 'assets', 'atlas', 'admin1', `${countryCode}.geojson.gz`);
 }
 
 let admin0Gz: Buffer | null | undefined;
@@ -46,13 +52,14 @@ export function loadAdmin0Gz(): Buffer | null {
 // Feed arbitrary gunzip chunks; invokes onFeature(text) once per top-level Feature object
 // inside "features":[ … ]. `pending` holds only the unconsumed tail (at most one partial
 // feature + the current chunk), keeping memory flat regardless of bundle size.
-export function createFeatureSplitter(onFeature: (text: string) => void): (chunk: string) => void {
+function createFeatureSplitter(onFeature: (text: string) => void): (chunk: string) => void {
   let pending = '';
   let started = false;
   // Scan progress is carried across chunks so each character is examined exactly once.
   // A large Feature (e.g. Canada, ~5.5MB) spans hundreds of gunzip chunks; re-scanning the
   // accumulated partial from the start on every chunk was O(n²) per feature and pushed the
-  // one-time admin1 build past the 15s test timeout under coverage/CI (#1576-followup).
+  // one-time admin1 build (since replaced by per-country files) past the 15s test timeout
+  // under coverage/CI (#1576-followup).
   let scanning = false; // currently inside a Feature object?
   let depth = 0,
     inStr = false,
