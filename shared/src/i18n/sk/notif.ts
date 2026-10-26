@@ -56,5 +56,12 @@ const notif: TranslationStrings = {
   'notif.generic.text': 'Máte nové oznámenie',
   'notif.dev.unknown_event.title': '[DEV] Neznáma udalosť',
   'notif.dev.unknown_event.text': 'Typ udalosti "{event}" nie je registrovaný v EVENT_NOTIFICATION_CONFIG',
+  'notif.trip_join_request.title': 'Žiadosť o pripojenie',
+  'notif.trip_join_request.text': '{actor} sa chce pripojiť k {trip}',
+  'notif.trip_join_accepted.title': 'Žiadosť prijatá',
+  'notif.trip_join_accepted.text': 'Vaša žiadosť o pripojenie k {trip} bola prijatá',
+  'notif.trip_join_rejected.title': 'Žiadosť zamietnutá',
+  'notif.trip_join_rejected.text': 'Vaša žiadosť o pripojenie k {trip} bola zamietnutá',
+  'notif.action.reject': 'Zamietnuť',
 };
 export default notif;

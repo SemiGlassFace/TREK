@@ -67,7 +67,36 @@ describe('DaysController (parity with the legacy /api/trips/:tripId/days route)'
 
   it('GET / returns the list service result verbatim (the { days } envelope)', async () => {
     const svc = daysSvc({ list: vi.fn().mockResolvedValue({ days: [{ id: 1 }] }) } as Partial<DaysService>);
-    expect(await new DaysController(svc, removalSvc()).list(user, '5')).toEqual({ days: [{ id: 1 }] });
+    expect(await new DaysController(svc, removalSvc()).list(user, '5', { id: 5, user_id: 1, currency: null })).toEqual({
+      days: [{ id: 1 }],
+    });
+  });
+
+  it("GET / hides the owner's day notes and assignment notes from a read-only visitor", async () => {
+    const day = {
+      id: 1,
+      notes: 'secret',
+      notes_items: [{ id: 9 }],
+      assignments: [
+        { id: 2, notes: 'n', participants: [{ user_id: 3 }], place: { id: 7, name: 'Louvre', notes: 'place secret' } },
+      ],
+    };
+    const svc = daysSvc({ list: vi.fn().mockResolvedValue({ days: [day] }) } as Partial<DaysService>);
+    const { days } = (await new DaysController(svc, removalSvc()).list(user, '5', {
+      id: 5,
+      user_id: 1,
+      currency: null,
+      is_viewer: true,
+    })) as {
+      days: { assignments: unknown[] }[];
+    };
+    expect(days[0]).toMatchObject({ id: 1, notes: null, notes_items: [] });
+    expect(days[0].assignments[0]).toMatchObject({
+      id: 2,
+      notes: null,
+      participants: [],
+      place: { id: 7, name: 'Louvre', notes: null },
+    });
   });
 
   it('POST / creates + broadcasts', async () => {

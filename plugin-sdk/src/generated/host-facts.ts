@@ -1116,4 +1116,7 @@ export const CHANNEL_EVENTS: string[] = [
   'collab_message',
   'packing_tagged',
   'plugin_notification',
+  'trip_join_request',
+  'trip_join_accepted',
+  'trip_join_rejected',
 ];

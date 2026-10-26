@@ -650,6 +650,9 @@ const settings: TranslationStrings = {
   'settings.apiKeys.modal.done': 'Valmis',
   'settings.mcp.deprecated': 'Aegunud',
   'settings.offline.cache.dateRange': '{start} kuni {end}',
+  'settings.notifyTripJoinRequest': 'Liitumistaotlused',
+  'settings.notifyTripJoinAccepted': 'Liitumine kinnitatud',
+  'settings.notifyTripJoinRejected': 'Liitumine tagasi lükatud',
 };
 
 export default settings;

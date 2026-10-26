@@ -36,6 +36,9 @@ const NTFY_EVENT_META: Partial<Record<NotifEventType, { priority: 1 | 2 | 3 | 4 
   paddle_region_requested: { priority: 3, tags: ['canoe'] },
   synology_session_cleared: { priority: 3, tags: ['warning'] },
   wanderer_source_hint: { priority: 2, tags: ['hiking_boot'] },
+  trip_join_request: { priority: 4, tags: ['raising_hand'] },
+  trip_join_accepted: { priority: 3, tags: ['white_check_mark'] },
+  trip_join_rejected: { priority: 3, tags: ['no_entry_sign'] },
 };
 const NTFY_DEFAULT_META = { priority: 3 as const, tags: [] as string[] };
 

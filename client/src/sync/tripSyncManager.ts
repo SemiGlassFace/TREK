@@ -87,6 +87,9 @@ export function isDateEligible(trip: Trip): boolean {
 }
 
 function shouldCache(trip: Trip): boolean {
+  // Someone else's public trip is listed, not synced: the offline bundle is members-only
+  // (the server refuses it), and nobody asked to keep a stranger's itinerary on the device.
+  if (trip.is_viewer === 1) return false
   return isTripPinned(trip.id) || isDateEligible(trip)
 }
 

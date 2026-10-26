@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { MOMENT_LABEL, daysUntil, fullDate, getTripStatus, sortTrips, localIsoToday } from './dashboardModel'
+import { MOMENT_LABEL, daysUntil, fullDate, getTripStatus, isReadOnlyTrip, sortTrips, localIsoToday } from './dashboardModel'
 
 /**
  * The dashboard classifies trips against the user's WALL CLOCK — `daysUntil`
@@ -67,5 +67,19 @@ describe('dashboardModel: MOMENT_LABEL', () => {
   it('labels only the two moments of a stay', () => {
     expect(MOMENT_LABEL).toEqual({ checkin: 'day.checkIn', checkout: 'day.checkOut' })
     expect(MOMENT_LABEL.flight).toBeUndefined()
+  })
+})
+
+describe('isReadOnlyTrip', () => {
+  it('is true only for the server\'s viewer flag (1 or true)', () => {
+    expect(isReadOnlyTrip({ is_viewer: 1 })).toBe(true)
+    expect(isReadOnlyTrip({ is_viewer: true })).toBe(true)
+  })
+
+  it('is false for owners and members, a missing flag, and a missing trip', () => {
+    expect(isReadOnlyTrip({ is_viewer: 0 })).toBe(false)
+    expect(isReadOnlyTrip({})).toBe(false)
+    expect(isReadOnlyTrip(null)).toBe(false)
+    expect(isReadOnlyTrip(undefined)).toBe(false)
   })
 })

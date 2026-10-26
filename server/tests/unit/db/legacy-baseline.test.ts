@@ -98,6 +98,8 @@ const UNNUMBERED = [
   'Migration20200101046280_an_assistant_conversation_can_be_about_no_one_trip',
   'Migration20200101046290_a_removed_member_cannot_rejoin_by_invite_link',
   'Migration20200101046300_an_attached_file_stays_with_its_conversation',
+  // The fork's: public trips and their join requests (docs/fork-upgrade.md).
+  'Migration20200101900100_public_trips_with_join_requests',
 ];
 // The last step the positional runner ever had; planLegacyBaseline refuses a
 // schema_version past it.

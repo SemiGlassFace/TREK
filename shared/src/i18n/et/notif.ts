@@ -55,5 +55,12 @@ const notif: TranslationStrings = {
   'notif.generic.text': 'Sul on uus teavitus',
   'notif.dev.unknown_event.title': '[DEV] Tundmatu sündmus',
   'notif.dev.unknown_event.text': 'Sündmuse tüüp "{event}" pole registreeritud loendis EVENT_NOTIFICATION_CONFIG',
+  'notif.trip_join_request.title': 'Liitumistaotlus',
+  'notif.trip_join_request.text': '{actor} soovib liituda reisiga {trip}',
+  'notif.trip_join_accepted.title': 'Taotlus kinnitatud',
+  'notif.trip_join_accepted.text': 'Sinu taotlus liituda reisiga {trip} kinnitati',
+  'notif.trip_join_rejected.title': 'Taotlus tagasi lükatud',
+  'notif.trip_join_rejected.text': 'Sinu taotlus liituda reisiga {trip} lükati tagasi',
+  'notif.action.reject': 'Lükka tagasi',
 };
 export default notif;

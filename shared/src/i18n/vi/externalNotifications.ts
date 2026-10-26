@@ -64,6 +64,18 @@ const en: NotificationLocale = {
       title: 'Có yêu cầu vùng chèo thuyền',
       body: `${p.actor} đang lên kế hoạch chèo thuyền ở ${p.region}. Tải hoặc từ chối dữ liệu nước trong khu quản trị, mục Tiện ích bổ sung.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Yêu cầu tham gia "${p.trip}"`,
+      body: `${p.actor} muốn tham gia chuyến đi "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Yêu cầu tham gia đã được chấp nhận`,
+      body: `Yêu cầu tham gia "${p.trip}" của bạn đã được chấp nhận.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Yêu cầu tham gia đã bị từ chối`,
+      body: `Yêu cầu tham gia "${p.trip}" của bạn đã bị từ chối.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Đã xóa phiên Synology',
       body: 'Tài khoản Synology của bạn hoặc URL đã thay đổi. Bạn đã đăng xuất khỏi Synology Photos.',

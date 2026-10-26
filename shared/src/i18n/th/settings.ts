@@ -630,6 +630,9 @@ const settings: TranslationStrings = {
   'settings.apiKeys.copyFailed': 'ไม่สามารถคัดลอกได้ เลือกข้อความและคัดลอกด้วยตนเอง',
   'settings.mcp.deprecated': 'เลิกใช้แล้ว',
   'settings.offline.cache.dateRange': '{start} ถึง {end}',
+  'settings.notifyTripJoinRequest': 'คำขอเข้าร่วม',
+  'settings.notifyTripJoinAccepted': 'อนุมัติการเข้าร่วม',
+  'settings.notifyTripJoinRejected': 'ปฏิเสธการเข้าร่วม',
 };
 
 export default settings;

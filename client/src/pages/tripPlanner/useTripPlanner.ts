@@ -1,5 +1,6 @@
 import { useTourVisitsSync } from '../../components/Tours/walk/useTourVisitsSync'
 import { useRoadtripSettings } from '../../hooks/useRoadtripSettings'
+import { useTripJoinRequest } from './useTripJoinRequest'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router'
 import { useTripStore } from '../../store/tripStore'
@@ -126,6 +127,7 @@ export function useTripPlanner() {
   const tripActions = useRef(useTripStore.getState()).current
   const can = useCanDo()
   const canUploadFiles = can('file_upload', trip)
+  const tripJoin = useTripJoinRequest(tripId, trip)
   const { pushUndo, undo, forgetDay, forgetPlace, canUndo, lastActionLabel } = usePlannerHistory()
 
   // A step that could not be taken back says so instead of claiming it was.
@@ -745,7 +747,7 @@ export function useTripPlanner() {
     highlightedAlternative, setHighlightedAlternative,
     moveRoadtripStopToDay,
     dropPoiOnRoute,
-    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal,
+    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal, tripJoin,
     showReservationModal, setShowReservationModal, editingReservation, setEditingReservation,
     showBookingImport, setShowBookingImport, bookingImportKind, setBookingImportKind, bookingImportAvailable,
     airTrailAvailable, showAirTrailImport, setShowAirTrailImport,

@@ -1,7 +1,10 @@
+import type { ViewerTripAccess } from '../../db/repositories/TripPublicVisibility.repository';
 import type { User } from '../../types';
 import { CurrentUser } from '../auth-core/current-user.decorator';
 import { JwtAuthGuard } from '../auth-core/jwt-auth.guard';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { redactAccommodationsForViewer } from '../common/viewer-redaction';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
 import { AccommodationCreateDto, AccommodationUpdateDto } from './accommodations.dto';
 import { AccommodationsService, type StayInput } from './accommodations.service';
 import { Body, Controller, Delete, Query, Get, Headers, Param, Post, Put, UseGuards } from '@nestjs/common';
@@ -33,8 +36,10 @@ export class AccommodationsController {
   constructor(private readonly accommodations: AccommodationsService) {}
 
   @Get()
-  async list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return { accommodations: await this.accommodations.list(tripId) };
+  @ViewerReadable()
+  async list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: ViewerTripAccess) {
+    const accommodations = await this.accommodations.list(tripId);
+    return { accommodations: trip.is_viewer ? redactAccommodationsForViewer(accommodations) : accommodations };
   }
 
   @RequirePermission('day_edit')

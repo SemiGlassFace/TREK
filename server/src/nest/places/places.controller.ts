@@ -1,3 +1,4 @@
+import type { ViewerTripAccess } from '../../db/repositories/TripPublicVisibility.repository';
 import type { User } from '../../types';
 import { RuntimeEnvService } from '../app-config/runtime-env.service';
 import { CurrentUser } from '../auth-core/current-user.decorator';
@@ -6,7 +7,9 @@ import { isUpdateConflict } from '../common/conflictResult';
 import { contentDisposition } from '../common/content-disposition';
 import { isDemoWriteBlocked, DEMO_WRITE_ERROR } from '../common/demo-write';
 import { PLACE_IMAGE_FILE_FILTER } from '../common/place-image-upload';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { redactPlacesForViewer } from '../common/viewer-redaction';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
 import { isDirectionsUrl, isGoogleListDataUrl } from '../place-import/place-import.service';
 import { StorageService } from '../storage/storage.service';
 import { placeImageUrl } from './place-image';
@@ -146,14 +149,17 @@ export class PlacesController {
 
   @Get()
   @UseGuards(TripAccessGuard)
+  @ViewerReadable()
   async list(
     @CurrentUser() user: User,
     @Param('tripId') tripId: string,
+    @Trip() trip: ViewerTripAccess,
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('tag') tag?: string,
   ) {
-    return { places: await this.places.list(tripId, { search, category, tag }) };
+    const places = await this.places.list(tripId, { search, category, tag });
+    return { places: trip.is_viewer ? redactPlacesForViewer(places) : places };
   }
 
   @Post()

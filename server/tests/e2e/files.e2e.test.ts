@@ -44,6 +44,8 @@ const { db } = vi.hoisted(() => {
   // TripAccessGuard now reads TripsRepository.findAccessible directly
   // (Plan 3c Task 0b), a real join against trip_members.
   tmp.exec('CREATE TABLE trip_members (trip_id INTEGER NOT NULL, user_id INTEGER NOT NULL);');
+  // The guard asks whether a trip a stranger reached is public before it answers 404.
+  tmp.exec('CREATE TABLE trip_public_visibility (trip_id INTEGER PRIMARY KEY);');
   tmp.exec(`CREATE TABLE trip_files (id INTEGER PRIMARY KEY AUTOINCREMENT, trip_id INTEGER NOT NULL,
     place_id INTEGER, reservation_id INTEGER, message_id INTEGER, filename TEXT NOT NULL,
     original_name TEXT NOT NULL, file_size INTEGER, mime_type TEXT, description TEXT,

@@ -73,12 +73,27 @@ describe('PlacesController (parity with the legacy /api/trips/:tripId/places rou
       await new PlacesController(svc({ list } as Partial<PlacesService>), new RuntimeEnvService(), storageStub).list(
         user,
         '5',
+        { id: 5, user_id: 1, currency: null },
         'beach',
         'cat',
         'tag',
       ),
     ).toEqual({ places: [{ id: 1 }] });
     expect(list).toHaveBeenCalledWith('5', { search: 'beach', category: 'cat', tag: 'tag' });
+  });
+
+  it('GET / blanks place notes for a read-only visitor and leaves the rest', async () => {
+    const list = vi
+      .fn()
+      .mockReturnValue([
+        { id: 1, name: 'Louvre', notes: 'ask for Marie', reservation_notes: 'x', ratings: [{ user_id: 3 }] },
+      ]);
+    const out = await new PlacesController(
+      svc({ list } as Partial<PlacesService>),
+      new RuntimeEnvService(),
+      storageStub,
+    ).list(user, '5', { id: 5, user_id: 1, currency: null, is_viewer: true });
+    expect(out).toEqual({ places: [{ id: 1, name: 'Louvre', notes: null, reservation_notes: null, ratings: [] }] });
   });
 
   describe('POST / (create)', () => {

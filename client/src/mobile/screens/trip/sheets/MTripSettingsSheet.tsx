@@ -2,6 +2,8 @@ import {
   Check,
   Copy,
   Crown,
+  Eye,
+  EyeOff,
   Link2,
   LogOut,
   Pencil,
@@ -12,11 +14,13 @@ import {
   UserMinus,
   UserPlus,
   UserRound,
+  X,
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import CustomSelect from '../../../../components/shared/CustomSelect';
 import { TripJournalLinkSection } from '../../../../components/Trips/TripJournalLinkSection';
 import { TripMemberAvatar } from '../../../../components/Trips/TripMemberAvatar';
+import { useJoinRequests, usePublicTrip } from '../../../../components/Trips/usePublicTrip';
 import {
   SHARE_OPTIONS,
   SHARE_SECTIONS,
@@ -210,6 +214,62 @@ function InviteLinkSection({ tripId }: { tripId: number }) {
           <UserPlus size={14} strokeWidth={2.2} /> {t('trip.invite.create')}
         </button>
       )}
+    </Section>
+  );
+}
+
+/** The owner's switch for making the trip readable, read-only, by every signed-in user. */
+function PublicTripSection({ tripId }: { tripId: number }) {
+  const { t } = useTranslation();
+  const pub = usePublicTrip(tripId);
+  if (pub.isPublic === null) return null;
+  return (
+    <Section
+      title={t('trips.public.title')}
+      hint={pub.isPublic ? t('trips.public.enabled') : t('trips.public.disabled')}
+    >
+      <button
+        type="button"
+        onClick={() => void pub.toggle()}
+        disabled={pub.busy}
+        className={`${PRIMARY} justify-center`}
+      >
+        {pub.isPublic ? <EyeOff size={14} strokeWidth={2.2} /> : <Eye size={14} strokeWidth={2.2} />}{' '}
+        {pub.isPublic ? t('trips.public.makePrivate') : t('trips.public.makePublic')}
+      </button>
+    </Section>
+  );
+}
+
+/** People asking to join a public trip; nothing while there are none. */
+function JoinRequestsSection({ tripId, onAccepted }: { tripId: number; onAccepted: () => void }) {
+  const { t } = useTranslation();
+  const { requests, busyId, decide } = useJoinRequests(tripId, true, onAccepted);
+  if (requests.length === 0) return null;
+  return (
+    <Section title={`${t('trips.joinRequests.title')} (${requests.length})`}>
+      {requests.map((req) => (
+        <PersonRow key={req.id} name={req.username} avatarUrl={null}>
+          <button
+            type="button"
+            onClick={() => void decide(req, true)}
+            disabled={busyId !== null}
+            aria-label={t('trips.joinRequests.accept')}
+            className={ROUND}
+          >
+            <Check size={15} strokeWidth={2.4} />
+          </button>
+          <button
+            type="button"
+            onClick={() => void decide(req, false)}
+            disabled={busyId !== null}
+            aria-label={t('trips.joinRequests.reject')}
+            className={ROUND}
+          >
+            <X size={15} strokeWidth={2.4} />
+          </button>
+        </PersonRow>
+      ))}
     </Section>
   );
 }
@@ -463,8 +523,10 @@ export default function MTripSettingsSheet({
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-[18px] pb-[18px] pt-3">
+          {m.isCurrentOwner && <JoinRequestsSection tripId={tripId} onAccepted={() => void m.reload(true)} />}
           <AccessSection m={m} ask={setQuestion} />
           <GuestsSection m={m} ask={setQuestion} />
+          {m.isCurrentOwner && <PublicTripSection tripId={tripId} />}
           {m.canManageShare && <ShareLinkSection tripId={tripId} />}
           {m.canManageShare && <InviteLinkSection tripId={tripId} />}
           <TripJournalLinkSection tripId={tripId} />

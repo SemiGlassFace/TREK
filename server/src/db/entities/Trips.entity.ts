@@ -35,10 +35,12 @@ import { TripAlbumLinks } from './TripAlbumLinks.entity';
 import { TripDocumentLinks } from './TripDocumentLinks.entity';
 import { TripFiles } from './TripFiles.entity';
 import { TripInviteTokens } from './TripInviteTokens.entity';
+import { TripJoinRequests } from './TripJoinRequests.entity';
 import { TripJournalLinks } from './TripJournalLinks.entity';
 import { TripMemberRemovals } from './TripMemberRemovals.entity';
 import { TripMembers } from './TripMembers.entity';
 import { TripPhotos } from './TripPhotos.entity';
+import { TripPublicVisibility } from './TripPublicVisibility.entity';
 import { Users } from './Users.entity';
 
 export class Trips {
@@ -92,10 +94,12 @@ export class Trips {
   trip_document_links_collection = new Collection<TripDocumentLinks>(this);
   trip_files_collection = new Collection<TripFiles>(this);
   trip_invite_tokens_collection = new Collection<TripInviteTokens>(this);
+  trip_join_requests_collection = new Collection<TripJoinRequests>(this);
   trip_journal_links_collection = new Collection<TripJournalLinks>(this);
   trip_member_removals_collection = new Collection<TripMemberRemovals>(this);
   trip_members_collection = new Collection<TripMembers>(this);
   trip_photos_collection = new Collection<TripPhotos>(this);
+  trip_public_visibility: Ref<TripPublicVisibility> | null = null;
 }
 
 export const TripsSchema = defineEntity({
@@ -158,9 +162,11 @@ export const TripsSchema = defineEntity({
     trip_document_links_collection: () => p.oneToMany(TripDocumentLinks).mappedBy('trip').hidden(),
     trip_files_collection: () => p.oneToMany(TripFiles).mappedBy('trip').hidden(),
     trip_invite_tokens_collection: () => p.oneToMany(TripInviteTokens).mappedBy('trip').hidden(),
+    trip_join_requests_collection: () => p.oneToMany(TripJoinRequests).mappedBy('trip').hidden(),
     trip_journal_links_collection: () => p.oneToMany(TripJournalLinks).mappedBy('trip').hidden(),
     trip_member_removals_collection: () => p.oneToMany(TripMemberRemovals).mappedBy('trip').hidden(),
     trip_members_collection: () => p.oneToMany(TripMembers).mappedBy('trip').hidden(),
     trip_photos_collection: () => p.oneToMany(TripPhotos).mappedBy('trip').hidden(),
+    trip_public_visibility: () => p.oneToOne(TripPublicVisibility).ref().mappedBy('trip').hidden(),
   },
 });

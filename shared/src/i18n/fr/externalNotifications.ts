@@ -71,6 +71,18 @@ const fr: NotificationLocale = {
       title: 'Région de pagaie demandée',
       body: `${p.actor} planifie une sortie en canoë dans ${p.region}. Charge ou refuse ses données d'eau dans l'administration, sous Modules.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Demande d’adhésion pour « ${p.trip} »`,
+      body: `${p.actor} souhaite rejoindre le voyage « ${p.trip} ».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Demande d’adhésion acceptée`,
+      body: `Votre demande pour rejoindre « ${p.trip} » a été acceptée.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Demande d’adhésion refusée`,
+      body: `Votre demande pour rejoindre « ${p.trip} » a été refusée.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Session Synology effacée',
       body: 'Votre compte ou URL Synology a changé. Vous avez été déconnecté de Synology Photos.',

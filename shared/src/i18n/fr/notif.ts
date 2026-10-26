@@ -49,6 +49,13 @@ const notif: TranslationStrings = {
   'notif.action.view': 'Voir',
   'notif.action.accept': 'Accepter',
   'notif.action.decline': 'Refuser',
+  'notif.trip_join_request.title': 'Demande d’adhésion',
+  'notif.trip_join_request.text': '{actor} souhaite rejoindre {trip}',
+  'notif.trip_join_accepted.title': 'Demande acceptée',
+  'notif.trip_join_accepted.text': 'Votre demande pour rejoindre {trip} a été acceptée',
+  'notif.trip_join_rejected.title': 'Demande refusée',
+  'notif.trip_join_rejected.text': 'Votre demande pour rejoindre {trip} a été refusée',
+  'notif.action.reject': 'Refuser',
   'notif.plugin.title': '{title}',
   'notif.plugin.text': '{body}',
   'notif.generic.title': 'Notification', // same-as-en

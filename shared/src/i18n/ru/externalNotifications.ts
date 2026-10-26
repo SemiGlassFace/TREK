@@ -75,6 +75,18 @@ const ru: NotificationLocale = {
       title: 'Запрошен регион для сплава',
       body: `${p.actor} планирует сплав в регионе ${p.region}. Загрузите или отклоните его данные о воде в администрировании в разделе «Дополнения».`,
     }),
+    trip_join_request: (p) => ({
+      title: `Запрос на присоединение к «${p.trip}»`,
+      body: `${p.actor} хочет присоединиться к поездке «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Запрос на присоединение принят`,
+      body: `Ваш запрос на присоединение к «${p.trip}» принят.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Запрос на присоединение отклонён`,
+      body: `Ваш запрос на присоединение к «${p.trip}» отклонён.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Сессия Synology сброшена',
       body: 'Ваш аккаунт или URL Synology изменился. Вы вышли из Synology Photos.',

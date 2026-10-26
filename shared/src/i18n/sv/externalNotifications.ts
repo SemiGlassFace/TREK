@@ -71,6 +71,18 @@ const en: NotificationLocale = {
       title: 'Paddelregion efterfrågad',
       body: `${p.actor} planerar en paddeltur i ${p.region}. Läs in eller avböj dess vattendata i administrationen under Tillägg.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Förfrågan om att gå med i ”${p.trip}”`,
+      body: `${p.actor} vill gå med i resan ”${p.trip}”.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Förfrågan godkänd`,
+      body: `Din förfrågan om att gå med i ”${p.trip}” godkändes.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Förfrågan avslagen`,
+      body: `Din förfrågan om att gå med i ”${p.trip}” avslogs.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology session rensad',
       body: 'Ditt Synology-konto eller din webbadress har ändrats. Du har loggats ut från Synology Photos.',

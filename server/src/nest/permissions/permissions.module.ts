@@ -1,6 +1,8 @@
 import { AppSettings } from '../../db/entities/AppSettings.entity';
+import { TripPublicVisibility } from '../../db/entities/TripPublicVisibility.entity';
 import { PermissionsCacheStore, permissionsCacheSlot, processPermissionsCache } from './permissions-cache';
 import { PermissionsService } from './permissions.service';
+import { PublicTripAccessService } from './public-trip-access.service';
 import { TripAccessGuard } from './trip-access.guard';
 import { TripOwnerGuard } from './trip-owner.guard';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
@@ -15,17 +17,18 @@ import { Module, type OnModuleDestroy } from '@nestjs/common';
  *  PermissionsService's @InjectRepository — the two guards keep DatabaseService's
  *  canAccessTrip (Plan 3c), unaffected by this. */
 @Module({
-  imports: [MikroOrmModule.forFeature([AppSettings])],
+  imports: [MikroOrmModule.forFeature([AppSettings, TripPublicVisibility])],
   // The cache store is the process-wide in-memory one; a shared store replaces
   // it here, and the constructor below hands whichever one the container
   // resolved to the readers outside it (the backup restore's flush).
   providers: [
     PermissionsService,
+    PublicTripAccessService,
     TripAccessGuard,
     TripOwnerGuard,
     { provide: PermissionsCacheStore, useValue: processPermissionsCache },
   ],
-  exports: [PermissionsService, TripAccessGuard, TripOwnerGuard],
+  exports: [PermissionsService, PublicTripAccessService, TripAccessGuard, TripOwnerGuard],
 })
 export class PermissionsModule implements OnModuleDestroy {
   constructor(private readonly cacheStore: PermissionsCacheStore) {

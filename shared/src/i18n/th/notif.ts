@@ -54,5 +54,12 @@ const notif: TranslationStrings = {
   'notif.generic.text': 'คุณมีการแจ้งเตือนใหม่',
   'notif.dev.unknown_event.title': '[DEV] เหตุการณ์ที่ไม่รู้จัก',
   'notif.dev.unknown_event.text': 'ประเภทเหตุการณ์ "{event}" ไม่ได้ลงทะเบียนใน EVENT_NOTIFICATION_CONFIG',
+  'notif.trip_join_request.title': 'คำขอเข้าร่วม',
+  'notif.trip_join_request.text': '{actor} ต้องการเข้าร่วม {trip}',
+  'notif.trip_join_accepted.title': 'อนุมัติคำขอแล้ว',
+  'notif.trip_join_accepted.text': 'คำขอเข้าร่วม {trip} ของคุณได้รับการอนุมัติแล้ว',
+  'notif.trip_join_rejected.title': 'ปฏิเสธคำขอแล้ว',
+  'notif.trip_join_rejected.text': 'คำขอเข้าร่วม {trip} ของคุณถูกปฏิเสธ',
+  'notif.action.reject': 'ปฏิเสธ',
 };
 export default notif;

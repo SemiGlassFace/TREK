@@ -307,7 +307,7 @@ export function useTripMembers({ isOpen, tripId, onClose, onMembersChanged }: {
   const guests = data ? data.members.filter(m => m.is_guest) : []
 
   return {
-    user, loading, realMembers, guests, allUsers, availableUsers,
+    user, loading, realMembers, guests, allUsers, availableUsers, reload: loadMembers,
     isCurrentOwner: !!data && data.owner?.id === user?.id,
     canManageMembers: can('member_manage', trip),
     canManageShare: can('share_manage', trip),

@@ -72,6 +72,18 @@ const et: NotificationLocale = {
       title: 'Aerutamispiirkonda taotleti',
       body: `${p.actor} kavandab aerutamismatka piirkonnas ${p.region}. Laadi või lükka selle veeandmed tagasi halduses jaotises Lisad.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Liitumistaotlus reisile „${p.trip}“`,
+      body: `${p.actor} soovib liituda reisiga „${p.trip}“.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Liitumistaotlus kinnitatud`,
+      body: `Sinu taotlus liituda reisiga „${p.trip}“ kinnitati.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Liitumistaotlus tagasi lükatud`,
+      body: `Sinu taotlus liituda reisiga „${p.trip}“ lükati tagasi.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology seanss tühjendatud',
       body: 'Sinu Synology konto või URL muutus. Sind on Synology Photosist välja logitud.',

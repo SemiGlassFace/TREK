@@ -71,6 +71,18 @@ const az: NotificationLocale = {
       title: 'Avarçəkmə regionu sorğulanıb',
       body: `${p.actor} ${p.region} ərazisində avarçəkmə turu planlaşdırır. Su məlumatını admin bölməsində Əlavələr altında yüklə və ya rədd et.`,
     }),
+    trip_join_request: (p) => ({
+      title: `"${p.trip}" səyahətinə qoşulma sorğusu`,
+      body: `${p.actor} "${p.trip}" səyahətinə qoşulmaq istəyir.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Qoşulma sorğusu qəbul edildi`,
+      body: `"${p.trip}" səyahətinə qoşulma sorğunuz qəbul edildi.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Qoşulma sorğusu rədd edildi`,
+      body: `"${p.trip}" səyahətinə qoşulma sorğunuz rədd edildi.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology sessiyası təmizləndi',
       body: 'Synology hesabınız və ya URL-iniz dəyişib. Synology Photos sessiyanız bağlanıb.',

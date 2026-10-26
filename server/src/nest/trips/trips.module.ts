@@ -21,6 +21,7 @@ import { StorageService } from '../storage/storage.service';
 import { TodoModule } from '../todo/todo.module';
 import { TripMembersModule } from '../trip-members/trip-members.module';
 import { TripMembershipModule } from '../trip-membership/trip-membership.module';
+import { TripPublicModule } from '../trip-public/trip-public.module';
 import { TripReadModelModule } from '../trip-read-model/trip-read-model.module';
 import { UnsplashModule } from '../unsplash/unsplash.module';
 import { VacayModule } from '../vacay/vacay.module';
@@ -70,6 +71,7 @@ import { MulterModule } from '@nestjs/platform-express';
     CalendarModule,
     AccommodationsModule,
     TripMembersModule,
+    TripPublicModule,
     TripReadModelModule,
     SettingsModule,
   ],

@@ -62,6 +62,18 @@ const ja: NotificationLocale = {
       title: 'パドル地域のリクエスト',
       body: `${p.actor}が${p.region}でパドルツアーを計画しています。管理画面のアドオンで水域データを読み込むか却下してください。`,
     }),
+    trip_join_request: (p) => ({
+      title: `「${p.trip}」への参加リクエスト`,
+      body: `${p.actor}さんが旅行「${p.trip}」への参加を希望しています。`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `参加リクエストが承認されました`,
+      body: `「${p.trip}」への参加リクエストが承認されました。`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `参加リクエストが却下されました`,
+      body: `「${p.trip}」への参加リクエストが却下されました。`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synologyセッションがクリアされました',
       body: 'SynologyアカウントまたはURLが変更されました。Synology Photosからログアウトされました。',

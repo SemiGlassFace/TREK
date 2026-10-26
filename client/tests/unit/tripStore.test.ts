@@ -46,6 +46,41 @@ function tripHandlers(
 
 describe('tripStore', () => {
   describe('loadTrip', () => {
+    it('FE-TRIP-PUB-001: a visitor of a public trip loads the itinerary with empty packing and to-do lists', async () => {
+      // Overrides first: the first matching handler wins.
+      server.use(
+        http.get('/api/trips/1', () => HttpResponse.json({ trip: buildTrip({ id: 1, is_viewer: 1 }) })),
+        http.get('/api/trips/1/days', () => HttpResponse.json({ days: [buildDay({ trip_id: 1 })] })),
+        http.get('/api/trips/1/packing', () => HttpResponse.json({ error: 'Read-only access' }, { status: 403 })),
+        http.get('/api/trips/1/todo', () => HttpResponse.json({ error: 'Read-only access' }, { status: 403 })),
+        ...tripHandlers(1, {}),
+      );
+
+      await useTripStore.getState().loadTrip(1);
+
+      const s = useTripStore.getState();
+      expect(s.error).toBeNull();
+      expect(s.days).toHaveLength(1);
+      expect(s.packingItems).toEqual([]);
+      expect(s.todoItems).toEqual([]);
+    });
+
+    it('FE-TRIP-PUB-002: any other failure on packing still fails the load — only "Read-only access" is tolerated', async () => {
+      server.use(
+        http.get('/api/trips/1/packing', () => HttpResponse.json({ error: 'No permission' }, { status: 403 })),
+        ...tripHandlers(1, {}),
+      );
+      await expect(useTripStore.getState().loadTrip(1)).rejects.toBeDefined();
+      expect(useTripStore.getState().error).not.toBeNull();
+
+      resetAllStores();
+      server.use(
+        http.get('/api/trips/1/todo', () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+        ...tripHandlers(1, {}),
+      );
+      await expect(useTripStore.getState().loadTrip(1)).rejects.toBeDefined();
+    });
+
     it('FE-TRIP-001: fires parallel API calls for trips, days, places, packing, todo, tags, categories', async () => {
       const calledUrls: string[] = [];
       server.use(

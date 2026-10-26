@@ -1,4 +1,4 @@
-import { ChevronRight, FileDown, Settings, Settings2, Sparkles } from 'lucide-react'
+import { ChevronRight, FileDown, Settings, Settings2, Sparkles, UserPlus, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import MSheet from '../../../components/MSheet'
 import type { MTripSheetsProps } from '../MTripShell'
@@ -53,13 +53,25 @@ export default function MMehrSheet({ planner, shell }: MTripSheetsProps) {
     shell.setTrTab(id)
   }
 
-  const actions: { id: string; icon: LucideIcon; label: string; go: () => void }[] = [
-    { id: 'members', icon: Settings2, label: t('trip.settings.title'), go: () => shell.openSheet('members') },
-    { id: 'export', icon: FileDown, label: t('mobileTrip.export'), go: () => shell.openSheet('export') },
-    ...(canEditTrip
-      ? [{ id: 'tripedit', icon: Settings, label: t('dashboard.editTrip'), go: () => shell.openSheet('tripedit') }]
-      : []),
-  ]
+  // A visitor of someone else's public trip has no roster to manage and no calendar
+  // feed to export (both are members-only on the server): their one action is asking
+  // the owner to add them, or taking that request back.
+  const join = planner.tripJoin
+  const pending = join.joinStatus === 'pending'
+  const actions: { id: string; icon: LucideIcon; label: string; go: () => void }[] = join.readOnly
+    ? [{
+        id: 'join',
+        icon: pending ? X : UserPlus,
+        label: pending ? t('trips.joinRequests.cancel') : t('trips.joinRequests.request'),
+        go: () => { shell.closeSheet(); void (pending ? join.cancelJoin() : join.requestJoin()) },
+      }]
+    : [
+        { id: 'members', icon: Settings2, label: t('trip.settings.title'), go: () => shell.openSheet('members') },
+        { id: 'export', icon: FileDown, label: t('mobileTrip.export'), go: () => shell.openSheet('export') },
+        ...(canEditTrip
+          ? [{ id: 'tripedit', icon: Settings, label: t('dashboard.editTrip'), go: () => shell.openSheet('tripedit') }]
+          : []),
+      ]
 
   return (
     <MSheet open={open} onClose={shell.closeSheet} variant="bottom" dimTransparent ariaLabel={t('mobileTrip.more')}>

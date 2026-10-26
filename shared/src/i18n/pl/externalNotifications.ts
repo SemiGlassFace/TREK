@@ -94,6 +94,18 @@ const pl: NotificationLocale = {
             : `„${p.tour}” w „${p.trip}” mógł się zmienić w wanderer. Otwórz trasę i sprawdź jej źródło. W podróży nic nie zmienia się samo.`,
     }),
     plugin_notification: (p) => ({ title: p.title ?? '', body: p.body ?? '' }),
+    trip_join_request: (p) => ({
+      title: `Prośba o dołączenie do "${p.trip}"`,
+      body: `${p.actor} chce dołączyć do podróży "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Prośba o dołączenie zaakceptowana`,
+      body: `Twoja prośba o dołączenie do "${p.trip}" została zaakceptowana.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Prośba o dołączenie odrzucona`,
+      body: `Twoja prośba o dołączenie do "${p.trip}" została odrzucona.`,
+    }),
   },
   passwordReset: {
     subject: 'Zresetuj hasło',

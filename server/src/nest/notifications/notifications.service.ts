@@ -7,7 +7,7 @@ import { UnitOfWork } from '../database/unit-of-work';
 import { RealtimeService } from '../realtime/realtime.service';
 import { getChannel, listChannels } from './channel-registry';
 import { registerBuiltinChannels } from './channels/builtins';
-import { getAction } from './in-app-actions';
+import { getAction, registerAction } from './in-app-actions';
 import { getEventText } from './mailer/email-html';
 import { MailerService } from './mailer/mailer.service';
 import {
@@ -266,6 +266,27 @@ const EVENT_NOTIFICATION_CONFIG: Record<string, EventNotifConfig> = {
     textKey: 'notifications.synologySessionCleared.text',
     navigateTarget: () => null,
   },
+  // Public trips: the owner is asked (boolean, with accept/reject callbacks supplied
+  // by the sender), the requester is told the outcome.
+  trip_join_request: {
+    inAppType: 'simple',
+    titleKey: 'notif.trip_join_request.title',
+    textKey: 'notif.trip_join_request.text',
+    navigateTarget: (p) => (p.tripId ? `/trips/${p.tripId}` : null),
+  },
+  trip_join_accepted: {
+    inAppType: 'navigate',
+    titleKey: 'notif.trip_join_accepted.title',
+    textKey: 'notif.trip_join_accepted.text',
+    navigateTextKey: 'notif.action.view_trip',
+    navigateTarget: (p) => (p.tripId ? `/trips/${p.tripId}` : null),
+  },
+  trip_join_rejected: {
+    inAppType: 'simple',
+    titleKey: 'notif.trip_join_rejected.title',
+    textKey: 'notif.trip_join_rejected.text',
+    navigateTarget: () => null,
+  },
 };
 
 // ── Fallback config for unknown event types ────────────────────────────────
@@ -380,6 +401,11 @@ export class NotificationsService {
     // registering from here means every path that can dispatch has the
     // built-ins. registerChannel is an idempotent Map.set.
     registerBuiltinChannels({ mailer, webhook, ntfy, push });
+  }
+
+  /** Lets a domain answer the buttons of its own boolean notifications. */
+  registerAction(action: string, handler: Parameters<typeof registerAction>[1]): void {
+    registerAction(action, handler);
   }
 
   async getPreferences(userId: number, role: string): Promise<PreferencesMatrix> {

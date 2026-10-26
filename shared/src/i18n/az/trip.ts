@@ -153,6 +153,20 @@ const trip: TranslationStrings = {
   'trip.journal.linked': 'Gündəlik bağlandı',
   'trip.journal.membersSaved': 'Giriş yadda saxlanıldı',
   'trip.journal.unlinked': 'Gündəlik ayrıldı',
+  'trips.public.label': 'Açıq səyahət',
+  'trips.public.title': 'Açıq səyahət',
+  'trips.public.enabled': 'Hər kəs bu səyahəti kəşf edib görə bilər. Qoşulmaq üçün sorğu göndərə bilər.',
+  'trips.public.disabled': 'Bu səyahəti yalnız dəvət olunmuş üzvlər görə bilər.',
+  'trips.public.makePublic': 'Açıq et',
+  'trips.public.makePrivate': 'Gizli et',
+  'trips.joinRequests.request': 'Qoşulmaq üçün sorğu göndər',
+  'trips.joinRequests.pending': 'Gözləyir',
+  'trips.joinRequests.sent': 'Qoşulma sorğusu göndərildi',
+  'trips.joinRequests.cancelled': 'Sorğu ləğv edildi',
+  'trips.joinRequests.cancel': 'Qoşulma sorğusunu ləğv et',
+  'trips.joinRequests.accept': 'Qəbul et',
+  'trips.joinRequests.reject': 'Rədd et',
+  'trips.joinRequests.title': 'Qoşulma sorğuları',
 };
 
 export default trip;

@@ -77,6 +77,18 @@ const cs: NotificationLocale = {
       title: 'Vyžádán vodácký region',
       body: `${p.actor} plánuje vodáckou trasu v regionu ${p.region}. Načti nebo zamítni jeho vodní data v administraci v části Doplňky.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Žádost o připojení k „${p.trip}“`,
+      body: `${p.actor} se chce připojit k výletu „${p.trip}“.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Žádost o připojení přijata`,
+      body: `Vaše žádost o připojení k „${p.trip}“ byla přijata.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Žádost o připojení zamítnuta`,
+      body: `Vaše žádost o připojení k „${p.trip}“ byla zamítnuta.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Relace Synology byla zrušena',
       body: 'Váš účet nebo URL Synology se změnil. Byli jste odhlášeni ze Synology Photos.',

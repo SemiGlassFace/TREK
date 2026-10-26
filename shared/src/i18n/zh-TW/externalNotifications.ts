@@ -65,6 +65,18 @@ const zhTW: NotificationLocale = {
       title: '划槳區域申請',
       body: `${p.actor} 正在 ${p.region} 規劃划槳行程。請在管理後台的附加元件中載入或拒絕其水域資料。`,
     }),
+    trip_join_request: (p) => ({
+      title: `加入「${p.trip}」的請求`,
+      body: `${p.actor}想加入行程「${p.trip}」。`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `加入請求已通過`,
+      body: `你加入「${p.trip}」的請求已通過。`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `加入請求已被拒絕`,
+      body: `你加入「${p.trip}」的請求已被拒絕。`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology 工作階段已清除',
       body: '您的 Synology 帳戶或 URL 已變更，您已登出 Synology Photos。',

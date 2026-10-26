@@ -9,6 +9,7 @@ import { AddRowButton, INPUT, LABEL, PANEL } from '../shared/dialogParts'
 import { LinkedJournalIcon } from './LinkedJournalIcon'
 import { TripJournalLinkSection } from './TripJournalLinkSection'
 import { TripMemberAvatar } from './TripMemberAvatar'
+import { JoinRequestsList, PublicTripCard } from './TripPublicSections'
 import { useTripJournalSectionVisible } from './useTripJournalLink'
 import { SHARE_OPTIONS, SHARE_SECTIONS, useShareLink, useTripInviteLink, useTripMembers, type TripMembersState } from './useTripShare'
 
@@ -61,7 +62,7 @@ function OpenDialog({ onClose, tripId, tripTitle, onMembersChanged }: TripShareD
   const [ask, setAsk] = useState<Ask | null>(null)
   const [area, setArea] = useState<Area>('people')
   const journalSection = useTripJournalSectionVisible(tripId)
-  const areas = AREAS.filter(a => a.id === 'people' || (a.id === 'sharing' ? m.canManageShare : journalSection))
+  const areas = AREAS.filter(a => a.id === 'people' || (a.id === 'sharing' ? m.canManageShare || m.isCurrentOwner : journalSection))
   const current = areas.find(a => a.id === area) ?? areas[0]
   const panelOf = (id: Area) => areas.find(a => a.id === id)
   const persons = `${m.realMembers.length} ${t('members.persons', { count: m.realMembers.length })}`
@@ -96,13 +97,15 @@ function OpenDialog({ onClose, tripId, tripTitle, onMembersChanged }: TripShareD
           {/* Every area stays mounted, so its links and lists are loaded by the time it is picked. */}
           <AreaPanel area={panelOf('people')} shown={current.id === 'people'} titled={areas.length > 1}>
             {m.canManageMembers && <InviteUser m={m} />}
+            {m.isCurrentOwner && <JoinRequestsList tripId={tripId} onAccepted={() => void m.reload(true)} />}
             <MembersList m={m} onAsk={setAsk} />
             {(m.isCurrentOwner || m.guests.length > 0) && <GuestsList m={m} onAsk={setAsk} />}
           </AreaPanel>
-          {m.canManageShare && (
+          {(m.canManageShare || m.isCurrentOwner) && (
             <AreaPanel area={panelOf('sharing')} shown={current.id === 'sharing'} titled>
-              <PublicLink tripId={tripId} />
-              <InviteLink tripId={tripId} />
+              {m.isCurrentOwner && <PublicTripCard tripId={tripId} />}
+              {m.canManageShare && <PublicLink tripId={tripId} />}
+              {m.canManageShare && <InviteLink tripId={tripId} />}
             </AreaPanel>
           )}
           {journalSection && (

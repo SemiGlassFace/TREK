@@ -205,6 +205,7 @@ function dialogState(): HookState {
     showTripForm: false,
     setShowTripForm: vi.fn(),
     showMembersModal: false,
+    tripJoin: { readOnly: false, joinStatus: null, joinBusy: false, requestJoin: vi.fn(), cancelJoin: vi.fn() },
     setShowMembersModal: vi.fn(),
     showReservationModal: false,
     setShowReservationModal: vi.fn(),

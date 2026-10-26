@@ -83,7 +83,9 @@ function authorization(
     getHandler: () => controller.prototype[handler],
     getClass: () => controller,
   } as unknown as ExecutionContext;
-  const em = { getRepository: vi.fn(() => ({ findAccessible: access })) } as unknown as EntityManager;
+  const em = {
+    getRepository: vi.fn(() => ({ findAccessible: access, findPublicTrip: vi.fn(async () => undefined) })),
+  } as unknown as EntityManager;
   const guard = new TripAccessGuard(
     em,
     { checkPermission: permission } as unknown as PermissionsService,

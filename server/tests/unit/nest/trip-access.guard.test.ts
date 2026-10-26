@@ -7,12 +7,15 @@
  * no business knowing), and a mutation additionally needs its own permission. They
  * moved out of days.controller.test.ts with the check itself.
  */
+import { TripPublicVisibility } from '../../../src/db/entities/TripPublicVisibility.entity';
 import type { PermissionsService } from '../../../src/nest/permissions/permissions.service';
 import {
   RequirePermission,
   TRIP_PERMISSION_KEY,
   TRIP_REQUEST_KEY,
+  TRIP_VIEWER_READABLE_KEY,
   TripAccessGuard,
+  ViewerReadable,
 } from '../../../src/nest/permissions/trip-access.guard';
 import { Trip } from '../../../src/nest/permissions/trip.decorator';
 import type { User } from '../../../src/types';
@@ -28,6 +31,8 @@ const owner = { id: 42, role: 'user' } as User;
 const member = { id: 7, role: 'user' } as User;
 /** Trip 5 belongs to user 42; user 7 is a member of it. Nothing else is reachable. */
 const TRIP = { id: 5, user_id: 42 };
+/** Trip 6 is public (its owner is user 42): everyone may look, nobody but 42 and 7 may touch. */
+const PUBLIC_TRIP = { id: 6, user_id: 42, currency: null, is_viewer: true };
 
 /**
  * Plan 3c Task 0b: the guard now injects `EntityManager` and resolves
@@ -36,7 +41,9 @@ const TRIP = { id: 5, user_id: 42 };
  * `EntityManager` whose `getRepository(Trips)` returns a `findAccessible`
  * stand-in, not a `DatabaseService` stand-in.
  */
-function makeGuard(options: { checkPermission?: ReturnType<typeof vi.fn>; action?: string } = {}) {
+function makeGuard(
+  options: { checkPermission?: ReturnType<typeof vi.fn>; action?: string; viewerReadable?: boolean } = {},
+) {
   // async, not a bare sync return: `TripAccessGuard.canActivate` awaits this
   // call, and a synchronous double would not catch a dropped `await` there
   // (a missing `await` on a genuinely async repository call leaves `trip` as
@@ -45,11 +52,21 @@ function makeGuard(options: { checkPermission?: ReturnType<typeof vi.fn>; action
   const findAccessible = vi.fn(async (tripId: number, userId: number) =>
     tripId === 5 && (userId === 42 || userId === 7) ? TRIP : undefined,
   );
-  const em = { getRepository: vi.fn(() => ({ findAccessible })) } as unknown as EntityManager;
+  const findPublicTrip = vi.fn(async (tripId: number) => (tripId === 6 ? PUBLIC_TRIP : undefined));
+  const em = {
+    getRepository: vi.fn((entity: unknown) =>
+      entity === TripPublicVisibility ? { findPublicTrip } : { findAccessible },
+    ),
+  } as unknown as EntityManager;
   const checkPermission = options.checkPermission ?? vi.fn(() => true);
-  const reflector = { getAllAndOverride: vi.fn(() => options.action) } as unknown as Reflector;
+  // Keyed, because the guard reads two pieces of metadata.
+  const reflector = {
+    getAllAndOverride: vi.fn((key: string) =>
+      key === TRIP_VIEWER_READABLE_KEY ? options.viewerReadable : options.action,
+    ),
+  } as unknown as Reflector;
   const guard = new TripAccessGuard(em, { checkPermission } as unknown as PermissionsService, reflector);
-  return { guard, canAccessTrip: findAccessible, checkPermission, reflector };
+  return { guard, canAccessTrip: findAccessible, findPublicTrip, checkPermission, reflector };
 }
 
 /** The slice of ExecutionContext the guard reads. */
@@ -174,6 +191,61 @@ describe('TripAccessGuard', () => {
       handler() {}
     }
     expect(Reflect.getMetadata(TRIP_PERMISSION_KEY, Probe.prototype.handler)).toBe('budget_edit');
+  });
+});
+
+describe('TripAccessGuard — public trips (read-only visitors)', () => {
+  const visitor = { id: 99, role: 'user' } as User;
+  const get = (tripId: string, user: User = visitor) =>
+    ({ user, method: 'GET', params: { tripId } }) as Record<string, unknown>;
+
+  it('TRIPGUARD-020 a visitor reads a @ViewerReadable GET and the row is flagged is_viewer', async () => {
+    const { guard } = makeGuard({ viewerReadable: true });
+    const request = get('6');
+    expect(await guard.canActivate(ctx(request))).toBe(true);
+    expect(request[TRIP_REQUEST_KEY]).toEqual(PUBLIC_TRIP);
+  });
+
+  it('TRIPGUARD-021 a GET that did not opt in is 403 "Read-only access" — the allowlist is the default', async () => {
+    const { guard } = makeGuard({ viewerReadable: false });
+    expect(await thrown(() => guard.canActivate(ctx(get('6'))))).toEqual({
+      status: 403,
+      body: { error: 'Read-only access' },
+    });
+  });
+
+  it('TRIPGUARD-022 a write is refused even on a handler marked readable', async () => {
+    const { guard, checkPermission } = makeGuard({ viewerReadable: true, action: 'day_edit' });
+    const answers = await Promise.all(
+      ['POST', 'PUT', 'PATCH', 'DELETE'].map((method) => thrown(() => guard.canActivate(ctx({ ...get('6'), method })))),
+    );
+    for (const answer of answers) expect(answer).toEqual({ status: 403, body: { error: 'Read-only access' } });
+    // The visitor never reaches the permission matrix, so no setting can lower the bar for them.
+    expect(checkPermission).not.toHaveBeenCalled();
+  });
+
+  it('TRIPGUARD-023 a trip that is not public stays an existence-hiding 404 for the same visitor', async () => {
+    const { guard } = makeGuard({ viewerReadable: true });
+    expect(await thrown(() => guard.canActivate(ctx(get('5'))))).toEqual({
+      status: 404,
+      body: { error: 'Trip not found' },
+    });
+  });
+
+  it('TRIPGUARD-024 a member is a member, not a visitor: the public lookup is never asked', async () => {
+    const { guard, findPublicTrip } = makeGuard({ viewerReadable: true });
+    const request = get('5', member);
+    expect(await guard.canActivate(ctx(request))).toBe(true);
+    expect(request[TRIP_REQUEST_KEY]).toBe(TRIP);
+    expect(findPublicTrip).not.toHaveBeenCalled();
+  });
+
+  it('TRIPGUARD-025 @ViewerReadable writes the metadata the guard reads', () => {
+    class Probe {
+      @ViewerReadable()
+      handler() {}
+    }
+    expect(Reflect.getMetadata(TRIP_VIEWER_READABLE_KEY, Probe.prototype.handler)).toBe(true);
   });
 });
 

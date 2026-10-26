@@ -62,6 +62,18 @@ const ko: NotificationLocale = {
       title: '패들 지역 요청',
       body: `${p.actor}님이 ${p.region}에서 패들 투어를 계획하고 있습니다. 관리 화면의 애드온에서 수역 데이터를 불러오거나 거절하세요.`,
     }),
+    trip_join_request: (p) => ({
+      title: `"${p.trip}" 참여 요청`,
+      body: `${p.actor}님이 여행 "${p.trip}"에 참여하려고 합니다.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `참여 요청이 수락되었습니다`,
+      body: `"${p.trip}" 참여 요청이 수락되었습니다.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `참여 요청이 거절되었습니다`,
+      body: `"${p.trip}" 참여 요청이 거절되었습니다.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology 세션이 초기화되었습니다',
       body: 'Synology 계정 또는 URL이 변경되었습니다. Synology Photos에서 로그아웃되었습니다.',

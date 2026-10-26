@@ -71,6 +71,18 @@ const nl: NotificationLocale = {
       title: 'Peddelregio aangevraagd',
       body: `${p.actor} plant een peddeltocht in ${p.region}. Laad of wijs de watergegevens af in het beheer onder Add-ons.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Deelnameverzoek voor “${p.trip}”`,
+      body: `${p.actor} wil meedoen aan de reis “${p.trip}”.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Deelnameverzoek geaccepteerd`,
+      body: `Je verzoek om mee te doen aan “${p.trip}” is geaccepteerd.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Deelnameverzoek afgewezen`,
+      body: `Je verzoek om mee te doen aan “${p.trip}” is afgewezen.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology-sessie gewist',
       body: 'Je Synology-account of URL is gewijzigd. Je bent uitgelogd bij Synology Photos.',

@@ -1,7 +1,10 @@
+import type { ViewerTripAccess } from '../../db/repositories/TripPublicVisibility.repository';
 import type { User } from '../../types';
 import { CurrentUser } from '../auth-core/current-user.decorator';
 import { JwtAuthGuard } from '../auth-core/jwt-auth.guard';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { redactDaysForViewer } from '../common/viewer-redaction';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
 import { DayRemovalService, DayDeleteError, type DayRemoval } from './day-removal.service';
 import { DayCreateDto, DayReorderDto, DayTransportDto, DayUpdateDto } from './days.dto';
 import { DaysService, DayReorderError, DayAppendError, type DatedDayAppend } from './days.service';
@@ -28,8 +31,10 @@ export class DaysController {
   ) {}
 
   @Get()
-  async list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return await this.days.list(tripId);
+  @ViewerReadable()
+  async list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: ViewerTripAccess) {
+    const result = await this.days.list(tripId);
+    return trip.is_viewer ? redactDaysForViewer(result) : result;
   }
 
   @RequirePermission('day_edit')

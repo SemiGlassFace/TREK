@@ -55,5 +55,12 @@ const notif: TranslationStrings = {
   'notif.generic.text': 'Yeni bildirişiniz var',
   'notif.dev.unknown_event.title': '[DEV] Naməlum hadisə',
   'notif.dev.unknown_event.text': '"{event}" hadisə növü EVENT_NOTIFICATION_CONFIG daxilində qeydiyyatdan keçməyib',
+  'notif.trip_join_request.title': 'Qoşulma sorğusu',
+  'notif.trip_join_request.text': '{actor} {trip} səyahətinə qoşulmaq istəyir',
+  'notif.trip_join_accepted.title': 'Sorğu qəbul edildi',
+  'notif.trip_join_accepted.text': '{trip} səyahətinə qoşulma sorğunuz qəbul edildi',
+  'notif.trip_join_rejected.title': 'Sorğu rədd edildi',
+  'notif.trip_join_rejected.text': '{trip} səyahətinə qoşulma sorğunuz rədd edildi',
+  'notif.action.reject': 'Rədd et',
 };
 export default notif;

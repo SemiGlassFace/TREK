@@ -71,6 +71,18 @@ const hu: NotificationLocale = {
       title: 'Evezős régiót kértek',
       body: `${p.actor} evezős túrát tervez itt: ${p.region}. Töltsd be vagy utasítsd el a vízadatait az adminfelületen a Bővítmények alatt.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Csatlakozási kérelem: „${p.trip}”`,
+      body: `${p.actor} csatlakozni szeretne a(z) „${p.trip}” utazáshoz.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Csatlakozási kérelem elfogadva`,
+      body: `A(z) „${p.trip}” utazáshoz való csatlakozási kérelmedet elfogadták.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Csatlakozási kérelem elutasítva`,
+      body: `A(z) „${p.trip}” utazáshoz való csatlakozási kérelmedet elutasították.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology munkamenet törölve',
       body: 'A Synology fiókja vagy URL-je megváltozott. Kijelentkeztek a Synology Photos-ból.',

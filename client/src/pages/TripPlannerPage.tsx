@@ -26,7 +26,6 @@ import ErrorBoundary from '../components/shared/ErrorBoundary'
 import { getDayBookendHotels } from '../utils/dayOrder'
 import { dayWeatherAnchor } from '../utils/dayWeather'
 import TripWarningsBanner from '../components/Planner/TripWarningsBanner'
-import Navbar from '../components/Layout/Navbar'
 import HelpAnchor from '../components/Help/HelpAnchor'
 import { getHelpContext } from '../help/registry'
 import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react'
@@ -34,6 +33,7 @@ import ConfirmDialog from '../components/shared/ConfirmDialog'
 import { Tooltip } from '../components/shared/Tooltip'
 import type { Reservation } from '../types'
 import { useTripPlannerPage } from './tripPlanner/useTripPlannerPage'
+import { TripPlannerNavbar } from './tripPlanner/TripPlannerNavbar'
 import { useBookingExpenseEditor } from './tripPlanner/useBookingExpenseEditor'
 import { applyTripCoverUpdate } from './tripPlanner/tripCover'
 import { latestReservation } from './tripPlanner/transportEditorOpeners'
@@ -92,7 +92,7 @@ function TripPlannerPageDesktop(): React.ReactElement | null {
     highlightedAlternative, setHighlightedAlternative,
     moveRoadtripStopToDay,
     dropPoiOnRoute,
-    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal,
+    showTripForm, setShowTripForm, showMembersModal, setShowMembersModal, tripJoin,
     showReservationModal, setShowReservationModal, editingReservation, setEditingReservation,
     showBookingImport, setShowBookingImport, bookingImportKind, setBookingImportKind, bookingImportAvailable,
     airTrailAvailable, showAirTrailImport, setShowAirTrailImport,
@@ -233,7 +233,7 @@ function TripPlannerPageDesktop(): React.ReactElement | null {
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', ...fontStyle }}>
       <HelpAnchor id={helpId} />
-      <Navbar tripTitle={trip.title} tripId={tripId} showBack onBack={() => navigate('/dashboard')} onSettings={() => setShowMembersModal(true)} />
+      <TripPlannerNavbar trip={trip} tripId={tripId} tripJoin={tripJoin} onBack={() => navigate('/dashboard')} onSettings={() => setShowMembersModal(true)} />
 
       <div className="bg-surface-elevated border-b border-edge-faint" style={{
         position: 'fixed', top: 'var(--nav-h)', insetInline: 0, zIndex: 40,

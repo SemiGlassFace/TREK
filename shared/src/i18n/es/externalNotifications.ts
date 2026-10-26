@@ -71,6 +71,18 @@ const es: NotificationLocale = {
       title: 'Región de kayak pedida',
       body: `${p.actor} está planificando una ruta en kayak en ${p.region}. Carga o rechaza sus datos de agua en la administración, en Complementos.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Solicitud de unión a «${p.trip}»`,
+      body: `${p.actor} quiere unirse al viaje «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Solicitud de unión aceptada`,
+      body: `Tu solicitud para unirte a «${p.trip}» fue aceptada.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Solicitud de unión rechazada`,
+      body: `Tu solicitud para unirte a «${p.trip}» fue rechazada.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Sesión de Synology cerrada',
       body: 'Tu cuenta o URL de Synology ha cambiado. Has cerrado sesión en Synology Photos.',

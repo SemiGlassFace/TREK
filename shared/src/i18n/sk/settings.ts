@@ -659,6 +659,9 @@ const settings: TranslationStrings = {
   'settings.apiKeys.modal.done': 'Hotovo',
   'settings.mcp.deprecated': 'Zastarané',
   'settings.offline.cache.dateRange': '{start} až {end}',
+  'settings.notifyTripJoinRequest': 'Žiadosti o pripojenie',
+  'settings.notifyTripJoinAccepted': 'Pripojenie prijaté',
+  'settings.notifyTripJoinRejected': 'Pripojenie zamietnuté',
 };
 
 export default settings;

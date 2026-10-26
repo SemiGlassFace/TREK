@@ -67,6 +67,18 @@ const ca: NotificationLocale = {
       title: 'Regió de caiac demanada',
       body: `${p.actor} planifica una ruta en caiac a ${p.region}. Carrega o rebutja les seves dades d'aigua a l'administració, a Complements.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Sol·licitud d’unió a «${p.trip}»`,
+      body: `${p.actor} vol unir-se al viatge «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Sol·licitud d’unió acceptada`,
+      body: `La teva sol·licitud per unir-te a «${p.trip}» s’ha acceptat.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Sol·licitud d’unió rebutjada`,
+      body: `La teva sol·licitud per unir-te a «${p.trip}» s’ha rebutjat.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Sessió de Synology tancada',
       body: 'El teu compte o URL de Synology ha canviat. Has tancat la sessió a Synology Photos.',

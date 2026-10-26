@@ -97,6 +97,9 @@ const settings: TranslationStrings = {
   'settings.notifications': 'Notifications', // same-as-en
   'settings.notifyTripInvite': 'Invitations de voyage',
   'settings.notifyBookingChange': 'Modifications de réservation',
+  'settings.notifyTripJoinRequest': 'Demandes d’adhésion',
+  'settings.notifyTripJoinAccepted': 'Adhésion acceptée',
+  'settings.notifyTripJoinRejected': 'Adhésion refusée',
   'settings.notifyTripReminder': 'Rappels de voyage',
   'settings.notifyTodoDue': 'Tâche à échéance',
   'settings.notifyVacayInvite': 'Invitations de fusion Vacay',

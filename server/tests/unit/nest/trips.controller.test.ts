@@ -3,6 +3,7 @@ import type { AuditService } from '../../../src/nest/audit/audit.service';
 import type { CalendarService } from '../../../src/nest/calendar/calendar.service';
 import { DomainError } from '../../../src/nest/common/domain-error';
 import type { TripWriter } from '../../../src/nest/common/trip-writer';
+import type { TripPublicService } from '../../../src/nest/trip-public/trip-public.service';
 import type { TripReadModelService } from '../../../src/nest/trip-read-model/trip-read-model.service';
 import type { TripListWriter, TripWritesService } from '../../../src/nest/trips/trip-writes.service';
 import { TripsController, MAX_COVER_SIZE, TRIP_COVER_FILE_FILTER } from '../../../src/nest/trips/trips.controller';
@@ -77,6 +78,7 @@ const tc = (
   calendar?: Partial<CalendarService>,
   readModel?: Partial<TripReadModelService>,
   writes = writesFor(s),
+  publicTrips: Partial<TripPublicService> = {},
 ) =>
   new TripsController(
     s,
@@ -87,6 +89,7 @@ const tc = (
     (readModel ?? {}) as TripReadModelService,
     storageStub,
     writes as unknown as TripWritesService,
+    publicTrips as TripPublicService,
   );
 
 function svc(o: Partial<TripsService> = {}): TripsService {
@@ -122,18 +125,20 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('TripsController (parity with the legacy /api/trips route)', async () => {
   it('GET / lists for the user with the archived flag', async () => {
-    const list = vi.fn().mockReturnValue([{ id: 1 }]);
-    expect(await tc(svc({ list } as Partial<TripsService>)).list(user, '1')).toEqual({ trips: [{ id: 1 }] });
-    expect(list).toHaveBeenCalledWith(1, 1);
+    const listTrips = vi.fn().mockReturnValue([{ id: 1 }]);
+    expect(
+      await tc(svc(), undefined, undefined, undefined, { listTrips } as Partial<TripPublicService>).list(user, '1'),
+    ).toEqual({ trips: [{ id: 1 }] });
+    expect(listTrips).toHaveBeenCalledWith(1, 1);
   });
 
   it('GET / defaults the archived flag to 0 when not "1"', async () => {
-    const list = vi.fn().mockReturnValue([]);
-    const c = tc(svc({ list } as Partial<TripsService>));
+    const listTrips = vi.fn().mockReturnValue([]);
+    const c = tc(svc(), undefined, undefined, undefined, { listTrips } as Partial<TripPublicService>);
     await c.list(user, undefined);
-    expect(list).toHaveBeenLastCalledWith(1, 0);
+    expect(listTrips).toHaveBeenLastCalledWith(1, 0);
     await c.list(user, '0');
-    expect(list).toHaveBeenLastCalledWith(1, 0);
+    expect(listTrips).toHaveBeenLastCalledWith(1, 0);
   });
 
   describe('GET /active (startup destination)', () => {
@@ -334,14 +339,18 @@ describe('TripsController (parity with the legacy /api/trips route)', async () =
   it('GET /:id 404 when missing', async () => {
     expect(
       await thrownAsync(() =>
-        tc(svc({ get: vi.fn().mockReturnValue(undefined) } as Partial<TripsService>)).get(user, '9'),
+        tc(svc(), undefined, undefined, undefined, {
+          getTrip: vi.fn().mockReturnValue(undefined),
+        } as Partial<TripPublicService>).get(user, '9'),
       ),
     ).toEqual({ status: 404, body: { error: 'Trip not found' } });
   });
 
   it('GET /:id returns the trip when present', async () => {
-    const s = svc({ get: vi.fn().mockReturnValue({ id: 9 }) } as Partial<TripsService>);
-    expect(await tc(s).get(user, '9')).toEqual({ trip: { id: 9 } });
+    const c = tc(svc(), undefined, undefined, undefined, {
+      getTrip: vi.fn().mockReturnValue({ id: 9 }),
+    } as Partial<TripPublicService>);
+    expect(await c.get(user, '9')).toEqual({ trip: { id: 9 } });
   });
 
   describe('PUT /:id', () => {

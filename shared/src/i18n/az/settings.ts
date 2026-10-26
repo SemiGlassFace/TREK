@@ -709,6 +709,9 @@ const settings: TranslationStrings = {
   'settings.apiKeys.modal.done': 'Hazır',
   'settings.mcp.deprecated': 'Köhnəlmiş',
   'settings.offline.cache.dateRange': '{start} tarixindən {end} tarixinədək',
+  'settings.notifyTripJoinRequest': 'Qoşulma sorğuları',
+  'settings.notifyTripJoinAccepted': 'Qoşulma qəbul edildi',
+  'settings.notifyTripJoinRejected': 'Qoşulma rədd edildi',
 };
 
 export default settings;

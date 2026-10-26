@@ -43,7 +43,10 @@ export type NotifEventType =
   | 'paddle_region_requested'
   | 'synology_session_cleared'
   | 'wanderer_source_hint'
-  | 'plugin_notification';
+  | 'plugin_notification'
+  | 'trip_join_request'
+  | 'trip_join_accepted'
+  | 'trip_join_rejected';
 
 /** Every event, in the order the preferences UI lists them. */
 export const ALL_EVENT_TYPES: NotifEventType[] = [
@@ -63,6 +66,9 @@ export const ALL_EVENT_TYPES: NotifEventType[] = [
   'synology_session_cleared',
   'wanderer_source_hint',
   'plugin_notification',
+  'trip_join_request',
+  'trip_join_accepted',
+  'trip_join_rejected',
 ];
 
 /** Events that target admins only (shown in admin panel, not in user settings). */

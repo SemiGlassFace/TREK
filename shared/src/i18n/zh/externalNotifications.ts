@@ -65,6 +65,18 @@ const zh: NotificationLocale = {
       title: '划桨区域申请',
       body: `${p.actor} 正在 ${p.region} 规划划桨行程。请在管理后台的附加组件中加载或拒绝其水域数据。`,
     }),
+    trip_join_request: (p) => ({
+      title: `加入“${p.trip}”的请求`,
+      body: `${p.actor}想加入行程“${p.trip}”。`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `加入请求已通过`,
+      body: `你加入“${p.trip}”的请求已通过。`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `加入请求已被拒绝`,
+      body: `你加入“${p.trip}”的请求已被拒绝。`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology 会话已清除',
       body: '您的 Synology 账户或 URL 已更改，您已退出 Synology Photos。',

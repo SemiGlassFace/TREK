@@ -74,6 +74,18 @@ const br: NotificationLocale = {
       title: 'Região de remo pedida',
       body: `${p.actor} está planejando um passeio de remo em ${p.region}. Carregue ou recuse os dados de água na administração, em Complementos.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Goulenn stagañ ouzh « ${p.trip} »`,
+      body: `${p.actor} a fell dezhi stagañ ouzh ar beaj « ${p.trip} ».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Goulenn stagañ degemeret`,
+      body: `Degemeret eo bet ho koulenn evit stagañ ouzh « ${p.trip} ».`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Goulenn stagañ nac’het`,
+      body: `Nac’het eo bet ho koulenn evit stagañ ouzh « ${p.trip} ».`,
+    }),
     synology_session_cleared: () => ({
       title: 'Sessão Synology encerrada',
       body: 'Sua conta ou URL do Synology foi alterada. Você foi desconectado do Synology Photos.',

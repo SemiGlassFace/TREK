@@ -376,7 +376,7 @@ export class TripsRepository extends TrekRepository<Trips> {
    * through, per `WebauthnChallengesRepository.claimChallenge`'s docstring
    * (entity-metadata inference is not what a hand-written statement wants).
    */
-  private tripSelectQuery(user_id: number) {
+  tripSelectQuery(user_id: number) {
     return this.kysely<TripSelectKyselyDB>()
       .selectFrom('trips as t')
       .innerJoin('users as u', 'u.id', 't.user_id')

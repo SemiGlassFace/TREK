@@ -57,6 +57,11 @@ export const tripSchema = z.object({
   is_owner: z.number().optional(),
   owner_username: z.string().optional(),
   shared_count: z.number().optional(),
+  // public trips (list/get only): 1 when the caller is a read-only visitor rather
+  // than the owner or a member; the owner's publish flag; the caller's own request.
+  is_viewer: z.union([z.literal(0), z.literal(1)]).optional(),
+  is_public: z.union([z.boolean(), z.number()]).optional(),
+  join_request_status: z.string().nullable().optional(),
 });
 export type Trip = z.infer<typeof tripSchema>;
 
@@ -126,6 +131,34 @@ export const tripCopyRequestSchema = z.object({
   title: z.string().optional(),
 });
 export type TripCopyRequest = z.infer<typeof tripCopyRequestSchema>;
+
+// Publish or unpublish a trip (owner only).
+export const tripVisibilityRequestSchema = z.object({
+  is_public: z.boolean(),
+});
+export type TripVisibilityRequest = z.infer<typeof tripVisibilityRequestSchema>;
+
+export const tripVisibilityResponseSchema = z.object({
+  is_public: z.boolean(),
+  // Only the read answers who owns the trip; the write echoes the new state.
+  is_owner: z.boolean().optional(),
+});
+
+// The caller's own join request on a public trip; null when there is none to act on.
+export const tripJoinRequestStatusResponseSchema = z.object({ status: z.string().nullable() });
+export const tripJoinRequestSubmitResponseSchema = z.object({ status: z.literal('pending') });
+
+export const tripJoinRequestSchema = z.object({
+  id: z.number(),
+  trip_id: z.number(),
+  user_id: z.number(),
+  status: z.string(),
+  created_at: z.string().nullable(),
+  username: z.string(),
+});
+export const tripJoinRequestListResponseSchema = z.object({ requests: z.array(tripJoinRequestSchema) });
+export const tripJoinRequestDecisionResponseSchema = z.object({ success: z.literal(true), user_id: z.number() });
+export const tripJoinRequestCancelResponseSchema = z.object({ success: z.literal(true) });
 
 export const tripAddMemberRequestSchema = z.object({
   identifier: z.string(),

@@ -152,14 +152,15 @@ describe('getPreferencesMatrix', () => {
     expect(event_types).not.toContain('version_available');
     // +1 for plugin_notification: users can mute host-mediated plugin notifications.
     // +1 for wanderer_source_hint: the hints of the user's own wanderer watch (WAN-02).
-    expect(event_types.length).toBe(13);
+    // +3 for the fork's trip_join_request, trip_join_accepted and trip_join_rejected.
+    expect(event_types.length).toBe(16);
   });
 
   it('NPREF-005 — user scope excludes version_available for everyone including admins', async () => {
     const { user } = createAdmin(testDb);
     const { event_types } = await getPreferencesMatrix(user.id, 'admin', 'user');
     expect(event_types).not.toContain('version_available');
-    expect(event_types.length).toBe(13);
+    expect(event_types.length).toBe(16);
   });
 
   it('NPREF-005b — admin scope returns the admin-scoped events', async () => {

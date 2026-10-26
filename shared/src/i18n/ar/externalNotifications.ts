@@ -86,6 +86,18 @@ const ar: NotificationLocale = {
       title: 'طلب منطقة تجديف',
       body: `${p.actor} يخطط لرحلة تجديف في ${p.region}. حمّل بياناتها المائية أو ارفضها في لوحة الإدارة ضمن الإضافات.`,
     }),
+    trip_join_request: (p) => ({
+      title: `طلب انضمام إلى «${p.trip}»`,
+      body: `${p.actor} يريد الانضمام إلى الرحلة «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `تم قبول طلب الانضمام`,
+      body: `تم قبول طلبك للانضمام إلى «${p.trip}».`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `تم رفض طلب الانضمام`,
+      body: `تم رفض طلبك للانضمام إلى «${p.trip}».`,
+    }),
     synology_session_cleared: () => ({
       title: 'تمت إعادة تعيين جلسة Synology',
       body: 'تغيّر حسابك أو رابط Synology. تم تسجيل خروجك من Synology Photos.',

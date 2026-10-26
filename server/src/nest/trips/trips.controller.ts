@@ -9,6 +9,7 @@ import { CalendarService } from '../calendar/calendar.service';
 import { contentDisposition } from '../common/content-disposition';
 import { isDemoWriteBlocked, DEMO_WRITE_ERROR } from '../common/demo-write';
 import { StorageService } from '../storage/storage.service';
+import { TripPublicService } from '../trip-public/trip-public.service';
 import { TripReadModelService } from '../trip-read-model/trip-read-model.service';
 import { UnsplashService } from '../unsplash/unsplash.service';
 import { TripWritesService } from './trip-writes.service';
@@ -84,11 +85,12 @@ export class TripsController {
     private readonly readModel: TripReadModelService,
     private readonly storage: StorageService,
     private readonly tripWrites: TripWritesService,
+    private readonly publicTrips: TripPublicService,
   ) {}
 
   @Get()
   async list(@CurrentUser() user: User, @Query('archived') archived?: string) {
-    return { trips: await this.trips.list(user.id, archived === '1' ? 1 : 0) };
+    return { trips: await this.publicTrips.listTrips(user.id, archived === '1' ? 1 : 0) };
   }
 
   /**
@@ -161,7 +163,7 @@ export class TripsController {
 
   @Get(':id')
   async get(@CurrentUser() user: User, @Param('id') id: string) {
-    const trip = await this.trips.get(id, user.id);
+    const trip = await this.publicTrips.getTrip(id, user.id);
     if (!trip) {
       throw new HttpException({ error: 'Trip not found' }, 404);
     }

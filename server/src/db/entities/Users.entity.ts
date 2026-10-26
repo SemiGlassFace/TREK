@@ -70,11 +70,13 @@ import { TripAlbumLinks } from './TripAlbumLinks.entity';
 import { TripDocumentLinks } from './TripDocumentLinks.entity';
 import { TripFiles } from './TripFiles.entity';
 import { TripInviteTokens } from './TripInviteTokens.entity';
+import { TripJoinRequests } from './TripJoinRequests.entity';
 import { TripJournalLinkMembers } from './TripJournalLinkMembers.entity';
 import { TripJournalLinks } from './TripJournalLinks.entity';
 import { TripMemberRemovals } from './TripMemberRemovals.entity';
 import { TripMembers } from './TripMembers.entity';
 import { TripPhotos } from './TripPhotos.entity';
+import { TripPublicVisibility } from './TripPublicVisibility.entity';
 import { Trips } from './Trips.entity';
 import { UserNoticeDismissals } from './UserNoticeDismissals.entity';
 import { UserSessions } from './UserSessions.entity';
@@ -211,12 +213,14 @@ export class Users {
   trip_document_links_collection = new Collection<TripDocumentLinks>(this);
   trip_files_collection = new Collection<TripFiles>(this);
   trip_invite_tokens_collection = new Collection<TripInviteTokens>(this);
+  trip_join_requests_collection = new Collection<TripJoinRequests>(this);
   trip_journal_link_members_collection = new Collection<TripJournalLinkMembers>(this);
   trip_journal_links_collection = new Collection<TripJournalLinks>(this);
   trip_member_removals_collection = new Collection<TripMemberRemovals>(this);
   trip_members_collection = new Collection<TripMembers>(this);
   trip_members_collection1 = new Collection<TripMembers>(this);
   trip_photos_collection = new Collection<TripPhotos>(this);
+  trip_public_visibility_collection = new Collection<TripPublicVisibility>(this);
   trips_collection = new Collection<Trips>(this);
   user_notice_dismissals_collection = new Collection<UserNoticeDismissals>(this);
   user_sessions_collection = new Collection<UserSessions>(this);
@@ -370,12 +374,14 @@ export const UsersSchema = defineEntity({
     trip_document_links_collection: () => p.oneToMany(TripDocumentLinks).mappedBy('createdByRef').hidden(),
     trip_files_collection: () => p.oneToMany(TripFiles).mappedBy('uploadedByRef').hidden(),
     trip_invite_tokens_collection: () => p.oneToMany(TripInviteTokens).mappedBy('createdByRef').hidden(),
+    trip_join_requests_collection: () => p.oneToMany(TripJoinRequests).mappedBy('user').hidden(),
     trip_journal_link_members_collection: () => p.oneToMany(TripJournalLinkMembers).mappedBy('user').hidden(),
     trip_journal_links_collection: () => p.oneToMany(TripJournalLinks).mappedBy('linkedByRef').hidden(),
     trip_member_removals_collection: () => p.oneToMany(TripMemberRemovals).mappedBy('user').hidden(),
     trip_members_collection: () => p.oneToMany(TripMembers).mappedBy('user').hidden(),
     trip_members_collection1: () => p.oneToMany(TripMembers).mappedBy('invitedByRef').hidden(),
     trip_photos_collection: () => p.oneToMany(TripPhotos).mappedBy('user').hidden(),
+    trip_public_visibility_collection: () => p.oneToMany(TripPublicVisibility).mappedBy('enabledByRef').hidden(),
     trips_collection: () => p.oneToMany(Trips).mappedBy('user').hidden(),
     user_notice_dismissals_collection: () => p.oneToMany(UserNoticeDismissals).mappedBy('user').hidden(),
     user_sessions_collection: () => p.oneToMany(UserSessions).mappedBy('user').hidden(),

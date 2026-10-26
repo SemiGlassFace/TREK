@@ -64,6 +64,18 @@ const th: NotificationLocale = {
       title: 'มีคำขอภูมิภาคพายเรือ',
       body: `${p.actor} กำลังวางแผนทริปพายเรือใน ${p.region} โหลดหรือปฏิเสธข้อมูลแหล่งน้ำได้ในส่วนผู้ดูแลที่ส่วนเสริม`,
     }),
+    trip_join_request: (p) => ({
+      title: `คำขอเข้าร่วม "${p.trip}"`,
+      body: `${p.actor} ต้องการเข้าร่วมทริป "${p.trip}"`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `อนุมัติคำขอเข้าร่วมแล้ว`,
+      body: `คำขอเข้าร่วม "${p.trip}" ของคุณได้รับการอนุมัติแล้ว`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `ปฏิเสธคำขอเข้าร่วมแล้ว`,
+      body: `คำขอเข้าร่วม "${p.trip}" ของคุณถูกปฏิเสธ`,
+    }),
     synology_session_cleared: () => ({
       title: 'ล้างเซสชัน Synology แล้ว',
       body: 'บัญชีหรือ URL ของ Synology เปลี่ยนแปลง คุณจึงออกจากระบบ Synology Photos แล้ว',

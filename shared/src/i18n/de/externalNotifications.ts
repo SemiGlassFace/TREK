@@ -71,6 +71,18 @@ const de: NotificationLocale = {
       title: 'Paddel-Region angefragt',
       body: `${p.actor} plant eine Paddeltour in ${p.region}. Im Admin-Bereich unter Addons kannst du die Gewässerdaten laden oder ablehnen.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Beitrittsanfrage für „${p.trip}“`,
+      body: `${p.actor} möchte der Reise „${p.trip}“ beitreten.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Beitrittsanfrage angenommen`,
+      body: `Deine Anfrage, „${p.trip}“ beizutreten, wurde angenommen.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Beitrittsanfrage abgelehnt`,
+      body: `Deine Anfrage, „${p.trip}“ beizutreten, wurde abgelehnt.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology-Sitzung beendet',
       body: 'Dein Synology-Konto oder die URL hat sich geändert. Du wurdest von Synology Photos abgemeldet.',

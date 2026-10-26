@@ -1,7 +1,10 @@
+import type { ViewerTripAccess } from '../../db/repositories/TripPublicVisibility.repository';
 import type { User } from '../../types';
 import { CurrentUser } from '../auth-core/current-user.decorator';
 import { JwtAuthGuard } from '../auth-core/jwt-auth.guard';
-import { RequirePermission, TripAccessGuard } from '../permissions/trip-access.guard';
+import { redactReservationsForViewer } from '../common/viewer-redaction';
+import { RequirePermission, TripAccessGuard, ViewerReadable } from '../permissions/trip-access.guard';
+import { Trip } from '../permissions/trip.decorator';
 import { ReservationWritesService } from './reservation-writes.service';
 import {
   ReservationCreateDto,
@@ -43,8 +46,10 @@ export class ReservationsController {
   ) {}
 
   @Get()
-  async list(@CurrentUser() user: User, @Param('tripId') tripId: string) {
-    return { reservations: await this.reservations.list(tripId) };
+  @ViewerReadable()
+  async list(@CurrentUser() user: User, @Param('tripId') tripId: string, @Trip() trip: ViewerTripAccess) {
+    const reservations = await this.reservations.list(tripId);
+    return { reservations: trip.is_viewer ? redactReservationsForViewer(reservations) : reservations };
   }
 
   @RequirePermission('reservation_edit')

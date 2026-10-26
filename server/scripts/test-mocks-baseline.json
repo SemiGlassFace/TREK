@@ -76,6 +76,7 @@
     "tests/integration/doc-sync-webhook-request-context.test.ts": 1,
     "tests/integration/feeds-request-context.test.ts": 1,
     "tests/integration/files.test.ts": 1,
+    "tests/integration/fork-upgrade-v244.test.ts": 1,
     "tests/integration/help.test.ts": 1,
     "tests/integration/immich.test.ts": 1,
     "tests/integration/journey-place-order.test.ts": 1,

@@ -75,6 +75,18 @@ const uk: NotificationLocale = {
       title: 'Запитано регіон для сплаву',
       body: `${p.actor} планує сплав у регіоні ${p.region}. Завантажте або відхиліть його дані про воду в адмініструванні в розділі «Доповнення».`,
     }),
+    trip_join_request: (p) => ({
+      title: `Запит на приєднання до «${p.trip}»`,
+      body: `${p.actor} хоче приєднатися до подорожі «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Запит на приєднання прийнято`,
+      body: `Ваш запит на приєднання до «${p.trip}» прийнято.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Запит на приєднання відхилено`,
+      body: `Ваш запит на приєднання до «${p.trip}» відхилено.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Сеанс Synology скинуто',
       body: 'Ваш обліковий запис або URL Synology змінився. Ви вийшли з Synology Photos.',

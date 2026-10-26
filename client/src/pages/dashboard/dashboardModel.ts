@@ -40,6 +40,13 @@ export function upcomingKey(r: UpcomingReservation): string {
 
 /** The label a stay's moment carries in place of a location. */
 export const MOMENT_LABEL: Record<string, string> = { checkin: 'day.checkIn', checkout: 'day.checkOut' }
+/**
+ * A public trip someone else owns: readable, not editable. The server flags it
+ * `is_viewer` on the list/get payloads; owners and members always get 0.
+ */
+export function isReadOnlyTrip(trip: { is_viewer?: unknown } | null | undefined): boolean {
+  return trip?.is_viewer === 1 || trip?.is_viewer === true
+}
 
 export const MS_PER_DAY = 86400000
 

@@ -74,6 +74,18 @@ const tr: NotificationLocale = {
       title: 'Kürek bölgesi istendi',
       body: `${p.actor}, ${p.region} bölgesinde kürek turu planlıyor. Su verisini yönetim alanında Eklentiler altında yükle ya da reddet.`,
     }),
+    trip_join_request: (p) => ({
+      title: `“${p.trip}” için katılma isteği`,
+      body: `${p.actor}, “${p.trip}” gezisine katılmak istiyor.`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Katılma isteği kabul edildi`,
+      body: `“${p.trip}” gezisine katılma isteğiniz kabul edildi.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Katılma isteği reddedildi`,
+      body: `“${p.trip}” gezisine katılma isteğiniz reddedildi.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Synology oturumu temizlendi',
       body: 'Synology hesabınız veya URL değişti. Synology Photos oturumunuz kapatıldı.',

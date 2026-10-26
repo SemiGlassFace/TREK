@@ -62,6 +62,18 @@ const id: NotificationLocale = {
       title: 'Wilayah dayung diminta',
       body: `${p.actor} merencanakan tur dayung di ${p.region}. Muat atau tolak data airnya di area admin pada Add-on.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Permintaan bergabung ke "${p.trip}"`,
+      body: `${p.actor} ingin bergabung dengan perjalanan "${p.trip}".`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Permintaan bergabung diterima`,
+      body: `Permintaan Anda untuk bergabung dengan "${p.trip}" diterima.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Permintaan bergabung ditolak`,
+      body: `Permintaan Anda untuk bergabung dengan "${p.trip}" ditolak.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Sesi Synology dihapus',
       body: 'Akun atau URL Synology Anda berubah. Anda telah keluar dari Synology Photos.',

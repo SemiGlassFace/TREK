@@ -68,6 +68,18 @@ const it: NotificationLocale = {
       title: 'Regione canoa richiesta',
       body: `${p.actor} sta pianificando un giro in canoa in ${p.region}. Carica o rifiuta i suoi dati sull'acqua nell'area amministrazione, sotto Componenti.`,
     }),
+    trip_join_request: (p) => ({
+      title: `Richiesta di partecipazione a «${p.trip}»`,
+      body: `${p.actor} vuole unirsi al viaggio «${p.trip}».`,
+    }),
+    trip_join_accepted: (p) => ({
+      title: `Richiesta di partecipazione accettata`,
+      body: `La tua richiesta di unirti a «${p.trip}» è stata accettata.`,
+    }),
+    trip_join_rejected: (p) => ({
+      title: `Richiesta di partecipazione rifiutata`,
+      body: `La tua richiesta di unirti a «${p.trip}» è stata rifiutata.`,
+    }),
     synology_session_cleared: () => ({
       title: 'Sessione Synology rimossa',
       body: 'Il tuo account o URL Synology è cambiato. Sei stato disconnesso da Synology Photos.',
