@@ -373,7 +373,7 @@ async function pool(items, worker) {
 // visible effect at the atlas' zoom range (3-10). ADM0 fills are viewed zoomed out, so
 // they tolerate a coarser grid than ADM1 region borders.
 const ADM0_DECIMALS = 2; // ~1.1 km
-const ADM1_DECIMALS = 3; // ~110 m
+const ADM1_DECIMALS = 3; // ~110 m; the server's region cache packs ×1000 (REGION_SCALE in atlas-geo.ts), raise both
 
 function quantizeRing(ring, decimals) {
   const m = 10 ** decimals;

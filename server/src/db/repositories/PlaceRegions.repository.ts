@@ -101,7 +101,9 @@ export class PlaceRegionsRepository extends TrekRepository<PlaceRegions> {
   /**
    * AT49 (`repairStaleRegionCache`'s read, #2527) — `SELECT pr.place_id AS id, pr.country_code,
    * pr.region_code, p.lat, p.lng, p.address FROM place_regions pr JOIN places p
-   * ON p.id = pr.place_id ORDER BY pr.place_id`.
+   * ON p.id = pr.place_id ORDER BY pr.country_code, pr.place_id`. By country first, so the
+   * pass resolves one country's places after another and its region cache, which keeps only
+   * so many countries, parses each country once.
    */
   async listWithPlaceLocation(): Promise<
     {
@@ -117,6 +119,7 @@ export class PlaceRegionsRepository extends TrekRepository<PlaceRegions> {
       .selectFrom('place_regions as pr')
       .innerJoin('places as p', 'p.id', 'pr.place_id')
       .select(['pr.place_id as id', 'pr.country_code', 'pr.region_code', 'p.lat', 'p.lng', 'p.address'])
+      .orderBy('pr.country_code')
       .orderBy('pr.place_id')
       .execute();
   }

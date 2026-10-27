@@ -8,9 +8,8 @@ import {
   getCountryFromCoords,
   isPointInCountryBox,
   loadAdmin0Gz,
-  pointInGeometry,
-  type Box,
-  type CompactGeom,
+  pointInPackedGeometry,
+  type PackedGeom,
 } from '../../utils/country-borders';
 import { cacheKeyFor, getCached, nominatimFetch, setCached } from '../geo/nominatim.client';
 
@@ -389,25 +388,38 @@ export async function reverseGeocodeCountry(lat: number, lng: number): Promise<s
 
 // ── Region geometry, for the ring test in utils/country-borders.ts ──────────
 
-// Flatten a GeoJSON Polygon/MultiPolygon into the same compact form the country index uses,
-// plus one bounding box per part (a part-box, like buildCountryIndexes builds, so an
-// archipelago-style region — Illes Balears, Canarias, … — gets one tight box per island
-// group rather than one box spanning the whole span between them). Used to resolve admin1
-// regions against the bundle, which are parsed per country on demand rather than held whole.
-function compactGeomFromGeometry(geometry: { type: string; coordinates: unknown }): { geom: CompactGeom; boxes: Box[] } {
+// The admin-1 bundle is quantized to ADM1_DECIMALS = 3 (scripts/build-atlas-geo.mjs), so
+// every coordinate is a whole number of thousandths and fits an Int32 exactly
+// (ATLAS-BUNDLE-009 guards it). Raise this with ADM1_DECIMALS.
+const REGION_SCALE = 1000;
+
+// Pack a GeoJSON Polygon/MultiPolygon at REGION_SCALE, plus one bounding box per part (a
+// part-box, like buildCountryIndexes builds, so an archipelago-style region — Illes Balears,
+// Canarias, … — gets one tight box per island group rather than one box spanning the whole
+// span between them), packed four values per part the same way.
+function packRegionGeometry(geometry: { type: string; coordinates: unknown }): { geom: PackedGeom; boxes: Int32Array } {
   const parts = (geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates) as number[][][][];
-  const rings: Float64Array[] = [];
-  const polyRingCounts: number[] = [];
-  const boxes: Box[] = [];
+  let points = 0;
+  let ringCount = 0;
   for (const part of parts) {
-    polyRingCounts.push(part.length);
+    ringCount += part.length;
+    for (const ring of part) points += ring.length;
+  }
+  const coords = new Int32Array(points * 2);
+  const ringStarts = new Uint32Array(ringCount + 1);
+  const polyRingCounts = new Uint32Array(parts.length);
+  const boxes = new Int32Array(parts.length * 4);
+  let p = 0;
+  let ri = 0;
+  for (const [k, part] of parts.entries()) {
+    polyRingCounts[k] = part.length;
     for (const ring of part) {
-      const flat = new Float64Array(ring.length * 2);
-      for (let i = 0; i < ring.length; i++) {
-        flat[2 * i] = ring[i][0];
-        flat[2 * i + 1] = ring[i][1];
+      ringStarts[ri++] = p;
+      for (const [lng, lat] of ring) {
+        coords[2 * p] = Math.round(lng * REGION_SCALE);
+        coords[2 * p + 1] = Math.round(lat * REGION_SCALE);
+        p++;
       }
-      rings.push(flat);
     }
     let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
     for (const [lng, lat] of part[0]) {
@@ -416,9 +428,10 @@ function compactGeomFromGeometry(geometry: { type: string; coordinates: unknown 
       if (lat < minLat) minLat = lat;
       if (lat > maxLat) maxLat = lat;
     }
-    boxes.push([minLng, minLat, maxLng, maxLat]);
+    boxes.set([minLng, minLat, maxLng, maxLat].map((v) => Math.round(v * REGION_SCALE)), 4 * k);
   }
-  return { geom: { rings, polyRingCounts }, boxes };
+  ringStarts[ri] = p;
+  return { geom: { coords, ringStarts, polyRingCounts }, boxes };
 }
 
 /**
@@ -518,32 +531,57 @@ const regionCache = new Map<string, RegionInfo | null>();
 // stored region_code/region_name are then guaranteed to equal a bundle feature.
 //
 // The admin1 regions ship as one file per country (never parsed whole, #1576), so a
-// country's region features are read, parsed and flattened to CompactGeom on first use
-// and cached — only visited countries ever pay the parse.
-type RegionFeature = { code: string; name: string; nameEn: string; geom: CompactGeom; boxes: Box[] };
-const regionFeatureCache = new Map<string, RegionFeature[]>();
+// country's region features are read, parsed and packed on first use and cached — only
+// visited countries ever pay the parse.
+type RegionFeature = { code: string; name: string; nameEn: string; geom: PackedGeom; boxes: Int32Array };
 
-async function getRegionFeatures(countryCode: string): Promise<RegionFeature[]> {
+// Countries least recently used first, kept while their typed arrays fit REGION_CACHE_BYTES
+// (every country packed keeps ~32 MB, CA alone ~5 MB). A country that falls out is parsed again
+// on its next lookup, which allocates ~90 MB for a while for CA, so the budget holds the
+// countries one install's places are in, and the repair pass reads its rows by country.
+const REGION_CACHE_BYTES = 16 * 1024 * 1024;
+const regionFeatureCache = new Map<string, { features: RegionFeature[]; bytes: number }>();
+let regionCacheBytes = 0;
+
+// Synchronous on purpose: a lookup that misses reads, parses and caches its country before
+// any other lookup runs, so lookups that miss the same country at once parse it only once.
+function getRegionFeatures(countryCode: string): RegionFeature[] {
   const cc = countryCode.toUpperCase();
-  const cached = regionFeatureCache.get(cc);
-  if (cached) return cached;
-  const json = readAdmin1Json(cc);
-  if (!json) {
-    regionFeatureCache.set(cc, []);
-    return [];
+  const hit = regionFeatureCache.get(cc);
+  if (hit) {
+    regionFeatureCache.delete(cc);
+    regionFeatureCache.set(cc, hit);
+    return hit.features;
   }
+  const features = parseRegionFeatures(cc);
+  let bytes = 0;
+  for (const { geom, boxes } of features) {
+    bytes += geom.coords.byteLength + geom.ringStarts.byteLength + geom.polyRingCounts.byteLength + boxes.byteLength;
+  }
+  regionFeatureCache.set(cc, { features, bytes });
+  regionCacheBytes += bytes;
+  for (const [code, entry] of regionFeatureCache) {
+    if (regionCacheBytes <= REGION_CACHE_BYTES || code === cc) break;
+    regionFeatureCache.delete(code);
+    regionCacheBytes -= entry.bytes;
+  }
+  return features;
+}
+
+function parseRegionFeatures(cc: string): RegionFeature[] {
+  const json = readAdmin1Json(cc);
+  if (!json) return [];
   let features: { properties?: Record<string, string>; geometry?: { type: string; coordinates: unknown } }[];
   try {
     features = JSON.parse(json.toString('utf8')).features ?? [];
   } catch {
-    regionFeatureCache.set(cc, []);
     return [];
   }
   const out: RegionFeature[] = [];
   for (const f of features) {
     const code = f.properties?.iso_3166_2;
     if (!code || !f.geometry) continue;
-    const { geom, boxes } = compactGeomFromGeometry(f.geometry);
+    const { geom, boxes } = packRegionGeometry(f.geometry);
     out.push({
       code,
       name: f.properties?.name || code,
@@ -552,7 +590,6 @@ async function getRegionFeatures(countryCode: string): Promise<RegionFeature[]> 
       boxes,
     });
   }
-  regionFeatureCache.set(cc, out);
   return out;
 }
 
@@ -562,11 +599,15 @@ async function getRegionFeatures(countryCode: string): Promise<RegionFeature[]> 
 // no admin1 coverage in the bundle or the point falls outside every polygon (simplification
 // gaps at coastlines, etc.) — callers should fall back to reverse geocoding.
 export async function getRegionFromCoords(countryCode: string, lat: number, lng: number): Promise<RegionInfo | null> {
-  const features = await getRegionFeatures(countryCode);
+  const features = getRegionFeatures(countryCode);
   if (features.length === 0) return null;
   const candidates: { f: RegionFeature; area: number }[] = [];
   for (const f of features) {
-    for (const [minLng, minLat, maxLng, maxLat] of f.boxes) {
+    for (let i = 0; i < f.boxes.length; i += 4) {
+      const minLng = f.boxes[i] / REGION_SCALE;
+      const minLat = f.boxes[i + 1] / REGION_SCALE;
+      const maxLng = f.boxes[i + 2] / REGION_SCALE;
+      const maxLat = f.boxes[i + 3] / REGION_SCALE;
       if (lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng) {
         candidates.push({ f, area: (maxLng - minLng) * (maxLat - minLat) });
         break;
@@ -575,7 +616,7 @@ export async function getRegionFromCoords(countryCode: string, lat: number, lng:
   }
   candidates.sort((a, b) => a.area - b.area);
   for (const { f } of candidates) {
-    if (pointInGeometry(lng, lat, f.geom)) {
+    if (pointInPackedGeometry(lng, lat, f.geom, REGION_SCALE)) {
       return { country_code: countryCode.toUpperCase(), region_code: f.code, region_name: f.nameEn || f.name };
     }
   }

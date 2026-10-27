@@ -64,6 +64,26 @@ describe('Atlas admin1 region bundle (#1217)', () => {
     expect(features.map(key).sort()).toEqual(bundle.map(key).sort());
   });
 
+  // The server's region cache keeps every coordinate as an Int32 ×1000 (REGION_SCALE in
+  // atlas-geo.ts) and divides it back on use. That is exact only while the bundle has no more
+  // than three decimals (ADM1_DECIMALS); a rebuild with more must raise the scale with it.
+  it('ATLAS-BUNDLE-009 — every admin1 coordinate round-trips through Int32 ×1000 unchanged', () => {
+    type Geometry = { type: string; coordinates: number[][][] | number[][][][] };
+    let values = 0;
+    const lossy: string[] = [];
+    for (const f of features as unknown as { properties: { iso_3166_2: string }; geometry: Geometry }[]) {
+      const g = f.geometry;
+      const parts = (g.type === 'Polygon' ? [g.coordinates] : g.coordinates) as number[][][][];
+      for (const v of parts.flat(3)) {
+        values++;
+        const packed = Math.round(v * 1000);
+        if (packed / 1000 !== v || Math.abs(packed) > 2 ** 31 - 1) lossy.push(`${f.properties.iso_3166_2}: ${v}`);
+      }
+    }
+    expect(values / 2, 'coordinate pairs checked').toBeGreaterThan(3_000_000);
+    expect(lossy.slice(0, 5)).toEqual([]);
+  });
+
   it('ATLAS-BUNDLE-001 — previously-broken countries now have distinct region codes', () => {
     for (const a2 of ['ES', 'CN', 'CL', 'OM']) {
       const f = regions(a2);

@@ -181,7 +181,7 @@ function pointInFlatRing(lng: number, lat: number, ring: Float64Array): boolean 
 // True when (lng,lat) falls inside a compact Polygon/MultiPolygon, honouring holes.
 // `rings` is every ring flattened; `polyRingCounts[k]` is how many rings polygon k owns
 // (its first ring is the outer boundary, the rest are holes).
-export function pointInGeometry(lng: number, lat: number, geom: CompactGeom): boolean {
+function pointInGeometry(lng: number, lat: number, geom: CompactGeom): boolean {
   let ri = 0;
   for (const rc of geom.polyRingCounts) {
     if (pointInFlatRing(lng, lat, geom.rings[ri])) {
@@ -199,10 +199,62 @@ export function pointInGeometry(lng: number, lat: number, geom: CompactGeom): bo
   return false;
 }
 
+// The ray-cast above on ring pairs [from, to) of packed coordinates. Each one is divided back
+// by the scale before use: for coordinates with no more decimals than the scale holds that
+// gives back the exact double the bundle had, so the answer is the one the Float64 ring gives.
+function pointInPackedRing(
+  lng: number,
+  lat: number,
+  coords: Int32Array,
+  scale: number,
+  from: number,
+  to: number,
+): boolean {
+  let inside = false;
+  let xj = coords[2 * (to - 1)] / scale;
+  let yj = coords[2 * (to - 1) + 1] / scale;
+  for (let i = from; i < to; i++) {
+    const xi = coords[2 * i] / scale;
+    const yi = coords[2 * i + 1] / scale;
+    if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+    xj = xi;
+    yj = yi;
+  }
+  return inside;
+}
+
+// pointInGeometry for a PackedGeom.
+export function pointInPackedGeometry(lng: number, lat: number, geom: PackedGeom, scale: number): boolean {
+  const { coords, ringStarts, polyRingCounts } = geom;
+  let ri = 0;
+  for (const rc of polyRingCounts) {
+    if (pointInPackedRing(lng, lat, coords, scale, ringStarts[ri], ringStarts[ri + 1])) {
+      let inHole = false;
+      for (let h = 1; h < rc; h++) {
+        if (pointInPackedRing(lng, lat, coords, scale, ringStarts[ri + h], ringStarts[ri + h + 1])) {
+          inHole = true;
+          break;
+        }
+      }
+      if (!inHole) return true;
+    }
+    ri += rc;
+  }
+  return false;
+}
+
 // Compact polygon geometry: rings flattened into Float64Arrays, grouped into polygons by
 // polyRingCounts. Replaces the retained parsed GeoJSON geometry.
-export type CompactGeom = { rings: Float64Array[]; polyRingCounts: number[] };
-export type Box = [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
+type CompactGeom = { rings: Float64Array[]; polyRingCounts: number[] };
+
+// Packed polygon geometry: every ring's [lng,lat] pairs back to back in one Int32Array, each
+// value times a scale. Ring r is pairs ringStarts[r] up to ringStarts[r + 1]; polyRingCounts
+// groups the rings into polygons as in CompactGeom. Three typed arrays per geometry instead
+// of one per ring, at half the bytes per point.
+export type PackedGeom = { coords: Int32Array; ringStarts: Uint32Array; polyRingCounts: Uint32Array };
+type Box = [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
 
 // ISO_A2 → compact admin0 geometry + bounding boxes, derived from the bundled admin0
 // borders on first use. The parsed FeatureCollection is dropped after this runs; only the
