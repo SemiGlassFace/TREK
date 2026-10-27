@@ -4,7 +4,8 @@ const memories: TranslationStrings = {
   'memories.title': 'תמונות',
   'memories.notConnected': '{provider_name} אינו מחובר',
   'memories.notConnectedHint': 'חברו את {provider_name} בהגדרות כדי שתוכלו להוסיף תמונות לטיול.',
-  'memories.notConnectedMultipleHint': 'חברו אחד מספקי התמונות האלה: {provider_names} בהגדרות כדי שתוכלו להוסיף תמונות לטיול.',
+  'memories.notConnectedMultipleHint':
+    'חברו אחד מספקי התמונות האלה: {provider_names} בהגדרות כדי שתוכלו להוסיף תמונות לטיול.',
   'memories.noDates': 'הוסיפו תאריכים לטיול כדי לטעון תמונות.',
   'memories.noPhotos': 'לא נמצאו תמונות',
   'memories.noPhotosHint': 'לא נמצאו תמונות ב-{provider_name} בטווח התאריכים של הטיול.',
@@ -15,6 +16,8 @@ const memories: TranslationStrings = {
   'memories.reviewTitle': 'סקירת התמונות',
   'memories.reviewHint': 'לחצו על תמונות כדי להוציא אותן מהשיתוף.',
   'memories.shareCount': 'שיתוף {count} תמונות',
+  'memories.shareCount.one': 'שיתוף תמונה אחת',
+  'memories.shareCount.two': 'שיתוף שתי תמונות',
   'memories.providerUrl': 'כתובת השרת',
   'memories.providerApiKey': 'מפתח API',
   'memories.providerUsername': 'שם משתמש',
@@ -46,6 +49,8 @@ const memories: TranslationStrings = {
   'memories.selectHint': 'הקישו על תמונות כדי לבחור אותן.',
   'memories.selected': 'נבחרו',
   'memories.addSelected': 'הוספת {count} תמונות',
+  'memories.addSelected.one': 'הוספת תמונה אחת',
+  'memories.addSelected.two': 'הוספת שתי תמונות',
   'memories.alreadyAdded': 'נוסף',
   'memories.private': 'פרטי',
   'memories.stopSharing': 'הפסקת שיתוף',
@@ -55,7 +60,10 @@ const memories: TranslationStrings = {
   'memories.tripDates': 'תאריכי הטיול',
   'memories.allPhotos': 'כל התמונות',
   'memories.confirmShareTitle': 'לשתף עם חברי הטיול?',
-  'memories.confirmShareHint': '{count} תמונות יהיו גלויות לכל חברי הטיול. אפשר להפוך תמונות בודדות לפרטיות מאוחר יותר.',
+  'memories.confirmShareHint':
+    '{count} תמונות יהיו גלויות לכל חברי הטיול. אפשר להפוך תמונות בודדות לפרטיות מאוחר יותר.',
+  'memories.confirmShareHint.one': 'התמונה תהיה גלויה לכל חברי הטיול. אפשר להפוך אותה לפרטית בהמשך.',
+  'memories.confirmShareHint.two': 'שתי התמונות יהיו גלויות לכל חברי הטיול. אפשר להפוך תמונות בודדות לפרטיות בהמשך.',
   'memories.confirmShareButton': 'שיתוף תמונות',
   'memories.error.loadAlbums': 'טעינת האלבומים נכשלה',
   'memories.error.linkAlbum': 'קישור האלבום נכשל',
@@ -69,4 +77,5 @@ const memories: TranslationStrings = {
   'memories.testRouteNotConfigured': 'נתיב הבדיקה אינו מוגדר עבור ספק זה',
   'memories.fillRequiredFields': 'מלאו את כל שדות החובה',
 };
+
 export default memories;

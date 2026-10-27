@@ -32,6 +32,7 @@ const perm: TranslationStrings = {
   'perm.action.collab_edit': 'שיתוף פעולה (הערות, סקרים, צ׳אט)',
   'perm.action.share_manage': 'ניהול קישורי שיתוף',
   'perm.actionHint.trip_create': 'מי יכול ליצור טיולים חדשים',
+  'perm.action.journal_link': 'קישור יומן מסע',
   'perm.actionHint.trip_edit': 'מי יכול לשנות שם, תאריכים, תיאור ומטבע של טיול',
   'perm.actionHint.trip_delete': 'מי יכול למחוק טיול לצמיתות',
   'perm.actionHint.trip_archive': 'מי יכול להעביר טיול לארכיון או לשחזר אותו',
@@ -47,5 +48,7 @@ const perm: TranslationStrings = {
   'perm.actionHint.packing_edit': 'מי יכול לנהל פריטי אריזה ותיקים',
   'perm.actionHint.collab_edit': 'מי יכול ליצור הערות וסקרים ולשלוח הודעות',
   'perm.actionHint.share_manage': 'מי יכול ליצור או למחוק קישורי שיתוף ציבוריים',
+  'perm.actionHint.journal_link': 'מי יכול לקשר יומן מסע מ-Journey לטיול ולפתוח אותו לחברי הטיול',
 };
+
 export default perm;

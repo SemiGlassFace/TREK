@@ -5,6 +5,7 @@ const undo: TranslationStrings = {
   'undo.tooltip': 'ביטול: {action}',
   'undo.assignPlace': 'מקום שויך ליום',
   'undo.removeAssignment': 'מקום הוסר מהיום',
+  'undo.clearDay': 'היום נוקה',
   'undo.reorder': 'סדר המקומות שונה',
   'undo.optimize': 'המסלול עבר אופטימיזציה',
   'undo.deletePlace': 'מקום נמחק',
@@ -22,4 +23,5 @@ const undo: TranslationStrings = {
   'undo.done': 'בוטל: {action}',
   'undo.failed': 'לא ניתן לבטל: {action}',
 };
+
 export default undo;

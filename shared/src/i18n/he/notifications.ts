@@ -31,5 +31,11 @@ const notifications: TranslationStrings = {
   'notifications.test.adminText': '{actor} שלח/ה התראת בדיקה לכל המנהלים.',
   'notifications.test.tripTitle': '{actor} פרסם/ה בטיול שלכם',
   'notifications.test.tripText': 'התראת בדיקה עבור הטיול "{trip}".',
+  'notifications.countLabel': 'התראות',
+  'notifications.countLabel.one': 'התראה',
+  'notifications.countLabel.two': 'התראות',
+  'notifications.deleteAllConfirmTitle': 'למחוק את כל ההתראות?',
+  'notifications.deleteAllConfirmText': 'כל ההתראות יימחקו לצמיתות. אי אפשר לבטל את הפעולה.',
 };
+
 export default notifications;

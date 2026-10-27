@@ -30,7 +30,8 @@ const oauth: TranslationStrings = {
   'oauth.scope.collections:read.label': 'צפייה באוספים',
   'oauth.scope.collections:read.description': 'קריאת אוספי מקומות שמורים, המקומות שבהם, דירוגים, תוויות וחברים',
   'oauth.scope.collections:write.label': 'ניהול אוספים',
-  'oauth.scope.collections:write.description': 'יצירה ועריכה של אוספים, שמירה, דירוג, תיוג והעתקה של מקומות ושיתוף רשימות',
+  'oauth.scope.collections:write.description':
+    'יצירה ועריכה של אוספים, שמירה, דירוג, תיוג והעתקה של מקומות ושיתוף רשימות',
   'oauth.scope.atlas:read.label': 'צפייה באטלס',
   'oauth.scope.atlas:read.description': 'קריאת מדינות ואזורים שביקרתם בהם ורשימת החלומות',
   'oauth.scope.atlas:write.label': 'ניהול האטלס',
@@ -81,10 +82,12 @@ const oauth: TranslationStrings = {
   'oauth.authorize.loginButton': 'התחברות ל-TREK',
   'oauth.authorize.requestLabel': 'בקשת הרשאה',
   'oauth.authorize.requestDescription': 'אפליקציה זו מבקשת גישה לחשבון ה-TREK שלכם.',
+  'oauth.authorize.verifiedHost': 'דומיין מאומת: {host}',
   'oauth.authorize.trustNote': 'העניקו גישה רק לאפליקציות שאתם סומכים עליהן. הנתונים שלכם נשארים בשרת שלכם.',
   'oauth.authorize.selectScope': 'בחרו לפחות הרשאה אחת',
-  'oauth.authorize.approveOneScope': 'אישור ({count} הרשאה)',
-  'oauth.authorize.approveManyScopes': 'אישור ({count} הרשאות)',
+  'oauth.authorize.approveScopes': 'אישור ({count} הרשאות)',
+  'oauth.authorize.approveScopes.one': 'אישור (הרשאה אחת)',
+  'oauth.authorize.approveScopes.two': 'אישור (שתי הרשאות)',
   'oauth.authorize.approveAccess': 'אישור גישה',
   'oauth.authorize.deny': 'דחייה',
   'oauth.authorize.choosePermissions': 'בחרו אילו הרשאות להעניק',
@@ -97,15 +100,19 @@ const oauth: TranslationStrings = {
   'oauth.scope.files:read.label': 'צפייה בקבצי הטיול',
   'oauth.scope.files:read.description': 'הצגת המסמכים בטיול: שמות, גדלים, מי העלה אותם ולמה הם מקושרים',
   'oauth.scope.files:write.label': 'ארגון קבצי הטיול',
-  'oauth.scope.files:write.description': 'שינוי שם ותיאור של קבצים, קישור להזמנות ולמקומות, סימון בכוכב והעברה לסל המחזור',
+  'oauth.scope.files:write.description':
+    'שינוי שם ותיאור של קבצים, קישור להזמנות ולמקומות, סימון בכוכב והעברה לסל המחזור',
   'oauth.scope.files:content.label': 'קריאת תוכן קבצים',
   'oauth.scope.files:content.description': 'קריאת התוכן של מסמך שהועלה, כמו PDF של הזמנה או כרטיס',
   'oauth.scope.settings:read.label': 'צפייה בהעדפות שלכם',
   'oauth.scope.settings:read.description': 'קריאת יחידות, פורמט שעה, שפה, מטבע ברירת מחדל ועמוד פתיחה',
   'oauth.scope.settings:write.label': 'שינוי ההעדפות שלכם',
-  'oauth.scope.settings:write.description': 'שינוי יחידות, פורמט שעה, שפה, מטבע ברירת מחדל ועמוד פתיחה. לעולם לא מפתחות API שמורים',
+  'oauth.scope.settings:write.description':
+    'שינוי יחידות, פורמט שעה, שפה, מטבע ברירת מחדל ועמוד פתיחה. לעולם לא מפתחות API שמורים',
   'oauth.scope.group.plugins': 'תוספים',
   'oauth.scope.plugins:use.label': 'הפעלת כלי תוספים',
-  'oauth.scope.plugins:use.description': 'אפשור ללקוח זה לקרוא לכלים שמפרסמים התוספים שמנהל המערכת התקין ואישר. כל תוסף פועל עם הגישה שכבר הוענקה לו, ולא עם ההרשאות של אסימון זה',
+  'oauth.scope.plugins:use.description':
+    'אפשור ללקוח זה לקרוא לכלים שמפרסמים התוספים שמנהל המערכת התקין ואישר. כל תוסף פועל עם הגישה שכבר הוענקה לו, ולא עם ההרשאות של אסימון זה',
 };
+
 export default oauth;

@@ -11,6 +11,7 @@ const todo: TranslationStrings = {
   'todo.uncategorized': 'ללא רשימה',
   'todo.namePlaceholder': 'שם המשימה',
   'todo.descriptionPlaceholder': 'תיאור (לא חובה)',
+  'todo.editDescription': 'לחצו לעריכה, קישורים נפתחים ישירות',
   'todo.unassigned': 'לא משויך',
   'todo.noCategory': 'ללא רשימה',
   'todo.hasDescription': 'יש תיאור',
@@ -38,4 +39,5 @@ const todo: TranslationStrings = {
   'todo.detail.noPriority': 'ללא',
   'todo.detail.create': 'יצירת משימה',
 };
+
 export default todo;

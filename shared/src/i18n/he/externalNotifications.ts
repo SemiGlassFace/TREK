@@ -1,4 +1,5 @@
 import type { NotificationLocale } from '../externalNotifications/types';
+import { pluralForm } from '../plural';
 
 const he: NotificationLocale = {
   email: {
@@ -37,8 +38,16 @@ const he: NotificationLocale = {
       body: `${p.actor} הזמין/ה אתכם לשתף אוסף. פתחו את TREK כדי לאשר או לדחות.`,
     }),
     photos_shared: (p) => ({
-      title: `${p.count} תמונות שותפו`,
-      body: `${p.actor} שיתף/ה ${p.count} תמונות ב-"${p.trip}".`,
+      title: pluralForm(p.count, 'he', {
+        one: 'תמונה אחת שותפה',
+        two: 'שתי תמונות שותפו',
+        other: `${p.count} תמונות שותפו`,
+      }),
+      body: pluralForm(p.count, 'he', {
+        one: `${p.actor} שיתף/ה תמונה אחת ב-"${p.trip}".`,
+        two: `${p.actor} שיתף/ה שתי תמונות ב-"${p.trip}".`,
+        other: `${p.actor} שיתף/ה ${p.count} תמונות ב-"${p.trip}".`,
+      }),
     }),
     collab_message: (p) => ({
       title: `הודעה חדשה ב-"${p.trip}"`,
@@ -56,11 +65,30 @@ const he: NotificationLocale = {
       title: 'כשל בעותק אחסון',
       body:
         `כתיבה לעותק נכשלה ב-'${p.backend}': ${p.op} של ${p.key} — ${p.error}.` +
-        (p.suppressed !== '0' ? ` ${p.suppressed} כשלים נוספים הוסתרו מאז ההתראה האחרונה.` : ''),
+        (p.suppressed !== '0'
+          ? pluralForm(p.suppressed, 'he', {
+              one: ' כשל נוסף אחד הוסתר מאז ההתראה האחרונה.',
+              two: ' שני כשלים נוספים הוסתרו מאז ההתראה האחרונה.',
+              other: ` ${p.suppressed} כשלים נוספים הוסתרו מאז ההתראה האחרונה.`,
+            })
+          : ''),
+    }),
+    paddle_region_requested: (p) => ({
+      title: 'התבקש אזור חתירה',
+      body: `${p.actor} מתכנן/ת טיול חתירה ב-${p.region}. טענו או דחו את נתוני המים שלו באזור הניהול, תחת תוספים.`,
     }),
     synology_session_cleared: () => ({
       title: 'הפעלת Synology נוקתה',
       body: 'חשבון ה-Synology או הכתובת שלכם השתנו. התנתקתם מ-Synology Photos.',
+    }),
+    wanderer_source_hint: (p) => ({
+      title: `מסלול wanderer: ${p.tour}`,
+      body:
+        p.state === 'changed'
+          ? `"${p.tour}" ב-"${p.trip}" השתנה ב-wanderer. פתחו את המסלול ובדקו את המקור שלו כדי לראות כל מה שהשתנה. שום דבר בטיול לא משתנה מעצמו.`
+          : p.state === 'unverifiable'
+            ? `כבר אי אפשר לבדוק את "${p.tour}" ב-"${p.trip}" ב-wanderer. המסלול בטיול שלכם נשאר כמו שהוא.`
+            : `ייתכן ש-"${p.tour}" ב-"${p.trip}" השתנה ב-wanderer. פתחו את המסלול ובדקו את המקור שלו כדי לראות אם כן. שום דבר בטיול לא משתנה מעצמו.`,
     }),
     plugin_notification: (p) => ({ title: p.title ?? '', body: p.body ?? '' }),
   },

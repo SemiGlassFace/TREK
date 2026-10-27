@@ -5,4 +5,5 @@ const mobileAdmin: TranslationStrings = {
   'mobileAdmin.updateAction': 'עדכון',
   'mobileAdmin.updateLine': 'גרסה {version} זמינה · אצלכם {current}',
 };
+
 export default mobileAdmin;

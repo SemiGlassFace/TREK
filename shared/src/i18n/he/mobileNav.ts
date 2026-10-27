@@ -5,4 +5,5 @@ const mobileNav: TranslationStrings = {
   'mobileNav.collectionsSub': 'מקומות שמורים',
   'mobileNav.more': 'עוד',
 };
+
 export default mobileNav;

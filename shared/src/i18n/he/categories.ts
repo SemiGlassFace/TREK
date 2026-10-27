@@ -22,4 +22,5 @@ const categories: TranslationStrings = {
   'categories.toast.deleted': 'הקטגוריה נמחקה',
   'categories.toast.deleteError': 'המחיקה נכשלה',
 };
+
 export default categories;

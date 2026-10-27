@@ -6,7 +6,11 @@ const mobileVacay: TranslationStrings = {
   'mobileVacay.prevMonth': 'החודש הקודם',
   'mobileVacay.nextMonth': 'החודש הבא',
   'mobileVacay.usedCount': '{count} נוצלו',
+  'mobileVacay.usedCount.one': 'יום אחד נוצל',
+  'mobileVacay.usedCount.two': 'יומיים נוצלו',
   'mobileVacay.leftCount': '{count} נותרו',
+  'mobileVacay.leftCount.one': 'נשאר יום אחד',
+  'mobileVacay.leftCount.two': 'נשארו יומיים',
   'mobileVacay.left': 'נותרו',
   'mobileVacay.modeCompany': 'חברה',
   'mobileVacay.decreaseAllowance': 'הפחתת מכסה',
@@ -15,4 +19,5 @@ const mobileVacay: TranslationStrings = {
   'mobileVacay.editCalendar': 'עריכת לוח שנה',
   'mobileVacay.viewYear': 'תצוגת שנה',
 };
+
 export default mobileVacay;

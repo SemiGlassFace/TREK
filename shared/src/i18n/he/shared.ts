@@ -14,11 +14,21 @@ const shared: TranslationStrings = {
   'shared.tabChat': 'צ׳אט',
   'shared.days': 'ימים',
   'shared.places': 'מקומות',
+  'shared.places.one': 'מקום',
+  'shared.places.two': 'מקומות',
+  'shared.unplanned': 'עדיין לא מתוכנן',
   'shared.other': 'אחר',
   'shared.totalBudget': 'סך ההוצאות',
   'shared.messages': 'הודעות',
   'shared.sharedVia': 'שותף דרך',
   'shared.confirmed': 'מאושר',
   'shared.pending': 'ממתין',
+  'shared.footerTagline': 'מתכנן הטיולים שאתם מארחים בעצמכם. קוד פתוח.',
+  'shared.emptyBookings': 'עדיין לא שותפו הזמנות',
+  'shared.emptyPacking': 'רשימת הציוד עדיין ריקה',
+  'shared.emptyCosts': 'עדיין אין הוצאות',
+  'shared.emptyChat': 'עדיין אין הודעות',
+  'shared.wholeTrip': 'כל הטיול',
 };
+
 export default shared;

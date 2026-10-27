@@ -21,6 +21,8 @@ const notif: TranslationStrings = {
   'notif.collection_invite.text': '{actor} הזמין/ה אתכם לשתף אוסף',
   'notif.photos_shared.title': 'תמונות שותפו',
   'notif.photos_shared.text': '{actor} שיתף/ה {count} תמונות ב-{trip}',
+  'notif.photos_shared.text.one': '{actor} שיתף/ה תמונה אחת ב-{trip}',
+  'notif.photos_shared.text.two': '{actor} שיתף/ה שתי תמונות ב-{trip}',
   'notif.collab_message.title': 'הודעה חדשה',
   'notif.collab_message.text': '{actor} שלח/ה הודעה ב-{trip}',
   'notif.packing_tagged.title': 'שיוך באריזה',
@@ -29,7 +31,10 @@ const notif: TranslationStrings = {
   'notif.version_available.text': 'TREK {version} זמין עכשיו',
   'notif.replica_failure.title': 'כשל בעותק אחסון',
   'notif.replica_failure.text': "כתיבה לעותק נכשלה ב-'{backend}': ‏{op} של {key} — {error}",
-  'notif.replica_failure.textSuppressed': "כתיבה לעותק נכשלה ב-'{backend}': ‏{op} של {key} — {error}. ‏{suppressed} כשלים נוספים הוסתרו מאז ההתראה האחרונה.",
+  'notif.replica_failure.textSuppressed':
+    "כתיבה לעותק נכשלה ב-'{backend}': ‏{op} של {key} — {error}. ‏{suppressed} כשלים נוספים הוסתרו מאז ההתראה האחרונה.",
+  'notif.paddle_region_requested.title': 'התבקש אזור חתירה',
+  'notif.paddle_region_requested.text': '{actor} מתכנן/ת טיול חתירה ב-{region}',
   'notif.action.view_trip': 'הצגת הטיול',
   'notif.action.view_collab': 'הצגת הודעות',
   'notif.action.view_packing': 'הצגת אריזה',
@@ -37,6 +42,11 @@ const notif: TranslationStrings = {
   'notif.action.view_vacay': 'הצגת חופשות',
   'notif.action.view_collection': 'הצגת האוסף',
   'notif.action.view_admin': 'מעבר לניהול',
+  'notif.wanderer_source_hint.title': 'מסלול wanderer',
+  'notif.wanderer_source_hint.possible_change': 'ייתכן ש-„{tour}” ב-{trip} השתנה ב-wanderer',
+  'notif.wanderer_source_hint.changed': '„{tour}” ב-{trip} השתנה ב-wanderer',
+  'notif.wanderer_source_hint.unverifiable': 'כבר אי אפשר לבדוק את „{tour}” ב-{trip} ב-wanderer',
+  'notif.action.view_tour': 'צפייה במסלול',
   'notif.action.view': 'הצגה',
   'notif.action.accept': 'אישור',
   'notif.action.decline': 'דחייה',
@@ -47,4 +57,5 @@ const notif: TranslationStrings = {
   'notif.dev.unknown_event.title': '[DEV] אירוע לא מוכר',
   'notif.dev.unknown_event.text': 'סוג האירוע "{event}" אינו רשום ב-EVENT_NOTIFICATION_CONFIG',
 };
+
 export default notif;

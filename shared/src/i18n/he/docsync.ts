@@ -61,6 +61,8 @@ const docsync: TranslationStrings = {
   'docsync.state.local_deleted': 'נמחק ב-TREK',
   'docsync.state.scope_drift': 'הועבר מחוץ לתיקייה',
   'docsync.conflict.resolve': 'פתרון {count}',
+  'docsync.conflict.resolve.one': 'פתרון התנגשות אחת',
+  'docsync.conflict.resolve.two': 'פתרון שתי התנגשויות',
   'docsync.conflict.title': 'שני העותקים השתנו',
   'docsync.conflict.keepTrek': 'שמירת הגרסה של TREK',
   'docsync.conflict.keepProvider': 'שמירת הגרסה של הספק',
@@ -121,7 +123,8 @@ const docsync: TranslationStrings = {
   'docsync.connect.insecureHint': 'למופע ברשת שלכם עם תעודה בחתימה עצמית.',
   'docsync.connect.about.paperless': 'TREK מתייק את הטיול תחת תגית משלו ולעולם לא נוגע בשאר הארכיון שלכם.',
   'docsync.connect.about.papra': 'בחרו את הארגון שהטיול שייך אליו. TREK מתייק אותו תחת תגית משלו בתוכו.',
-  'docsync.connect.about.nextcloud': 'השתמשו בסיסמת אפליקציה, לא בסיסמת החשבון: היא עובדת עם אימות דו-שלבי ואפשר לבטל אותה בנפרד.',
+  'docsync.connect.about.nextcloud':
+    'השתמשו בסיסמת אפליקציה, לא בסיסמת החשבון: היא עובדת עם אימות דו-שלבי ואפשר לבטל אותה בנפרד.',
   'docsync.connect.about.opencloud': 'TREK מקבל מרחב משלו לטיול הזה, נפרד מכל השאר.',
   'docsync.connect.about.synologydrive': 'עדיף חשבון DSM שניגש רק לתיקייה המשותפת שהטיול צריך להשתמש בה.',
   'docsync.scope.title': 'איפה הטיול הזה צריך לשבת ב-{provider}?',
@@ -140,5 +143,12 @@ const docsync: TranslationStrings = {
   'docsync.error.unknown_provider': 'ספק זה אינו זמין במופע הזה.',
   'docsync.error.provider_disabled': 'מושהה: מנהל המערכת כיבה את הספק הזה. הסנכרון יתחדש כשהוא יופעל שוב.',
   'docsync.binding.reconnect': 'התחברות מחדש',
+  'docsync.connection.title': 'חיבור',
+  'docsync.connection.hint': 'הכתובת ופרטי ההתחברות ש-TREK משתמש בהם עבור המאגר הזה.',
+  'docsync.connection.edit': 'עריכת החיבור',
+  'docsync.connection.remove': 'הסרת החיבור',
+  'docsync.connection.confirmRemove':
+    'TREK ישכח את הכתובת ופרטי ההתחברות של המאגר הזה, וכל סנכרון של הטיול דרכו ייפסק. המסמכים נשארים ב-TREK ובמאגר.',
 };
+
 export default docsync;

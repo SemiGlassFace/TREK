@@ -21,10 +21,14 @@ const planner: TranslationStrings = {
   'planner.days': 'ימים',
   'planner.allPlaces': 'כל המקומות',
   'planner.totalPlaces': '{n} מקומות בסך הכל',
+  'planner.totalPlaces.one': 'מקום אחד בסך הכול',
+  'planner.totalPlaces.two': 'שני מקומות בסך הכול',
   'planner.noDaysPlanned': 'עדיין לא תוכננו ימים',
   'planner.editTrip': '← עריכת טיול',
   'planner.placeOne': 'מקום אחד',
   'planner.placeN': '{n} מקומות',
+  'planner.placeN.one': 'מקום אחד',
+  'planner.placeN.two': 'שני מקומות',
   'planner.addNote': 'הוספת הערה',
   'planner.noEntries': 'אין רשומות ליום זה',
   'planner.addPlace': 'הוספת מקום/פעילות',
@@ -59,9 +63,12 @@ const planner: TranslationStrings = {
   'planner.noDays': 'עדיין אין ימים',
   'planner.editTripToAddDays': 'ערכו את הטיול כדי להוסיף ימים',
   'planner.dayCount': '{n} ימים',
+  'planner.dayCount.one': 'יום אחד',
+  'planner.dayCount.two': 'יומיים',
   'planner.clickToUnlock': 'לחצו לביטול הנעילה',
   'planner.keepPosition': 'שמירת המיקום במהלך אופטימיזציית המסלול',
   'planner.dayDetails': 'פרטי היום',
   'planner.dayN': 'יום {n}',
 };
+
 export default planner;

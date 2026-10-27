@@ -11,6 +11,7 @@ const trips: TranslationStrings = {
   'trips.reminderDays': 'ימים',
   'trips.reminderCustom': 'מותאם אישית',
   'trips.reminderDaysBefore': 'ימים לפני היציאה',
-  'trips.reminderDisabledHint': 'תזכורות טיול כבויות. הפעילו אותן בניהול > הגדרות > התראות.',
+  'trips.reminderDisabledHint': 'תזכורות טיול כבויות. הפעילו אותן בניהול > התראות > תזכורות טיול.',
 };
+
 export default trips;

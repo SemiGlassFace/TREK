@@ -89,6 +89,8 @@ const vacay: TranslationStrings = {
   'vacay.carryOverHint': 'העברה אוטומטית של ימי החופשה שנותרו לשנה הבאה',
   'vacay.carriedOverPrevPeriod': 'מהתקופה הקודמת',
   'vacay.compUsedCount': '{count} פיצוי / גמיש',
+  'vacay.compUsedCount.one': 'יום פיצוי / גמיש אחד',
+  'vacay.compUsedCount.two': 'שני ימי פיצוי / גמיש',
   'vacay.yearType': 'שנת חופשה',
   'vacay.yearTypeHint': 'מתי מתחילה שנת החופשה שלכם — המכסה, הניצול וההעברה נקבעים לפיה',
   'vacay.yearTypeCalendar': 'קלנדרית',
@@ -146,4 +148,5 @@ const vacay: TranslationStrings = {
   'vacay.sharedEmpty': 'הראו זה לזה את לוחות השנה בלי לאחד אותם.',
   'vacay.sharedLegend': 'משותף (צפייה בלבד)',
 };
+
 export default vacay;

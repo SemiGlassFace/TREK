@@ -1,14 +1,14 @@
 import type { TranslationStrings } from '../types';
 
 const members: TranslationStrings = {
-  'members.shareTrip': 'שיתוף טיול',
   'members.inviteUser': 'הזמנת משתמש',
   'members.selectUser': 'בחירת משתמש…',
   'members.invite': 'הזמנה',
   'members.allHaveAccess': 'לכל המשתמשים כבר יש גישה.',
   'members.access': 'גישה',
-  'members.person': 'אדם',
   'members.persons': 'אנשים',
+  'members.persons.one': 'אדם',
+  'members.persons.two': 'אנשים',
   'members.you': 'את/ה',
   'members.owner': 'בעלים',
   'members.leaveTrip': 'עזיבת הטיול',
@@ -32,6 +32,9 @@ const members: TranslationStrings = {
   'members.guestAddError': 'הוספת האורח נכשלה',
   'members.guestRenameError': 'שינוי שם האורח נכשל',
   'members.guestRemoved': 'האורח הוסר',
-  'members.confirmRemoveGuest': 'להסיר את האורח? גם השיוכים והחלק שלו בהוצאות יוסרו.',
+  'members.confirmRemoveGuest':
+    'להסיר את האורח? השיוכים שלו יוסרו, והחלק שלו בכל הוצאה יעבור לשאר המשתתפים בחלוקה שלה.',
+  'members.guestHasPayments': 'האורח הזה שילם על הוצאה או משתתף בתשלום שנרשם. קודם שנו את המשלם או מחקו את התשלום.',
 };
+
 export default members;

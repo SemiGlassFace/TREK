@@ -24,10 +24,15 @@ const login: TranslationStrings = {
   'login.oidc.noEmail': 'לא התקבל אימייל מהספק.',
   'login.oidc.tokenFailed': 'האימות נכשל.',
   'login.oidc.invalidState': 'הפעלה לא תקינה. נסו שוב.',
+  'login.oidc.emailNotVerified': 'ספק ההתחברות שלכם לא אישר את כתובת האימייל הזו, ולכן אי אפשר לקשר אותה לחשבון קיים.',
+  'login.oidc.emailLinkBlocked':
+    'לא ניתן היה לקשר את ההתחברות הזו לחשבון הקיים עם האימייל הזה. בקשו מהמנהל לאשר את הכתובת.',
   'login.demoFailed': 'התחברות לדמו נכשלה',
   'login.oidcSignIn': 'התחברות עם {name}',
   'login.oidcOnly': 'התחברות בסיסמה מושבתת. התחברו דרך ספק ה-SSO שלכם.',
   'login.oidcLoggedOut': 'התנתקתם. התחברו שוב דרך ספק ה-SSO שלכם.',
+  'login.oidcRedirecting': 'מעבירים אתכם אל {name}…',
+  'login.oidcRedirectSlow': 'עדיין כאן? המשיכו אל {name}',
   'login.demoHint': 'נסו את הדמו — בלי הרשמה',
   'login.mfaTitle': 'אימות דו-שלבי',
   'login.mfaSubtitle': 'הזינו את הקוד בן 6 הספרות מאפליקציית האימות.',
@@ -71,4 +76,5 @@ const login: TranslationStrings = {
     'אתם מתחברים דרך HTTP רגיל, ולכן הדפדפן מוחק את עוגיית ההפעלה המאובטחת של TREK — הבקשה הבאה נכשלת עם "Access token required". פתרון: השתמשו ב-HTTPS, או ברשת ביתית הגדירו COOKIE_SECURE=false.',
   'login.insecureCookie.link': 'פתיחת מדריך פתרון התקלות',
 };
+
 export default login;

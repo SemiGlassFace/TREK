@@ -73,8 +73,8 @@ for (const { file, generalKeyCount, modules } of TOUR_DOMAINS) {
   const generalKeys = (keys: string[]) => keys.filter((key) => !pluralFormOf(key, groups));
 
   describe(`Tours locale contracts: ${file}.ts`, () => {
-    it(`covers all 27 supported locales with ${generalKeyCount} general source keys`, () => {
-      expect(Object.keys(modules)).toHaveLength(27);
+    it(`covers all 28 supported locales with ${generalKeyCount} general source keys`, () => {
+      expect(Object.keys(modules)).toHaveLength(28);
       expect(Object.keys(modules).sort()).toEqual(
         SUPPORTED_LANGUAGE_CODES.map((code) => `./${code}/${file}.ts`).sort(),
       );

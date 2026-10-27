@@ -6,5 +6,7 @@ const transport: TranslationStrings = {
   'transport.modalTitle.edit': 'עריכת תחבורה',
   'transport.title': 'תחבורה',
   'transport.addManual': 'תחבורה',
+  'transport.empty': 'עדיין אין תחבורה',
 };
+
 export default transport;

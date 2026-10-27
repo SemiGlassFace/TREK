@@ -7,7 +7,7 @@ const day: TranslationStrings = {
   'day.sunrise': 'זריחה',
   'day.sunset': 'שקיעה',
   'day.hourlyForecast': 'תחזית שעתית',
-  'day.climateHint': 'ממוצעים היסטוריים — תחזית אמיתית זמינה עד 16 יום לפני התאריך.',
+  'day.climateHint': 'ממוצעים היסטוריים: תחזית אמיתית זמינה עד 16 יום לפני התאריך.',
   'day.noWeather': 'אין נתוני מזג אוויר. הוסיפו מקום עם קואורדינטות.',
   'day.weatherFor': 'תחזית עבור {name}',
   'day.overview': 'סקירה יומית',
@@ -19,8 +19,10 @@ const day: TranslationStrings = {
   'day.checkIn': 'צ׳ק-אין',
   'day.checkInUntil': 'עד',
   'day.checkOut': 'צ׳ק-אאוט',
+  'day.openStayBooking': 'פתיחת ההזמנה',
   'day.confirmation': 'אישור',
   'day.editAccommodation': 'עריכת לינה',
   'day.reservations': 'הזמנות',
 };
+
 export default day;

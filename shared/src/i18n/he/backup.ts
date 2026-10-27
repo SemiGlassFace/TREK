@@ -41,7 +41,8 @@ const backup: TranslationStrings = {
   'backup.auto.summaryWeekly': 'כל {day} ב-{hour}:00',
   'backup.auto.summaryMonthly': 'ביום {day} בכל חודש ב-{hour}:00',
   'backup.auto.envLocked': 'Docker',
-  'backup.auto.envLockedHint': 'הגיבוי האוטומטי מוגדר דרך משתני סביבה של Docker. כדי לשנות את ההגדרות, עדכנו את docker-compose.yml והפעילו מחדש את הקונטיינר.',
+  'backup.auto.envLockedHint':
+    'הגיבוי האוטומטי מוגדר דרך משתני סביבה של Docker. כדי לשנות את ההגדרות, עדכנו את docker-compose.yml והפעילו מחדש את הקונטיינר.',
   'backup.auto.copyEnv': 'העתקת משתני Docker',
   'backup.auto.envCopied': 'משתני Docker הועתקו ללוח',
   'backup.auto.keepLabel': 'מחיקת גיבויים ישנים אחרי',
@@ -63,8 +64,11 @@ const backup: TranslationStrings = {
   'backup.keep.30days': '30 ימים',
   'backup.keep.forever': 'שמירה לתמיד',
   'backup.restoreConfirmTitle': 'לשחזר את הגיבוי?',
-  'backup.restoreWarning': 'כל הנתונים הנוכחיים (טיולים, מקומות, משתמשים, העלאות) יוחלפו לצמיתות בגיבוי. לא ניתן לבטל פעולה זו.',
+  'backup.restoreWarning':
+    'כל הנתונים הנוכחיים (טיולים, מקומות, משתמשים, העלאות) יוחלפו לצמיתות בגיבוי. לא ניתן לבטל פעולה זו.',
   'backup.restoreTip': 'טיפ: צרו גיבוי של המצב הנוכחי לפני השחזור.',
   'backup.restoreConfirm': 'כן, לשחזר',
+  'backup.auto.hourHintTz': 'שעון השרת המקומי (פורמט {format}), אזור זמן {timezone}',
 };
+
 export default backup;
