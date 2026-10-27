@@ -17,12 +17,35 @@ describe('Atlas admin0 country bundle (#1609)', () => {
   const bundlePath = path.join(__dirname, '..', '..', '..', 'assets', 'atlas', 'admin0.geojson.gz');
   const features = JSON.parse(zlib.gunzipSync(fs.readFileSync(bundlePath)).toString()).features as {
     properties: { ISO_A2: string | null; ADM0_A3: string; NAME?: string };
+    geometry: { type: string; coordinates: number[][][] | number[][][][] } | null;
   }[];
 
   it('ATLAS-BUNDLE-003 — Kosovo ships with a resolvable ISO_A2', () => {
     const kosovo = features.filter((f) => f.properties.ADM0_A3 === 'XKX');
     expect(kosovo.length, 'exactly one Kosovo feature').toBe(1);
     expect(kosovo[0].properties.ISO_A2).toBe('XK');
+  });
+
+  // The server's country index keeps every coordinate in an Int16Array ×100 (ADMIN0_SCALE in
+  // country-borders.ts) and divides it back on use. A value with a third decimal comes back
+  // changed, and one past ±327.67 wraps around without an error, so a rebuild with more
+  // decimals (ADM0_DECIMALS) must fail here, not move borders.
+  it('ATLAS-BUNDLE-010 — every admin0 coordinate round-trips through Int16 ×100 unchanged', () => {
+    const int16 = new Int16Array(1);
+    let values = 0;
+    const lossy: string[] = [];
+    for (const f of features) {
+      const g = f.geometry;
+      if (!g) continue;
+      const parts = (g.type === 'Polygon' ? [g.coordinates] : g.coordinates) as number[][][][];
+      for (const v of parts.flat(3)) {
+        values++;
+        int16[0] = Math.round(v * 100);
+        if (int16[0] / 100 !== v) lossy.push(`${f.properties.ADM0_A3}: ${v} comes back as ${int16[0] / 100}`);
+      }
+    }
+    expect(values / 2, 'coordinate pairs checked').toBeGreaterThan(2_000_000);
+    expect(lossy.slice(0, 5)).toEqual([]);
   });
 });
 

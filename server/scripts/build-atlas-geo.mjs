@@ -372,7 +372,7 @@ async function pool(items, worker) {
 // the now-redundant consecutive duplicate points shrinks the bundles ~5-8x with no
 // visible effect at the atlas' zoom range (3-10). ADM0 fills are viewed zoomed out, so
 // they tolerate a coarser grid than ADM1 region borders.
-const ADM0_DECIMALS = 2; // ~1.1 km
+const ADM0_DECIMALS = 2; // ~1.1 km; the server's country index packs ×100 into Int16 (ADMIN0_SCALE in country-borders.ts), raise both
 const ADM1_DECIMALS = 3; // ~110 m; the server's region cache packs ×1000 (REGION_SCALE in atlas-geo.ts), raise both
 
 function quantizeRing(ring, decimals) {

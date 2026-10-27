@@ -19,11 +19,12 @@ function makeController(svc: Partial<AtlasService> & Partial<AtlasWritesService>
 }
 
 function makeRes() {
-  const res = { setHeader: vi.fn(), send: vi.fn(), json: vi.fn(), type: vi.fn() };
+  const res = { setHeader: vi.fn(), send: vi.fn(), sendFile: vi.fn(), json: vi.fn(), type: vi.fn() };
   res.type.mockReturnValue(res);
   return res as unknown as Response & {
     setHeader: ReturnType<typeof vi.fn>;
     send: ReturnType<typeof vi.fn>;
+    sendFile: ReturnType<typeof vi.fn>;
     json: ReturnType<typeof vi.fn>;
     type: ReturnType<typeof vi.fn>;
   };
@@ -89,20 +90,24 @@ describe('AtlasController (parity with the legacy /api/addons/atlas route)', () 
     });
   });
 
-  it('GET /countries/geo serves the gzipped admin-0 bundle with Content-Encoding', () => {
-    const gz = Buffer.from('gzipped-bytes');
-    const countryGeoGz = vi.fn().mockReturnValue(gz);
+  it('GET /countries/geo sends the gzipped admin-0 file from disk with Content-Encoding', () => {
+    const countryGeoFile = vi.fn().mockReturnValue('/srv/trek/assets/atlas/admin0.geojson.gz');
     const res = makeRes();
-    makeController({ countryGeoGz }).countryGeo(res);
+    makeController({ countryGeoFile }).countryGeo(res);
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/json; charset=utf-8');
     expect(res.setHeader).toHaveBeenCalledWith('Content-Encoding', 'gzip');
     expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'public, max-age=86400');
-    expect(res.send).toHaveBeenCalledWith(gz);
+    expect(res.sendFile).toHaveBeenCalledWith('admin0.geojson.gz', {
+      root: '/srv/trek/assets/atlas',
+      acceptRanges: false,
+      lastModified: false,
+    });
   });
 
   it('GET /countries/geo falls back to an empty FeatureCollection when the bundle is missing', () => {
-    const countryGeoGz = vi.fn().mockReturnValue(null);
+    const countryGeoFile = vi.fn().mockReturnValue(null);
     const res = makeRes();
-    makeController({ countryGeoGz }).countryGeo(res);
+    makeController({ countryGeoFile }).countryGeo(res);
     expect(res.json).toHaveBeenCalledWith({ type: 'FeatureCollection', features: [] });
     expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
   });

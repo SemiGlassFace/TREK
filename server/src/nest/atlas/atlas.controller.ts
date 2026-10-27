@@ -26,6 +26,7 @@ import { regionGeoParamsSchema } from '@trek/shared';
 import type { AtlasLocateResponse, RegionGeoParams } from '@trek/shared';
 
 import type { Response } from 'express';
+import path from 'node:path';
 
 /**
  * /api/addons/atlas — visited countries/regions, region GeoJSON, bucket list.
@@ -123,10 +124,13 @@ export class AtlasController {
   countryGeo(@Res() res: Response): void {
     // Serve the pre-gzipped admin-0 bundle straight from disk. The browser decompresses
     // transparently, so the wire shape is identical to before, but the server never parses
-    // or holds the ~145MB FeatureCollection (#1576). Content-Encoding is set explicitly, so
-    // the compression middleware leaves the body untouched.
-    const gz = this.atlas.countryGeoGz();
-    if (!gz) {
+    // or holds the ~145MB FeatureCollection (#1576), nor the 4MB file itself. Content-Encoding
+    // is set explicitly, so the compression middleware leaves the body untouched, and
+    // send() keeps the Content-Type and Cache-Control set here. Without Accept-Ranges and
+    // Last-Modified the headers are the ones res.send(buffer) gave. Root + basename, not the
+    // absolute path: see plugin-frame.controller.ts.
+    const file = this.atlas.countryGeoFile();
+    if (!file) {
       res.setHeader('Cache-Control', 'no-store');
       res.json({ type: 'FeatureCollection', features: [] });
       return;
@@ -134,7 +138,7 @@ export class AtlasController {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Content-Encoding', 'gzip');
     res.setHeader('Cache-Control', 'public, max-age=86400');
-    res.send(gz);
+    res.sendFile(path.basename(file), { root: path.dirname(file), acceptRanges: false, lastModified: false });
   }
 
   @Get('country/:code')

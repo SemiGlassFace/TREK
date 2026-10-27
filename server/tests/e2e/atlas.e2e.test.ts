@@ -16,6 +16,7 @@ import { VisitedRegions } from '../../src/db/entities/VisitedRegions.entity';
 import { AtlasModule } from '../../src/nest/atlas/atlas.module';
 import { TrekExceptionFilter } from '../../src/nest/common/trek-exception.filter';
 import { ZodValidationPipe } from '../../src/nest/common/zod-validation.pipe';
+import { getAdmin0File } from '../../src/utils/country-borders';
 import { createUser, createTrip } from '../helpers/factories';
 import { markCountryVisited } from '../helpers/factories/atlas';
 import { makePlace } from '../helpers/factories/places';
@@ -28,6 +29,7 @@ import { sessionCookie } from './harness';
 import { Test } from '@nestjs/testing';
 
 import cookieParser from 'cookie-parser';
+import fs from 'fs';
 import type { Server } from 'http';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
@@ -85,11 +87,22 @@ describe('Atlas e2e (real auth guard + real service + temp SQLite)', () => {
   it('200 countries/geo serves the bundled gzipped admin-0 that the client decompresses to a FeatureCollection', async () => {
     const res = await request(server).get('/api/addons/atlas/countries/geo').set('Cookie', sessionCookie(userId));
     expect(res.status).toBe(200);
-    expect(res.headers['content-encoding']).toBe('gzip');
+    const admin0 = getAdmin0File();
+    expect(admin0).not.toBeNull();
+    // Sent from disk with the headers res.send(buffer) gave when the bytes were kept in
+    // memory: send() replaces none of them and adds no Accept-Ranges or Last-Modified.
+    expect(res.headers).toMatchObject({
+      'content-type': 'application/json; charset=utf-8',
+      'content-encoding': 'gzip',
+      'cache-control': 'public, max-age=86400',
+      'content-length': String(fs.statSync(String(admin0)).size),
+    });
+    expect(res.headers.etag).toMatch(/^W\/"/);
+    expect(res.headers).not.toHaveProperty('accept-ranges');
+    expect(res.headers).not.toHaveProperty('last-modified');
     // superagent transparently decompresses, mirroring the browser.
     expect(res.body.type).toBe('FeatureCollection');
     expect(res.body.features.length).toBeGreaterThan(0);
-    expect(res.headers['cache-control']).toContain('max-age=86400');
   });
 
   it('200 stats for an authenticated user — the trip-less branch keeps its bespoke shape', async () => {

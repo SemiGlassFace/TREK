@@ -5,9 +5,9 @@ import path from 'path';
 import zlib from 'zlib';
 import {
   admin1AssetPath,
+  getAdmin0File,
   getCountryFromCoords,
   isPointInCountryBox,
-  loadAdmin0Gz,
   pointInPackedGeometry,
   type PackedGeom,
 } from '../../utils/country-borders';
@@ -30,30 +30,30 @@ export { getCountryFromCoords, isPointInCountryBox };
 
 // ── Bundled boundary GeoJSON (admin-0 countries + admin-1 regions) ─────────
 //
-// Where the bundles come from, the path they are read from, the admin-0 gz bytes and
-// the country index built on them are in utils/country-borders.ts. The admin-1 half
+// Where the bundles come from, the path they are read from, the admin-0 file and
+// the country index built on it are in utils/country-borders.ts. The admin-1 half
 // is below.
 //
 // Neither parsed bundle is cached. admin0 (~145MB) and admin1 (~260MB) parsed at once are
 // what exhausted a 512MB host while using Atlas (#1576). Instead we retain only compact
-// derivatives: the raw admin0 .gz bytes for direct serving and a Float64Array poly/box
-// index for server-side point-in-polygon (see buildCountryIndexes in
-// utils/country-borders.ts). admin1 ships as one gzipped file per country, which is
-// served from disk as it is and read one country at a time for region lookups.
+// derivatives: the admin0 .gz is sent from disk and an Int16Array poly/box index serves
+// server-side point-in-polygon (see buildCountryIndexes in utils/country-borders.ts).
+// admin1 ships as one gzipped file per country, which is served from disk as it is and
+// read one country at a time for region lookups.
 
-/** admin-0 country borders as gzipped GeoJSON bytes, served to the client map with
+/** Path of the gzipped admin-0 country borders, sent to the client map with
  *  Content-Encoding: gzip so the server never holds the parsed FeatureCollection. */
-export function getCountryGeoGz(): Buffer | null {
-  return loadAdmin0Gz();
+export function getCountryGeoFile(): string | null {
+  return getAdmin0File();
 }
 
 /** Parsed admin-0 FeatureCollection, parsed on demand (not cached). Not on the client hot
- *  path — the map is served the gz bytes via getCountryGeoGz — but kept for internal/test
+ *  path — the map is sent the gz file via getCountryGeoFile — but kept for internal/test
  *  callers that need the objects. */
 export function getCountryGeo(): any {
-  const gz = loadAdmin0Gz();
-  if (!gz) return { type: 'FeatureCollection', features: [] };
-  return JSON.parse(zlib.gunzipSync(gz).toString('utf8'));
+  const file = getAdmin0File();
+  if (!file) return { type: 'FeatureCollection', features: [] };
+  return JSON.parse(zlib.gunzipSync(fs.readFileSync(file)).toString('utf8'));
 }
 
 // A country's admin-1 file, or null for anything that is not a two-letter code, so
@@ -86,7 +86,7 @@ function readAdmin1Json(countryCode: string): Buffer | null {
 }
 
 /** One country's admin-1 regions as gzipped GeoJSON bytes, served to the client map with
- *  Content-Encoding: gzip like getCountryGeoGz, so the server never parses them. */
+ *  Content-Encoding: gzip like getCountryGeoFile, so the server never parses them. */
 export async function getRegionGeoGz(countryCode: string): Promise<Buffer | null> {
   const file = admin1File(countryCode);
   if (!file) return null;

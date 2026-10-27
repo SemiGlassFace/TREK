@@ -26,7 +26,7 @@ import type { ReservationEndpointsRepository, TravelerOwnedEndpointRow } from '.
 import {
   getCountryFromAddress,
   getCountryFromCoords,
-  getCountryGeoGz,
+  getCountryGeoFile,
   getRegionFromCoords,
   geocodingInFlight,
   resolveCountryCodeSync,
@@ -876,8 +876,8 @@ export class AtlasService {
     };
   }
 
-  countryGeoGz(): Buffer | null {
-    return getCountryGeoGz();
+  countryGeoFile(): string | null {
+    return getCountryGeoFile();
   }
 
   // ── Bucket list CRUD ──────────────────────────────────────────────────────
