@@ -53,7 +53,8 @@ export function usePlaceContrib() {
     setBusy(true);
     try {
       const result = await placeContribRepo.withdraw();
-      setState(await placeContribRepo.state());
+      // The withdrawal went through; a failed re-read keeps the old state rather than reporting it failed.
+      await placeContribRepo.state().then(setState, () => undefined);
       return result;
     } finally {
       setBusy(false);
