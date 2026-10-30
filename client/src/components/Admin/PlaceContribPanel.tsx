@@ -1,8 +1,7 @@
 import type { PlaceContribField, PlaceContribState } from '@trek/shared';
-import { HeartHandshake, Undo2 } from 'lucide-react';
+import { ChevronRight, HeartHandshake, Undo2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from '../../i18n';
-import FoldSummary from '../../pages/admin/FoldSummary';
 import type { TranslationFn } from '../../types';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { StatusPill } from '../Settings/settingsKit';
@@ -156,11 +155,18 @@ export default function PlaceContribPanel() {
 
       {(agreed || state.consent.decision === 'off') && (
         <details className="group overflow-hidden rounded-[12px] border border-edge-faint bg-surface-card">
-          <FoldSummary>
+          {/* The admin page's fold head (pages/admin/FoldSummary), which a component cannot import. */}
+          <summary className="flex cursor-pointer list-none items-center gap-2.5 px-3.5 py-2.5 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--text-primary)] [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              size={15}
+              strokeWidth={2}
+              className="flex-none text-content-faint transition-transform group-open:rotate-90"
+              aria-hidden="true"
+            />
             <span className="font-medium text-content" style={fs(12.5, 'body')}>
               {t('admin.contribute.log.title')}
             </span>
-          </FoldSummary>
+          </summary>
           <div className="flex flex-col gap-3 border-t border-edge-faint p-3">
             <PlaceContribLog />
             <button

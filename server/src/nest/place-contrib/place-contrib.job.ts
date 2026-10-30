@@ -24,6 +24,7 @@ export class PlaceContribJob implements OnApplicationBootstrap {
     private readonly registrar: CronRegistrarService,
   ) {}
 
+  /** @txIndependent two schedules, each registered on its own; neither touches the database. */
   onApplicationBootstrap(): void {
     if (!this.registrar.isEnabled()) return;
     this.registrar.register('place-contrib-send', SEND_SCHEDULE, () => this.send());

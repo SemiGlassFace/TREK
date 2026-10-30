@@ -10,6 +10,7 @@
 import { AuditLog } from '../../src/db/entities/AuditLog.entity';
 import { PlaceContribLog } from '../../src/db/entities/PlaceContribLog.entity';
 import { servicesConfig } from '../../src/nest/app-config/tokens';
+import { inOrder } from '../../src/nest/common/in-order';
 import { TrekExceptionFilter } from '../../src/nest/common/trek-exception.filter';
 import { ZodValidationPipe } from '../../src/nest/common/zod-validation.pipe';
 import { PlaceContribModule } from '../../src/nest/place-contrib/place-contrib.module';
@@ -91,12 +92,11 @@ describe('the guards', () => {
       () => request(server).get(`${BASE}/log`),
       () => request(server).post(`${BASE}/withdraw`).send({ confirm: true }),
     ];
-    await Promise.all(
-      routes.map(async (route) => {
-        expect((await route()).status).toBe(401);
-        expect((await route().set(as(USER))).status).toBe(403);
-      }),
-    );
+    // One after another: the test server resets connections opened all at once.
+    await inOrder(routes, async (route) => {
+      expect((await route()).status).toBe(401);
+      expect((await route().set(as(USER))).status).toBe(403);
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
@@ -153,12 +153,10 @@ describe('the state and the decisions', () => {
       { action: 'agree', termsVersion: 1, fields: { website: true } },
       { action: 'fields', fields: FIELDS, withdraw: 'yes' },
     ];
-    await Promise.all(
-      bodies.map(async (body) => {
-        const res = await request(server).put(`${BASE}/decision`).set(as(ADMIN)).send(body);
-        expect(res.status, JSON.stringify(body)).toBe(400);
-      }),
-    );
+    await inOrder(bodies, async (body) => {
+      const res = await request(server).put(`${BASE}/decision`).set(as(ADMIN)).send(body);
+      expect(res.status, JSON.stringify(body)).toBe(400);
+    });
   });
 
   it('PCE2E-014: "Not now" answers when the prompt comes back for this admin', async () => {
