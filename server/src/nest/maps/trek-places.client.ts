@@ -241,7 +241,7 @@ function statusError(status: number): Error & { status: number } {
   return err;
 }
 
-async function getJson<T>(
+export async function getJson<T>(
   path: string,
   params: Record<string, string | number | undefined>,
   opts: { maxBytes?: number; timeoutMs?: number; breaker?: Breaker } = {},

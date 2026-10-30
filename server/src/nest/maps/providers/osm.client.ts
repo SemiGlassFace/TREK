@@ -26,6 +26,7 @@
  */
 import { logWarn } from '../../audit/audit-log.logger';
 import { nominatimFetch, type GeoLane } from '../../geo/nominatim.client';
+import { markCommunityAsked, withCommunityValues } from '../community-overlay';
 import { OVERPASS_ALONG_QUERY_TIMEOUT_S, aroundPath, overpassAlongQuery } from '../maps-along.helpers';
 import { nearbyOverpassQuery, overpassNearbyRecords } from '../maps-nearby.helpers';
 import {
@@ -47,6 +48,7 @@ import {
 } from '../maps.helpers';
 import { overpassSelector, tagsMatchFilter } from '../osm-filter.helpers';
 import { OverpassBusy, hedged, lastAnsweredFirst, retryAfterMs, soonestRetryMs } from '../overpass-hedge.helpers';
+import { asOverpassElement, trekOsmElement } from '../trek-osm-element';
 import {
   photonElementDetails,
   photonIdentity,
@@ -732,10 +734,17 @@ export class OsmClient {
     const [osmType, osmId] = placeId.split(':');
     // Where Photon is the geocoder, Overpass places the element and Photon
     // names it; Nominatim is asked only when Overpass could not place it.
-    const located = this.photon.inUse() ? await this.fetchOverpassDetails(osmType, osmId, true) : undefined;
+    // TREK's own copy of OSM first: one read on the Places API instead of the
+    // public Overpass servers, which take seconds and are often down.
+    const own = this.photon.inUse() ? await trekOsmElement(osmType, osmId) : null;
+    const located = own
+      ? asOverpassElement(own)
+      : this.photon.inUse()
+        ? await this.fetchOverpassDetails(osmType, osmId, true)
+        : undefined;
     if (located) {
       const answer = await photonElementDetails(this.photon, located, { osmType, osmId, placeId, lang });
-      if (answer) return answer;
+      if (answer) return own ? markCommunityAsked(withCommunityValues(answer, own)) : answer;
     }
     // buildOsmDetails never yields name/address/coordinates — Nominatim is
     // the source for those (Overpass contributes the tag-derived rest).

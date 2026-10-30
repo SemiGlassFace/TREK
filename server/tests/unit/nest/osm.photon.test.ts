@@ -34,6 +34,7 @@ const NOMINATIM_REVERSE = {
 let identity: FakeServiceIdentity;
 let photonReply: () => Response;
 let overpassReply: () => Response;
+let placesReply: (url: URL) => Response;
 let osm: OsmClient;
 const hosts: string[] = [];
 
@@ -55,6 +56,8 @@ beforeEach(() => {
       }),
       { status: 200, headers: { 'content-type': 'application/json' } },
     );
+  // TREK's own details layer holds nothing unless a test says so.
+  placesReply = () => new Response(JSON.stringify({ detail: 'no such element' }), { status: 404 });
   hosts.length = 0;
   vi.stubEnv('NOMINATIM_URL', '');
   vi.stubGlobal(
@@ -64,6 +67,7 @@ beforeEach(() => {
       hosts.push(url.hostname);
       if (url.hostname === 'photon.liketrek.com') return photonReply();
       if (url.hostname === 'overpass-api.de') return overpassReply();
+      if (url.hostname === 'places.liketrek.com') return placesReply(url);
       const body = url.pathname.endsWith('/reverse') ? NOMINATIM_REVERSE : [NOMINATIM_GATE];
       return new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } });
     }),
@@ -292,7 +296,37 @@ it('OSM-PHOTON-009: a lookup by id is Overpass for the tags and the place, Photo
     osm_id: 'way:518071791',
     website: 'https://example.org',
   });
-  expect(hosts).toEqual(['overpass-api.de', 'photon.liketrek.com']);
+  // TREK's details layer is asked first; it does not hold this element here.
+  expect(hosts).toEqual(['places.liketrek.com', 'overpass-api.de', 'photon.liketrek.com']);
+});
+
+it("OSM-PHOTON-021: an element in TREK's own details layer asks no Overpass, and carries the community values", async () => {
+  placesReply = (url) => {
+    expect(url.pathname).toBe('/v1/osm/way/518071791');
+    return new Response(
+      JSON.stringify({
+        place: {
+          name: 'Brandenburger Tor',
+          lat: 52.5163,
+          lng: 13.3777,
+          tags: { website: 'https://example.org', opening_hours: '24/7' },
+          contact: { phone: '+49 30 1234567' },
+          community: { version: 2, fields: ['phone'] },
+        },
+      }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    );
+  };
+  const details = await osm.elementDetails('way:518071791', 'en');
+  expect(details).toMatchObject({
+    website: 'https://example.org',
+    opening_hours: '24/7',
+    phone: '+49 30 1234567',
+    community_version: 2,
+    lat: 52.5163,
+    lng: 13.3777,
+  });
+  expect(hosts).toEqual(['places.liketrek.com', 'photon.liketrek.com']);
 });
 
 it('OSM-PHOTON-018: Nominatim names the element only when Overpass cannot place it, or without the TREK services', async () => {

@@ -73,3 +73,12 @@ describe('community values on OSM details', () => {
     expect(await osmDetailsWithCommunity('node:7', DETAILS)).toEqual(DETAILS);
   });
 });
+
+describe('records that carry the community answer already', () => {
+  it('COMOV-006: are not asked about a second time', async () => {
+    const { markCommunityAsked } = await import('../../../src/nest/maps/community-overlay');
+    const record = markCommunityAsked({ ...DETAILS });
+    expect(await osmDetailsWithCommunity('relation:3389505', record)).toBe(record);
+    expect(ask).not.toHaveBeenCalled();
+  });
+});

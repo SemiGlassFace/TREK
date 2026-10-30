@@ -32,13 +32,21 @@ export function withCommunityValues(
   return out;
 }
 
+/** Records built from TREK's own details layer, which carry the community answer already. */
+const asked = new WeakSet<object>();
+
+export function markCommunityAsked(details: Record<string, unknown>): Record<string, unknown> {
+  asked.add(details);
+  return details;
+}
+
 /** OSM details as Overpass and Photon gave them, with the community's values for the same element. */
 export async function osmDetailsWithCommunity(
   placeId: string,
   details: Record<string, unknown> | null,
 ): Promise<Record<string, unknown> | null> {
   const key = communityKeyOf(placeId);
-  if (!details || !key) return details;
+  if (!details || !key || asked.has(details)) return details;
   const published = await trekCommunityByKeys([key]);
   return withCommunityValues(details, published[key]);
 }
