@@ -200,7 +200,7 @@ Most of what follows is an addon an admin switches on or off. Lists, Costs, Docu
 - **Admin panel**: users and the permission matrix, defaults for new users, categories and templates, addons, plugins, storage, notifications, MCP tokens, backups, audit log and releases
 - **Backups and storage**: scheduled backups with retention that restore their own secrets, and local or S3-compatible storage per content category with replicas
 - **Appearance**: light, dark or follow the OS, seven colour schemes plus a custom accent, transparency, density, reduced motion and text size
-- **27 languages**: en, de, es, fr, it, nl, hu, ru, zh, zh-TW, pl, cs, ar (right to left), br, id, tr, ja, ko, uk, gr, sv, vi, ca, az, et, sk, th
+- **28 languages**: en, de, es, fr, it, nl, hu, ru, zh, zh-TW, pl, cs, ar (right to left), he (right to left), br, id, tr, ja, ko, uk, gr, sv, vi, ca, az, et, sk, th
 - **Help center**: a ? in the top bar with 381 step-by-step guides with screenshots, searched together with the wiki that ships in the image
 
 </td>

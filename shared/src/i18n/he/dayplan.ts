@@ -69,6 +69,8 @@ const dayplan: TranslationStrings = {
   'dayplan.pdfTooltip': 'ייצוא התוכנית היומית כ-PDF',
   'dayplan.pdfMine': 'התוכנית שלי כ-PDF',
   'dayplan.pdfMineSub': 'רק הפעילויות וההזמנות שאתם משתתפים בהן',
+  'dayplan.pdfRouting': 'מחשב מסלולים: {done} מתוך {total}',
+  'dayplan.pdfSkipRouting': 'ייצוא בלי המסלולים שנותרו',
   'dayplan.gpxTooltip': 'ייצוא כ-GPX למפות לא מקוונות ומכשירי GPS',
   'dayplan.gpxAll': 'כל הטיול',
   'dayplan.gpxPlaces': 'מקומות בלבד',

@@ -33,6 +33,8 @@ const map: TranslationStrings = {
   'map.lock.unlock': 'לתת למפה לעקוב אחרי הבחירה',
   'map.overview.hide': 'הסתרת כל הטיול',
   'map.overview.total': 'מרחק כולל',
+  'map.overview.distanceAtLeast': 'לפחות {distance}',
+  'map.overview.notRouted': 'ללא מסלול',
   'map.attribution': 'קרדיטים למפה',
   'map.overview.unrouted': 'לא ניתן היה לחשב מסלול ל-{count} קטעים, ולכן המרחקים חלקיים.',
   'map.overview.unrouted.one': 'לא ניתן היה לחשב מסלול לקטע אחד, ולכן המרחקים חלקיים.',

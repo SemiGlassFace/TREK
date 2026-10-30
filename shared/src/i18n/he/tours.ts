@@ -144,6 +144,8 @@ const tours: TranslationStrings = {
   'tours.planner.plannedTotalInfoLabel': 'מידע על המשך הכולל המתוכנן',
   'tours.planner.plannedTotalManual': 'הגדרה ידנית',
   'tours.planner.timeValueInvalid': 'הזינו מספר שלם בין 0 ל-1,440 דקות.',
+  'tours.planner.plannedTotalOverDay':
+    'זמן ההליכה וההפסקות מסתכמים ביותר מ-24 שעות ביום. הפכו את הסיור לרב-יומי עם "סיום מקטע כאן" בעצירה, או הזינו סך מתוכנן קצר יותר.',
   'tours.planner.walkingTimeUnknown': 'לא חושב',
   'tours.planner.walkingShort': 'הליכה',
   'tours.planner.breaksShort': 'הפסקות',

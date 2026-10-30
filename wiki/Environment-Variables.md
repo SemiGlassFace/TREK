@@ -97,7 +97,7 @@ Setting `ENCRYPTION_KEY` explicitly is recommended so you can back it up indepen
 
 ### `DEFAULT_LANGUAGE` — Supported Codes
 
-You can set `DEFAULT_LANGUAGE` to any of the 27 languages TREK ships. The currently supported codes are:
+You can set `DEFAULT_LANGUAGE` to any of the 28 languages TREK ships. The currently supported codes are:
 
 | Code    | Language           |
 |---------|--------------------|
@@ -119,6 +119,7 @@ You can set `DEFAULT_LANGUAGE` to any of the 27 languages TREK ships. The curren
 | `tr`    | Türkçe             |
 | `ar`    | العربية            |
 | `az`    | Azərbaycanca       |
+| `he`    | עברית              |
 | `id`    | Bahasa Indonesia   |
 | `ja`    | 日本語                |
 | `ko`    | 한국어                |

@@ -38,7 +38,14 @@ const settings: TranslationStrings = {
     'מופע OSRM משלכם. ריק משתמש בשרתים הציבוריים, שמאפשרים בערך בקשה אחת לשנייה — מספיק ליום, צפוף לטיול דרכים. נכנס לתוקף אחרי הפעלה מחדש של השרת.',
   'settings.valhallaBase': 'מופע Valhalla משלכם',
   'settings.valhallaBaseHint':
-    'TREK משתמש כברירת מחדל ב-Valhalla הציבורי של FOSSGIS כדי להימנע מכבישי אגרה, כבישים מהירים ומעבורות. הזינו כאן כתובת Valhalla משלכם כדי להשתמש בה במקום. אם מוגדר רק מופע ניווט מותאם, ה-Valhalla הציבורי לא ישמש. אחרי הזנת כתובת מותאמת, הפעילו מחדש את השרת וטענו מחדש את העמוד.',
+    'Valhalla משלכם, שנשאל כששירות הניווט למעלה מוגדר אליו או לאוטומטי. אם מוגדר רק מנוע ניווט משלכם ולא נבחר שירות ניווט, אף Valhalla לא נשאל. אחרי הזנת כתובת, הפעילו מחדש את השרת וטענו מחדש את העמוד.',
+  'settings.valhallaProvider': 'שירות ניווט',
+  'settings.valhallaProviderHint':
+    'עם שירותי TREK או Valhalla משלכם, Valhalla מחשב כל מסלול: ימים וטיולי דרכים ברגל, באופניים וברכב, מסלולים שנמנעים מכבישי אגרה, כבישים מהירים או מעבורות, וגם המסלולים, הגבהים והשבילים של סיורים. כשהוא לא יכול לענות, OSRM מחשב את אותו יום במקומו. שירותי TREK נשאלים דרך השרת הזה. עם ה-Valhalla הציבורי של FOSSGIS, OSRM מחשב את המסלולים ו-Valhalla עונה רק על מה ש-OSRM לא יכול. אוטומטי שואל את שירותי TREK, אלא אם הוגדר Valhalla משלכם או רק מנוע ניווט משלכם.',
+  'settings.valhallaProviderOption.auto': 'אוטומטי',
+  'settings.valhallaProviderOption.trek': 'שירותי TREK',
+  'settings.valhallaProviderOption.fossgis': 'Valhalla ציבורי (FOSSGIS)',
+  'settings.valhallaProviderOption.custom': 'מופע Valhalla משלכם',
   'settings.mapHint': 'תבנית URL לאריחי מפה',
   'settings.mapProvider': 'ספק מפות',
   'settings.mapProviderHint': 'משפיע על המפות במתכנן הטיולים וביומן המסע. האטלס תמיד משתמש ב-Leaflet.',
