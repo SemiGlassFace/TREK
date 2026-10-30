@@ -96,7 +96,7 @@ The place inspector shows the phone and the e-mail address as pills in its head 
 
 ### Newer place details
 
-When you edit a saved place, TREK looks the place up again. If the lookup knows a website, phone number, e-mail address or opening hours that differ from what the place holds, a **New place details** pill with the number of differences appears in the head of the form. It opens a list with what the place holds now beside what the lookup has. A field that is empty is ticked; a field that already has a value is not, and says that it would replace it. **Take over** writes only the ticked fields into the form, and the place keeps them once you save it. A field the lookup knows nothing about is never offered, so refreshing never empties anything.
+When you edit a saved place, TREK looks the place up again. If the lookup knows a description, website, phone number, e-mail address or opening hours that differ from what the place holds, a **New place details** pill with the number of differences appears in the head of the form. It opens a list with what the place holds now beside what the lookup has. A field that is empty is ticked; a field that already has a value is not, and says that it would replace it. **Take over** writes only the ticked fields into the form, and the place keeps them once you save it. A field the lookup knows nothing about is never offered, so refreshing never empties anything.
 
 ### Costs for a place
 
