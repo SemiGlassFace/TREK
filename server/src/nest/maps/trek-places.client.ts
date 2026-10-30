@@ -637,6 +637,31 @@ export async function trekPlacesById(gers: string, opts: { lang?: string } = {})
   }
 }
 
+/** What the service publishes for a place found elsewhere (Photon, Overpass): the overlay of its own rows. */
+export interface TrekCommunityValues {
+  contact?: { website?: string | null; phone?: string | null; email?: string | null } | null;
+  hours?: { osm?: string | null } | null;
+  description?: { text?: string | null } | null;
+  community?: { version?: number; fields?: string[] } | null;
+}
+
+/**
+ * The published community values of places that are no rows of the index, by
+ * key (`osm:relation/3389505`). Nothing published, or the service not
+ * answering, is an empty map: the details are shown as they are.
+ */
+export async function trekCommunityByKeys(keys: string[]): Promise<Record<string, TrekCommunityValues>> {
+  if (keys.length === 0) return {};
+  try {
+    const body = await getJson<{ places?: Record<string, TrekCommunityValues> }>('/v1/community', {
+      keys: keys.slice(0, 50).join(','),
+    });
+    return body.places ?? {};
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Map a TREK place onto the record shape the client already reads.
  *

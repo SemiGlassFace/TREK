@@ -13,6 +13,7 @@ import {
   trekPlacesArea,
   trekPlacesBaseUrl,
   trekPlacesById,
+  trekCommunityByKeys,
   trekPlacesHighlights,
   trekPlacesMiss,
   trekPlacesNearby,
@@ -1205,5 +1206,24 @@ describe('the layers breaker', () => {
     calls = [];
     await expect(trekPlacesSearch('x')).rejects.toThrow('unreachable, not retrying yet');
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe('trekCommunityByKeys', () => {
+  it('asks /v1/community for the keys and answers its places', async () => {
+    const places = { 'osm:relation/3389505': { contact: { website: 'https://www.skybldg.co.jp/' } } };
+    stubFetch({ places });
+    expect(await trekCommunityByKeys(['osm:relation/3389505', 'osm:node/1'])).toEqual(places);
+    const url = new URL(calls[0]?.url ?? 'http://missing');
+    expect(url.pathname).toBe('/v1/community');
+    expect(url.searchParams.get('keys')).toBe('osm:relation/3389505,osm:node/1');
+  });
+
+  it('asks nothing without keys, and a failing service is an empty map', async () => {
+    stubFetch({ places: {} });
+    expect(await trekCommunityByKeys([])).toEqual({});
+    expect(calls).toHaveLength(0);
+    stubFetch({ error: 'down' }, 503);
+    expect(await trekCommunityByKeys(['osm:node/1'])).toEqual({});
   });
 });
