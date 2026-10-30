@@ -1074,5 +1074,89 @@ const admin: TranslationStrings = {
   'admin.addons.ai.parsing.pullFailed': "No s'ha pogut baixar el model",
   'admin.addons.ai.parsing.unreachable': "No s'ha pogut connectar amb el servidor local",
   'admin.addons.ai.parsing.apiKeyOptional': 'Normalment no cal',
+  'admin.contribute.title': 'Comparteix detalls de llocs',
+  'admin.contribute.status.active': 'Compartint',
+  'admin.contribute.status.paused': 'En pausa',
+  'admin.contribute.status.off': 'Desactivat',
+  'admin.contribute.status.unavailable': 'No disponible',
+  'admin.contribute.noteActive':
+    "El que els teus usuaris escriuen sobre els llocs arriba, després d'una revisió, a tots els TREK. Gràcies per ajudar.",
+  'admin.contribute.noteOff':
+    'Fes que el que els teus usuaris escriuen sobre els llocs millori la TREK Places API per a tothom.',
+  'admin.contribute.ineligible.env_off': 'Desactivat per a aquesta instal·lació mitjançant TREK_PLACES_CONTRIBUTE.',
+  'admin.contribute.ineligible.not_production': 'Només una instal·lació de producció pot compartir detalls de llocs.',
+  'admin.contribute.ineligible.demo': 'Una instal·lació de demostració no comparteix detalls de llocs.',
+  'admin.contribute.ineligible.index_off': "Compartir requereix l'índex de TREK com a font de llocs.",
+  'admin.contribute.ineligible.custom_places_url':
+    'Aquesta instal·lació fa servir la seva pròpia Places API, així que no hi ha amb qui compartir.',
+  'admin.contribute.ineligible.services_off': 'Els serveis de TREK estan desactivats per a aquesta instal·lació.',
+  'admin.contribute.ineligible.no_key':
+    'Aquesta instal·lació encara no té cap clau de serveis. Es sol·licita automàticament.',
+  'admin.contribute.pause.key_invalid': "En pausa: el servei no ha acceptat la clau d'aquesta instal·lació.",
+  'admin.contribute.pause.key_refused':
+    "En pausa: el servei ha rebutjat la clau d'aquesta instal·lació. Una clau nova reprèn l'enviament.",
+  'admin.contribute.pause.not_accepting':
+    "En pausa: el servei no admet contribucions en aquest moment. Els valors en espera s'enviaran més tard.",
+  'admin.contribute.field.website': 'Lloc web',
+  'admin.contribute.field.phone': 'Telèfon',
+  'admin.contribute.field.email': 'Correu electrònic',
+  'admin.contribute.field.opening_hours': "Horari d'obertura",
+  'admin.contribute.field.description': 'Descripció',
+  'admin.contribute.field.image': 'Foto',
+  'admin.contribute.figure.accepted': 'Acceptats',
+  'admin.contribute.figure.acceptedInfo': 'Valors que el servei ha acceptat en els darrers 30 dies.',
+  'admin.contribute.figure.queue': 'En espera',
+  'admin.contribute.figure.queueFull':
+    'La cua és plena. Els valors nous esperen fins que hi hagi lloc una altra vegada.',
+  'admin.contribute.figure.last': 'Darrer acceptat',
+  'admin.contribute.never': 'mai',
+  'admin.contribute.log.title': "Registre d'enviaments",
+  'admin.contribute.log.result': 'Resultat',
+  'admin.contribute.log.field': 'Camp',
+  'admin.contribute.log.allResults': 'Tots els resultats',
+  'admin.contribute.log.allFields': 'Tots els camps',
+  'admin.contribute.log.empty': "Encara no s'ha enviat res.",
+  'admin.contribute.log.failed': "No s'ha pogut carregar el registre.",
+  'admin.contribute.log.previous': 'Pàgina anterior',
+  'admin.contribute.log.next': 'Pàgina següent',
+  'admin.contribute.result.accepted': 'Acceptat',
+  'admin.contribute.result.duplicate': 'Ja conegut',
+  'admin.contribute.result.rejected': 'Rebutjat',
+  'admin.contribute.result.withheld': 'No enviat',
+  'admin.contribute.result.retracted': 'Retirat',
+  'admin.contribute.withdraw': "Retira tot el que s'ha enviat",
+  'admin.contribute.withdrawTitle': 'Retirar-ho tot?',
+  'admin.contribute.withdrawMessage':
+    "Tots els valors que ha enviat aquesta instal·lació s'eliminen de la TREK Places API i els valors en espera es descarten. Els llocs conserven els seus detalls aquí.",
+  'admin.contribute.withdrawn': "Retirats de l'índex: {total}",
+  'admin.contribute.offTitle': 'Deixar de compartir?',
+  'admin.contribute.offMessage':
+    "No s'envia res més i els valors en espera es descarten. El que ja s'ha acceptat es queda a l'índex, tret que ho retiris.",
+  'admin.contribute.offConfirm': 'Deixa de compartir',
+  'admin.contribute.refused.terms_outdated': 'Les condicions han canviat mentrestant. Torna a revisar-les.',
+  'admin.contribute.refused.no_field': 'Tria almenys un camp per compartir.',
+  'admin.contribute.prompt.title': 'Ajuda cada TREK a conèixer millor els llocs',
+  'admin.contribute.prompt.lead':
+    "Quan algú afegeix aquí un lloc web, un telèfon, un horari o una descripció a un lloc, TREK ho pot transmetre. Després d'una revisió, cada instal·lació de TREK ho mostra, i la teva rep a canvi el que han afegit altres.",
+  'admin.contribute.prompt.why':
+    'La TREK Places API és gratuïta i no necessita cap clau de Google perquè es construeix amb dades obertes. Cada detall que comparteixes la millora per a milers de viatgers. Gràcies per formar-ne part.',
+  'admin.contribute.prompt.whatLabel': 'Què es comparteix',
+  'admin.contribute.prompt.imageNote':
+    'Les fotos es revisen a mà abans que les vegi ningú més. Pots canviar cada ajust més endavant.',
+  'admin.contribute.prompt.neverLabel': 'Mai es comparteix',
+  'admin.contribute.never.notes': 'Notes', // same-as-en
+  'admin.contribute.never.files': 'Fitxers i adjunts',
+  'admin.contribute.never.trips': 'Viatges, dies i reserves',
+  'admin.contribute.never.people': 'Noms, correus i comptes',
+  'admin.contribute.never.providers': 'Detalls emplenats per Google o un altre proveïdor',
+  'admin.contribute.prompt.how':
+    "Només el que els teus usuaris han escrit ells mateixos, i només per a llocs que l'índex coneix. No s'envia cap usuari, viatge ni compte. El registre mostra cada enviament, i pots desactivar camps o retirar-ho tot en qualsevol moment.",
+  'admin.contribute.prompt.openRegistration':
+    'El registre és obert en aquesta instal·lació, així que qualsevol persona amb un compte pot escriure detalls. Cada valor es revisa abans de publicar-se.',
+  'admin.contribute.prompt.footnote': 'Ho decideixes per a tota la instal·lació. No es pregunta als teus usuaris.',
+  'admin.contribute.prompt.agree': 'Accepta i comparteix',
+  'admin.contribute.prompt.snooze': 'Ara no',
+  'admin.contribute.prompt.decline': 'No, gràcies',
+  'admin.contribute.prompt.thanks': 'Gràcies. Els detalls dels llocs ja es comparteixen.',
 };
 export default admin;

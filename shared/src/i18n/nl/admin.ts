@@ -1067,5 +1067,88 @@ const admin: TranslationStrings = {
   'admin.addons.ai.parsing.pullFailed': 'Model kon niet worden opgehaald',
   'admin.addons.ai.parsing.unreachable': 'De lokale server is niet bereikbaar',
   'admin.addons.ai.parsing.apiKeyOptional': 'Meestal niet nodig',
+  'admin.contribute.title': 'Plaatsdetails delen',
+  'admin.contribute.status.active': 'Wordt gedeeld',
+  'admin.contribute.status.paused': 'Gepauzeerd',
+  'admin.contribute.status.off': 'Uit',
+  'admin.contribute.status.unavailable': 'Niet beschikbaar',
+  'admin.contribute.noteActive':
+    'Wat je gebruikers over plaatsen invullen, bereikt na een controle elke TREK. Bedankt voor je hulp.',
+  'admin.contribute.noteOff':
+    'Laat wat je gebruikers over plaatsen invullen de TREK Places API voor iedereen beter maken.',
+  'admin.contribute.ineligible.env_off': 'Voor deze installatie uitgezet via TREK_PLACES_CONTRIBUTE.',
+  'admin.contribute.ineligible.not_production': 'Alleen een productie-installatie kan plaatsdetails delen.',
+  'admin.contribute.ineligible.demo': 'Een demo-installatie deelt geen plaatsdetails.',
+  'admin.contribute.ineligible.index_off': 'Delen vereist de TREK-index als plaatsbron.',
+  'admin.contribute.ineligible.custom_places_url':
+    'Deze installatie gebruikt een eigen Places API, dus er is niets om mee te delen.',
+  'admin.contribute.ineligible.services_off': 'De TREK-diensten staan uit voor deze installatie.',
+  'admin.contribute.ineligible.no_key':
+    'Deze installatie heeft nog geen dienstsleutel. Die wordt automatisch aangevraagd.',
+  'admin.contribute.pause.key_invalid': 'Gepauzeerd: de dienst accepteerde de sleutel van deze installatie niet.',
+  'admin.contribute.pause.key_refused':
+    'Gepauzeerd: de dienst weigerde de sleutel van deze installatie. Met een nieuwe sleutel gaat het delen verder.',
+  'admin.contribute.pause.not_accepting':
+    'Gepauzeerd: de dienst neemt nu geen bijdragen aan. Wachtende waarden worden later verstuurd.',
+  'admin.contribute.field.website': 'Website', // same-as-en
+  'admin.contribute.field.phone': 'Telefoon',
+  'admin.contribute.field.email': 'E-mail',
+  'admin.contribute.field.opening_hours': 'Openingstijden',
+  'admin.contribute.field.description': 'Beschrijving',
+  'admin.contribute.field.image': 'Foto',
+  'admin.contribute.figure.accepted': 'Geaccepteerd',
+  'admin.contribute.figure.acceptedInfo': 'Waarden die de dienst de afgelopen 30 dagen heeft aangenomen.',
+  'admin.contribute.figure.queue': 'Wachtend',
+  'admin.contribute.figure.queueFull': 'De wachtrij is vol. Nieuwe waarden wachten tot er weer ruimte is.',
+  'admin.contribute.figure.last': 'Laatst geaccepteerd',
+  'admin.contribute.never': 'nooit',
+  'admin.contribute.log.title': 'Verzendlogboek',
+  'admin.contribute.log.result': 'Resultaat',
+  'admin.contribute.log.field': 'Veld',
+  'admin.contribute.log.allResults': 'Alle resultaten',
+  'admin.contribute.log.allFields': 'Alle velden',
+  'admin.contribute.log.empty': 'Nog niets verzonden.',
+  'admin.contribute.log.failed': 'Het logboek kon niet worden geladen.',
+  'admin.contribute.log.previous': 'Vorige pagina',
+  'admin.contribute.log.next': 'Volgende pagina',
+  'admin.contribute.result.accepted': 'Geaccepteerd',
+  'admin.contribute.result.duplicate': 'Al bekend',
+  'admin.contribute.result.rejected': 'Afgewezen',
+  'admin.contribute.result.withheld': 'Niet verzonden',
+  'admin.contribute.result.retracted': 'Ingetrokken',
+  'admin.contribute.withdraw': 'Alles wat is verzonden intrekken',
+  'admin.contribute.withdrawTitle': 'Alles intrekken?',
+  'admin.contribute.withdrawMessage':
+    'Elke waarde die deze installatie heeft verzonden wordt uit de TREK Places API verwijderd en wachtende waarden worden weggegooid. Plaatsen behouden hier hun details.',
+  'admin.contribute.withdrawn': 'Uit de index ingetrokken: {total}',
+  'admin.contribute.offTitle': 'Stoppen met delen?',
+  'admin.contribute.offMessage':
+    'Er wordt niets meer verzonden en wachtende waarden worden weggegooid. Wat al is geaccepteerd blijft in de index, tenzij je het intrekt.',
+  'admin.contribute.offConfirm': 'Stoppen met delen',
+  'admin.contribute.refused.terms_outdated': 'De voorwaarden zijn intussen gewijzigd. Bekijk ze nog eens.',
+  'admin.contribute.refused.no_field': 'Kies minstens één veld om te delen.',
+  'admin.contribute.prompt.title': 'Help elke TREK plaatsen beter te kennen',
+  'admin.contribute.prompt.lead':
+    'Als iemand hier een website, telefoonnummer, openingstijden of beschrijving bij een plaats zet, kan TREK dat doorgeven. Na een controle toont elke TREK-installatie het, en de jouwe krijgt in ruil wat anderen hebben toegevoegd.',
+  'admin.contribute.prompt.why':
+    'De TREK Places API is gratis en heeft geen Google-sleutel nodig, omdat hij is opgebouwd uit open data. Elk detail dat je deelt maakt hem beter voor duizenden reizigers. Bedankt dat je meedoet.',
+  'admin.contribute.prompt.whatLabel': 'Wat er wordt gedeeld',
+  'admin.contribute.prompt.imageNote':
+    "Foto's worden met de hand bekeken voordat iemand anders ze ziet. Je kunt elke schakelaar later wijzigen.",
+  'admin.contribute.prompt.neverLabel': 'Nooit gedeeld',
+  'admin.contribute.never.notes': 'Notities',
+  'admin.contribute.never.files': 'Bestanden en bijlagen',
+  'admin.contribute.never.trips': 'Reizen, dagen en boekingen',
+  'admin.contribute.never.people': 'Namen, e-mailadressen en accounts',
+  'admin.contribute.never.providers': 'Details die door Google of een andere aanbieder zijn ingevuld',
+  'admin.contribute.prompt.how':
+    'Alleen wat je gebruikers zelf hebben ingevuld, en alleen voor plaatsen die de index kent. Er gaat geen gebruiker, reis of account mee. Het logboek toont elke verzending, en je kunt velden uitzetten of alles op elk moment intrekken.',
+  'admin.contribute.prompt.openRegistration':
+    'De registratie staat open op deze installatie, dus iedereen met een account kan details invullen. Elke waarde wordt gecontroleerd voordat ze wordt gepubliceerd.',
+  'admin.contribute.prompt.footnote': 'Je beslist dit voor de hele installatie. Je gebruikers worden niet gevraagd.',
+  'admin.contribute.prompt.agree': 'Akkoord en delen',
+  'admin.contribute.prompt.snooze': 'Nu niet',
+  'admin.contribute.prompt.decline': 'Nee, bedankt',
+  'admin.contribute.prompt.thanks': 'Bedankt. Plaatsdetails worden nu gedeeld.',
 };
 export default admin;

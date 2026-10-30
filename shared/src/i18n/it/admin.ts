@@ -1070,5 +1070,89 @@ const admin: TranslationStrings = {
   'admin.addons.ai.parsing.pullFailed': 'Impossibile scaricare il modello',
   'admin.addons.ai.parsing.unreachable': 'Impossibile raggiungere il server locale',
   'admin.addons.ai.parsing.apiKeyOptional': 'Spesso non serve',
+  'admin.contribute.title': 'Condividi i dettagli dei luoghi',
+  'admin.contribute.status.active': 'Condivisione attiva',
+  'admin.contribute.status.paused': 'In pausa',
+  'admin.contribute.status.off': 'Disattivata',
+  'admin.contribute.status.unavailable': 'Non disponibile',
+  'admin.contribute.noteActive':
+    "Ciò che i tuoi utenti scrivono sui luoghi arriva a ogni TREK dopo un controllo. Grazie per l'aiuto.",
+  'admin.contribute.noteOff':
+    'Lascia che ciò che i tuoi utenti scrivono sui luoghi migliori la TREK Places API per tutti.',
+  'admin.contribute.ineligible.env_off': 'Disattivata per questa installazione da TREK_PLACES_CONTRIBUTE.',
+  'admin.contribute.ineligible.not_production':
+    "Solo un'installazione di produzione può condividere i dettagli dei luoghi.",
+  'admin.contribute.ineligible.demo': "Un'installazione demo non condivide i dettagli dei luoghi.",
+  'admin.contribute.ineligible.index_off': "La condivisione richiede l'indice TREK come fonte dei luoghi.",
+  'admin.contribute.ineligible.custom_places_url':
+    "Questa installazione usa una propria Places API, quindi non c'è nulla con cui condividere.",
+  'admin.contribute.ineligible.services_off': 'I servizi TREK sono disattivati per questa installazione.',
+  'admin.contribute.ineligible.no_key':
+    'Questa installazione non ha ancora una chiave dei servizi. Viene richiesta automaticamente.',
+  'admin.contribute.pause.key_invalid': 'In pausa: il servizio non ha accettato la chiave di questa installazione.',
+  'admin.contribute.pause.key_refused':
+    'In pausa: il servizio ha rifiutato la chiave di questa installazione. Con una nuova chiave la condivisione riprende.',
+  'admin.contribute.pause.not_accepting':
+    'In pausa: il servizio al momento non accetta contributi. I valori in attesa vengono inviati più tardi.',
+  'admin.contribute.field.website': 'Sito web',
+  'admin.contribute.field.phone': 'Telefono',
+  'admin.contribute.field.email': 'Email', // same-as-en
+  'admin.contribute.field.opening_hours': 'Orari di apertura',
+  'admin.contribute.field.description': 'Descrizione',
+  'admin.contribute.field.image': 'Foto',
+  'admin.contribute.figure.accepted': 'Accettati',
+  'admin.contribute.figure.acceptedInfo': 'Valori accettati dal servizio negli ultimi 30 giorni.',
+  'admin.contribute.figure.queue': 'In attesa',
+  'admin.contribute.figure.queueFull': "La coda è piena. I nuovi valori attendono finché non c'è di nuovo posto.",
+  'admin.contribute.figure.last': 'Ultimo accettato',
+  'admin.contribute.never': 'mai',
+  'admin.contribute.log.title': 'Registro degli invii',
+  'admin.contribute.log.result': 'Esito',
+  'admin.contribute.log.field': 'Campo',
+  'admin.contribute.log.allResults': 'Tutti gli esiti',
+  'admin.contribute.log.allFields': 'Tutti i campi',
+  'admin.contribute.log.empty': 'Non è stato ancora inviato nulla.',
+  'admin.contribute.log.failed': 'Impossibile caricare il registro.',
+  'admin.contribute.log.previous': 'Pagina precedente',
+  'admin.contribute.log.next': 'Pagina successiva',
+  'admin.contribute.result.accepted': 'Accettato',
+  'admin.contribute.result.duplicate': 'Già noto',
+  'admin.contribute.result.rejected': 'Rifiutato',
+  'admin.contribute.result.withheld': 'Non inviato',
+  'admin.contribute.result.retracted': 'Ritirato',
+  'admin.contribute.withdraw': 'Ritira tutto ciò che è stato inviato',
+  'admin.contribute.withdrawTitle': 'Ritirare tutto?',
+  'admin.contribute.withdrawMessage':
+    'Ogni valore inviato da questa installazione viene rimosso dalla TREK Places API e i valori in attesa vengono scartati. I luoghi mantengono qui i loro dettagli.',
+  'admin.contribute.withdrawn': "Ritirati dall'indice: {total}",
+  'admin.contribute.offTitle': 'Interrompere la condivisione?',
+  'admin.contribute.offMessage':
+    "Non viene inviato altro e i valori in attesa vengono scartati. Ciò che è già stato accettato resta nell'indice, a meno che tu non lo ritiri.",
+  'admin.contribute.offConfirm': 'Interrompi la condivisione',
+  'admin.contribute.refused.terms_outdated': "Nel frattempo i termini sono cambiati. Dagli un'altra occhiata.",
+  'admin.contribute.refused.no_field': 'Scegli almeno un campo da condividere.',
+  'admin.contribute.prompt.title': 'Aiuta ogni TREK a conoscere meglio i luoghi',
+  'admin.contribute.prompt.lead':
+    'Quando qualcuno qui aggiunge un sito web, un numero di telefono, gli orari di apertura o una descrizione a un luogo, TREK può inoltrarli. Dopo un controllo, ogni installazione TREK li mostra, e la tua riceve in cambio ciò che hanno aggiunto gli altri.',
+  'admin.contribute.prompt.why':
+    'La TREK Places API è gratuita e non richiede una chiave Google perché nasce da dati aperti. Ogni dettaglio che condividi la migliora per migliaia di viaggiatori. Grazie di farne parte.',
+  'admin.contribute.prompt.whatLabel': 'Che cosa viene condiviso',
+  'admin.contribute.prompt.imageNote':
+    'Le foto vengono guardate a mano prima che le veda qualcun altro. Puoi cambiare ogni interruttore più tardi.',
+  'admin.contribute.prompt.neverLabel': 'Mai condiviso',
+  'admin.contribute.never.notes': 'Note',
+  'admin.contribute.never.files': 'File e allegati',
+  'admin.contribute.never.trips': 'Viaggi, giorni e prenotazioni',
+  'admin.contribute.never.people': 'Nomi, email e account',
+  'admin.contribute.never.providers': 'Dettagli compilati da Google o da un altro provider',
+  'admin.contribute.prompt.how':
+    "Solo ciò che i tuoi utenti hanno scritto di persona, e solo per luoghi che l'indice conosce. Nessun utente, viaggio o account viene inviato insieme. Il registro mostra ogni invio e puoi disattivare i campi o ritirare tutto in qualsiasi momento.",
+  'admin.contribute.prompt.openRegistration':
+    'La registrazione è aperta su questa installazione, quindi chiunque abbia un account può scrivere dei dettagli. Ogni valore viene controllato prima della pubblicazione.',
+  'admin.contribute.prompt.footnote': "Decidi tu per l'intera installazione. I tuoi utenti non vengono interpellati.",
+  'admin.contribute.prompt.agree': 'Accetta e condividi',
+  'admin.contribute.prompt.snooze': 'Non ora',
+  'admin.contribute.prompt.decline': 'No, grazie',
+  'admin.contribute.prompt.thanks': 'Grazie. I dettagli dei luoghi ora sono condivisi.',
 };
 export default admin;

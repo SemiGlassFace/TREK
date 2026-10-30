@@ -1080,5 +1080,91 @@ const admin: TranslationStrings = {
   'admin.addons.ai.parsing.pullFailed': 'Impossible de télécharger le modèle',
   'admin.addons.ai.parsing.unreachable': 'Impossible de joindre le serveur local',
   'admin.addons.ai.parsing.apiKeyOptional': 'Souvent inutile',
+  'admin.contribute.title': 'Partager les détails des lieux',
+  'admin.contribute.status.active': 'Partage actif',
+  'admin.contribute.status.paused': 'En pause',
+  'admin.contribute.status.off': 'Désactivé',
+  'admin.contribute.status.unavailable': 'Indisponible',
+  'admin.contribute.noteActive':
+    'Ce que vos utilisateurs saisissent sur les lieux parvient, après vérification, à chaque TREK. Merci de votre aide.',
+  'admin.contribute.noteOff':
+    'Faites en sorte que ce que vos utilisateurs saisissent sur les lieux améliore la TREK Places API pour tout le monde.',
+  'admin.contribute.ineligible.env_off': 'Désactivé pour cette installation par TREK_PLACES_CONTRIBUTE.',
+  'admin.contribute.ineligible.not_production':
+    'Seule une installation de production peut partager des détails de lieux.',
+  'admin.contribute.ineligible.demo': 'Une installation de démonstration ne partage pas de détails de lieux.',
+  'admin.contribute.ineligible.index_off': "Le partage nécessite l'index TREK comme source de lieux.",
+  'admin.contribute.ineligible.custom_places_url':
+    "Cette installation utilise sa propre Places API, il n'y a donc personne avec qui partager.",
+  'admin.contribute.ineligible.services_off': 'Les services TREK sont désactivés pour cette installation.',
+  'admin.contribute.ineligible.no_key':
+    "Cette installation n'a pas encore de clé de services. Elle est demandée automatiquement.",
+  'admin.contribute.pause.key_invalid': "En pause : le service n'a pas accepté la clé de cette installation.",
+  'admin.contribute.pause.key_refused':
+    'En pause : le service a refusé la clé de cette installation. Une nouvelle clé reprend le partage.',
+  'admin.contribute.pause.not_accepting':
+    "En pause : le service n'accepte pas de contributions pour le moment. Les valeurs en attente seront envoyées plus tard.",
+  'admin.contribute.field.website': 'Site web',
+  'admin.contribute.field.phone': 'Téléphone',
+  'admin.contribute.field.email': 'E-mail',
+  'admin.contribute.field.opening_hours': "Horaires d'ouverture",
+  'admin.contribute.field.description': 'Description', // same-as-en
+  'admin.contribute.field.image': 'Photo', // same-as-en
+  'admin.contribute.figure.accepted': 'Acceptées',
+  'admin.contribute.figure.acceptedInfo': 'Valeurs prises en compte par le service au cours des 30 derniers jours.',
+  'admin.contribute.figure.queue': 'En attente',
+  'admin.contribute.figure.queueFull':
+    "La file d'attente est pleine. Les nouvelles valeurs attendent qu'une place se libère.",
+  'admin.contribute.figure.last': 'Dernière acceptée',
+  'admin.contribute.never': 'jamais',
+  'admin.contribute.log.title': 'Journal des transmissions',
+  'admin.contribute.log.result': 'Résultat',
+  'admin.contribute.log.field': 'Champ',
+  'admin.contribute.log.allResults': 'Tous les résultats',
+  'admin.contribute.log.allFields': 'Tous les champs',
+  'admin.contribute.log.empty': "Rien n'a encore été envoyé.",
+  'admin.contribute.log.failed': "Le journal n'a pas pu être chargé.",
+  'admin.contribute.log.previous': 'Page précédente',
+  'admin.contribute.log.next': 'Page suivante',
+  'admin.contribute.result.accepted': 'Acceptée',
+  'admin.contribute.result.duplicate': 'Déjà connue',
+  'admin.contribute.result.rejected': 'Refusée',
+  'admin.contribute.result.withheld': 'Non envoyée',
+  'admin.contribute.result.retracted': 'Retirée',
+  'admin.contribute.withdraw': 'Retirer tout ce qui a été envoyé',
+  'admin.contribute.withdrawTitle': 'Tout retirer ?',
+  'admin.contribute.withdrawMessage':
+    'Toutes les valeurs envoyées par cette installation sont supprimées de la TREK Places API et les valeurs en attente sont abandonnées. Les lieux conservent leurs détails ici.',
+  'admin.contribute.withdrawn': "Retirées de l'index : {total}",
+  'admin.contribute.offTitle': 'Arrêter le partage ?',
+  'admin.contribute.offMessage':
+    "Plus rien n'est envoyé et les valeurs en attente sont abandonnées. Ce qui a déjà été accepté reste dans l'index, sauf si vous le retirez.",
+  'admin.contribute.offConfirm': 'Arrêter le partage',
+  'admin.contribute.refused.terms_outdated': 'Les conditions ont changé entre-temps. Veuillez les relire.',
+  'admin.contribute.refused.no_field': 'Choisissez au moins un champ à partager.',
+  'admin.contribute.prompt.title': 'Aidez chaque TREK à mieux connaître les lieux',
+  'admin.contribute.prompt.lead':
+    "Lorsqu'une personne ajoute ici un site web, un numéro de téléphone, des horaires ou une description à un lieu, TREK peut les transmettre. Après vérification, chaque installation TREK les affiche, et la vôtre reçoit en retour ce que d'autres ont ajouté.",
+  'admin.contribute.prompt.why':
+    "La TREK Places API est gratuite et n'exige aucune clé Google, car elle est construite à partir de données ouvertes. Chaque détail que vous partagez l'améliore pour des milliers de voyageurs. Merci d'en faire partie.",
+  'admin.contribute.prompt.whatLabel': 'Ce qui est partagé',
+  'admin.contribute.prompt.imageNote':
+    'Les photos sont examinées à la main avant que quiconque les voie. Vous pourrez modifier chaque réglage plus tard.',
+  'admin.contribute.prompt.neverLabel': 'Jamais partagé',
+  'admin.contribute.never.notes': 'Notes', // same-as-en
+  'admin.contribute.never.files': 'Fichiers et pièces jointes',
+  'admin.contribute.never.trips': 'Voyages, jours et réservations',
+  'admin.contribute.never.people': 'Noms, e-mails et comptes',
+  'admin.contribute.never.providers': 'Détails renseignés par Google ou un autre fournisseur',
+  'admin.contribute.prompt.how':
+    "Seulement ce que vos utilisateurs ont saisi eux-mêmes, et seulement pour les lieux que l'index connaît. Aucun utilisateur, voyage ou compte n'accompagne ces données. Le journal montre chaque transmission, et vous pouvez désactiver des champs ou tout retirer à tout moment.",
+  'admin.contribute.prompt.openRegistration':
+    "L'inscription est ouverte sur cette installation : toute personne ayant un compte peut donc saisir des détails. Chaque valeur est vérifiée avant d'être publiée.",
+  'admin.contribute.prompt.footnote':
+    "Vous décidez pour toute l'installation. Vos utilisateurs ne sont pas sollicités.",
+  'admin.contribute.prompt.agree': 'Accepter et partager',
+  'admin.contribute.prompt.snooze': 'Pas maintenant',
+  'admin.contribute.prompt.decline': 'Non, merci',
+  'admin.contribute.prompt.thanks': 'Merci. Les détails des lieux sont désormais partagés.',
 };
 export default admin;

@@ -917,7 +917,7 @@ export default function PlaceFormModal(props: PlaceFormModalProps) {
             email={form.email ?? ''}
             openingHours={form.opening_hours ?? ''}
             suggestedHours={S.detailsHours}
-            onChange={(field, value) => handleChange(field, value)}
+            onChange={(field, value, origin) => handleChange(field, value, origin)}
           />
 
           {/* Costs — create / view the expense linked to this place (#1298).

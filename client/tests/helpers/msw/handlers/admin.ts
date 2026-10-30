@@ -166,4 +166,24 @@ export const adminHandlers = [
   http.get('/api/admin/service-identity', () => {
     return HttpResponse.json({ state: 'legacy', tier: 'legacy', keySource: null, services: [], lastSeenAt: null });
   }),
+
+  // Sharing place details, inside the same card: not eligible, so no prompt opens in other tests.
+  http.get('/api/admin/places-contribute', () => {
+    const fields = { website: true, phone: true, email: true, opening_hours: true, description: true, image: true };
+    return HttpResponse.json({
+      termsVersion: 1,
+      ceiling: 'admin',
+      eligible: false,
+      ineligibleReason: 'not_production',
+      consent: { enabled: false, fields, termsVersion: null, decision: null, decidedBy: null, decidedAt: null },
+      showPrompt: false,
+      snoozedUntil: null,
+      active: false,
+      counts: { accepted: 0, duplicate: 0, rejected: 0, withheld: 0, retracted: 0 },
+      lastSuccessDay: null,
+      queue: { size: 0, cap: 5000, full: false },
+      pauseReason: null,
+      registrationOpen: false,
+    });
+  }),
 ];

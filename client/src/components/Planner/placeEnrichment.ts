@@ -52,7 +52,11 @@ const ENRICH_CACHE_V = 4;
 
 export function cacheKeyFor(selection: PlaceDetailsSelection, language: string): string {
   const id = selection.placeId || `coords:${selection.lat}:${selection.lng}`;
-  return `enrich_v${ENRICH_CACHE_V}_${id}_${language}`;
+  // A place of the TREK index names the version of the community values it is
+  // served with; a new version is a new answer, not the one this tab kept.
+  const version = selection.details?.community_version;
+  const community = typeof version === 'number' ? `_c${version}` : '';
+  return `enrich_v${ENRICH_CACHE_V}_${id}${community}_${language}`;
 }
 
 /** The answer if it was already fetched this session, else undefined. */

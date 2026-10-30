@@ -29,6 +29,13 @@ describe('placeEnrichment', () => {
     expect(cacheKeyFor({ lat: 1.5, lng: 2, name: 'Pin' }, 'en')).toBe('enrich_v4_coords:1.5:2_en');
   });
 
+  it('FE-PLANNER-ENRICHCACHE-006: a place of the index served with another community version is another answer', () => {
+    const gers = { placeId: 'gers:abc', lat: 1, lng: 2, name: 'Cafe', details: { community_version: 3 } };
+    expect(cacheKeyFor(gers, 'de')).toBe('enrich_v4_gers:abc_c3_de');
+    expect(cacheKeyFor({ ...gers, details: { community_version: 4 } }, 'de')).not.toBe(cacheKeyFor(gers, 'de'));
+    expect(cacheKeyFor({ ...gers, details: {} }, 'de')).toBe('enrich_v4_gers:abc_de');
+  });
+
   it('FE-PLANNER-ENRICHCACHE-002: nothing is cached before it is stored, then both caches hold it', () => {
     expect(readCachedEnrichment(SELECTION, 'de')).toBeUndefined();
     storeEnrichment(SELECTION, 'de', RESULT);

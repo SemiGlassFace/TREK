@@ -5,6 +5,7 @@ import { fs } from '../../components/shared/DialogShell'
 import { StatusPill } from '../../components/Settings/settingsKit'
 import FoldSummary from './FoldSummary'
 import ServiceIdentityPanel from '../../components/Admin/ServiceIdentityPanel'
+import PlaceContribPanel from '../../components/Admin/PlaceContribPanel'
 import type { TranslationFn } from '../../types'
 import {
   TREK_API_SOURCES as SOURCES,
@@ -83,6 +84,7 @@ export default function TrekApiCard({ t, managed = false }: TrekApiCardProps): R
         </ul>
 
         <ServiceIdentityPanel managed={managed} />
+        <PlaceContribPanel />
       </div>
 
       <details className="group border-t border-edge-faint">

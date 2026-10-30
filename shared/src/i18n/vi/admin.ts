@@ -1044,5 +1044,88 @@ const admin: TranslationStrings = {
   'admin.addons.ai.parsing.pullFailed': 'Không thể tải mô hình',
   'admin.addons.ai.parsing.unreachable': 'Không kết nối được máy chủ cục bộ',
   'admin.addons.ai.parsing.apiKeyOptional': 'Thường không cần',
+  'admin.contribute.title': 'Chia sẻ chi tiết địa điểm',
+  'admin.contribute.status.active': 'Đang chia sẻ',
+  'admin.contribute.status.paused': 'Đã tạm dừng',
+  'admin.contribute.status.off': 'Tắt',
+  'admin.contribute.status.unavailable': 'Không khả dụng',
+  'admin.contribute.noteActive':
+    'Những gì người dùng của bạn nhập về địa điểm sẽ đến với mọi TREK sau khi được kiểm tra. Cảm ơn bạn đã giúp đỡ.',
+  'admin.contribute.noteOff':
+    'Hãy để những gì người dùng của bạn nhập về địa điểm giúp TREK Places API tốt hơn cho tất cả mọi người.',
+  'admin.contribute.ineligible.env_off': 'Đã tắt cho bản cài đặt này bởi TREK_PLACES_CONTRIBUTE.',
+  'admin.contribute.ineligible.not_production': 'Chỉ bản cài đặt chạy thật mới có thể chia sẻ chi tiết địa điểm.',
+  'admin.contribute.ineligible.demo': 'Bản cài đặt demo không chia sẻ chi tiết địa điểm.',
+  'admin.contribute.ineligible.index_off': 'Chia sẻ cần chỉ mục TREK làm nguồn địa điểm.',
+  'admin.contribute.ineligible.custom_places_url':
+    'Bản cài đặt này dùng Places API riêng, nên không có nơi nào để chia sẻ.',
+  'admin.contribute.ineligible.services_off': 'Các dịch vụ TREK đã bị tắt cho bản cài đặt này.',
+  'admin.contribute.ineligible.no_key': 'Bản cài đặt này chưa có khóa dịch vụ. Khóa được yêu cầu tự động.',
+  'admin.contribute.pause.key_invalid': 'Đã tạm dừng: dịch vụ không chấp nhận khóa của bản cài đặt này.',
+  'admin.contribute.pause.key_refused':
+    'Đã tạm dừng: dịch vụ đã từ chối khóa của bản cài đặt này. Khóa mới sẽ tiếp tục việc chia sẻ.',
+  'admin.contribute.pause.not_accepting':
+    'Đã tạm dừng: hiện dịch vụ không nhận đóng góp. Các giá trị đang chờ sẽ được gửi sau.',
+  'admin.contribute.field.website': 'Trang web',
+  'admin.contribute.field.phone': 'Điện thoại',
+  'admin.contribute.field.email': 'Email', // same-as-en
+  'admin.contribute.field.opening_hours': 'Giờ mở cửa',
+  'admin.contribute.field.description': 'Mô tả',
+  'admin.contribute.field.image': 'Ảnh',
+  'admin.contribute.figure.accepted': 'Đã chấp nhận',
+  'admin.contribute.figure.acceptedInfo': 'Các giá trị dịch vụ đã nhận trong 30 ngày qua.',
+  'admin.contribute.figure.queue': 'Đang chờ',
+  'admin.contribute.figure.queueFull': 'Hàng đợi đã đầy. Các giá trị mới sẽ chờ đến khi có chỗ trống.',
+  'admin.contribute.figure.last': 'Chấp nhận gần nhất',
+  'admin.contribute.never': 'chưa bao giờ',
+  'admin.contribute.log.title': 'Nhật ký truyền',
+  'admin.contribute.log.result': 'Kết quả',
+  'admin.contribute.log.field': 'Trường',
+  'admin.contribute.log.allResults': 'Tất cả kết quả',
+  'admin.contribute.log.allFields': 'Tất cả trường',
+  'admin.contribute.log.empty': 'Chưa gửi gì cả.',
+  'admin.contribute.log.failed': 'Không thể tải nhật ký.',
+  'admin.contribute.log.previous': 'Trang trước',
+  'admin.contribute.log.next': 'Trang sau',
+  'admin.contribute.result.accepted': 'Đã chấp nhận',
+  'admin.contribute.result.duplicate': 'Đã biết',
+  'admin.contribute.result.rejected': 'Bị từ chối',
+  'admin.contribute.result.withheld': 'Chưa gửi',
+  'admin.contribute.result.retracted': 'Đã rút lại',
+  'admin.contribute.withdraw': 'Rút lại mọi thứ đã gửi',
+  'admin.contribute.withdrawTitle': 'Rút lại tất cả?',
+  'admin.contribute.withdrawMessage':
+    'Mọi giá trị mà bản cài đặt này đã gửi sẽ bị xóa khỏi TREK Places API, và các giá trị đang chờ sẽ bị bỏ. Các địa điểm vẫn giữ chi tiết ở đây.',
+  'admin.contribute.withdrawn': 'Đã rút khỏi chỉ mục: {total}',
+  'admin.contribute.offTitle': 'Dừng chia sẻ?',
+  'admin.contribute.offMessage':
+    'Sẽ không gửi thêm gì nữa và các giá trị đang chờ sẽ bị bỏ. Những gì đã được chấp nhận vẫn ở trong chỉ mục trừ khi bạn rút lại.',
+  'admin.contribute.offConfirm': 'Dừng chia sẻ',
+  'admin.contribute.refused.terms_outdated': 'Điều khoản đã thay đổi trong lúc này. Vui lòng xem lại.',
+  'admin.contribute.refused.no_field': 'Hãy chọn ít nhất một trường để chia sẻ.',
+  'admin.contribute.prompt.title': 'Giúp mọi TREK hiểu địa điểm tốt hơn',
+  'admin.contribute.prompt.lead':
+    'Khi ai đó ở đây thêm trang web, số điện thoại, giờ mở cửa hoặc mô tả cho một địa điểm, TREK có thể chuyển tiếp thông tin đó. Sau khi kiểm tra, mọi bản cài đặt TREK sẽ hiển thị nó, và bản của bạn cũng nhận lại những gì người khác đã thêm.',
+  'admin.contribute.prompt.why':
+    'TREK Places API miễn phí và không cần khóa Google vì được xây dựng từ dữ liệu mở. Mỗi chi tiết bạn chia sẻ giúp nó tốt hơn cho hàng nghìn du khách. Cảm ơn bạn đã cùng tham gia.',
+  'admin.contribute.prompt.whatLabel': 'Những gì được chia sẻ',
+  'admin.contribute.prompt.imageNote':
+    'Ảnh được xem xét thủ công trước khi bất kỳ ai khác nhìn thấy. Bạn có thể đổi từng công tắc sau này.',
+  'admin.contribute.prompt.neverLabel': 'Không bao giờ chia sẻ',
+  'admin.contribute.never.notes': 'Ghi chú',
+  'admin.contribute.never.files': 'Tệp và tệp đính kèm',
+  'admin.contribute.never.trips': 'Chuyến đi, ngày và đặt chỗ',
+  'admin.contribute.never.people': 'Tên, email và tài khoản',
+  'admin.contribute.never.providers': 'Chi tiết do Google hoặc nhà cung cấp khác điền',
+  'admin.contribute.prompt.how':
+    'Chỉ những gì người dùng của bạn tự nhập, và chỉ cho các địa điểm mà chỉ mục biết. Không có người dùng, chuyến đi hay tài khoản nào đi kèm. Nhật ký cho thấy mọi lần truyền, và bạn có thể tắt từng trường hoặc rút lại tất cả bất cứ lúc nào.',
+  'admin.contribute.prompt.openRegistration':
+    'Bản cài đặt này đang mở đăng ký, nên bất kỳ ai có tài khoản đều có thể nhập chi tiết. Mọi giá trị đều được kiểm tra trước khi xuất bản.',
+  'admin.contribute.prompt.footnote':
+    'Bạn quyết định việc này cho toàn bộ bản cài đặt. Người dùng của bạn không được hỏi.',
+  'admin.contribute.prompt.agree': 'Đồng ý và chia sẻ',
+  'admin.contribute.prompt.snooze': 'Để sau',
+  'admin.contribute.prompt.decline': 'Không, cảm ơn',
+  'admin.contribute.prompt.thanks': 'Cảm ơn bạn. Chi tiết địa điểm hiện đã được chia sẻ.',
 };
 export default admin;
