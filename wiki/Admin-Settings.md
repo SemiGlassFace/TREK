@@ -145,7 +145,7 @@ A key that comes from an environment variable makes its field read-only. The fie
 
 ### Saving the keys
 
-The **Save** button at the bottom of the card stores the Google, Unsplash and Amap keys. Everything else on the card (the switches, the daily limit, the two provider choices) saves on its own.
+The **Save** button at the bottom of the card stores the Google, Unsplash and Amap keys. The Google switches and the daily limit under the key save on their own.
 
 ## Danger Zone
 
