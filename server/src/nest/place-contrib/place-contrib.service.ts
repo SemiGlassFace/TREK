@@ -11,7 +11,8 @@ import { SettingsService } from '../settings/settings.service';
 import { agreedToCurrentTerms, PlaceContribSettings } from './place-contrib-settings';
 import { PlaceContribClient } from './place-contrib.client';
 import { COUNT_WINDOW_DAYS, OUTBOX_CAP, SNOOZE_DAYS } from './place-contrib.constants';
-import { contribKeyOf, dayOf, eligibleDelayMs, newEntryCid, payloadOf, summaryOf } from './place-contrib.helpers';
+import { contribKeyOf, dayOf, newEntryCid, payloadOf, summaryOf } from './place-contrib.helpers';
+import { PlaceContribJob } from './place-contrib.job';
 import type { ContribValue, ContribWrite } from './place-contrib.types';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
@@ -51,6 +52,7 @@ export class PlaceContribService {
     private readonly settings: SettingsService,
     private readonly client: PlaceContribClient,
     private readonly uow: UnitOfWork,
+    private readonly job: PlaceContribJob,
   ) {}
 
   async state(adminId: number, now: Date = new Date()): Promise<PlaceContribState> {
@@ -183,7 +185,7 @@ export class PlaceContribService {
    * user's leave the queue whatever the decision; the user's values are
    * queued only while the installation is eligible and an admin agreed, each
    * for a field that is switched on, and only for a place the service can key.
-   * The newest value replaces a queued one; it goes a few minutes later.
+   * The newest value replaces a queued one, and the queue is sent at once.
    *
    * @txStandalone a derived write after the place write committed: it never fails that write.
    */
@@ -198,9 +200,10 @@ export class PlaceContribService {
         await this.log.insertLines(shared.map((value) => this.withheldLine(write, value, now, 'no_contrib_key')));
         return;
       }
-      const due = dbNow(new Date(now.getTime() + eligibleDelayMs()));
+      const due = dbNow(now);
       await inOrder(shared, (value) => this.queueOne(write, { key, value, due, now }));
     });
+    this.job.sendSoon();
   }
 
   private async queueOne(

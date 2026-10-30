@@ -24,19 +24,44 @@ export class PlaceContribJob implements OnApplicationBootstrap {
     private readonly registrar: CronRegistrarService,
   ) {}
 
+  /** Whether the schedules run here; off in tests and on a replica, so a save sends nothing there either. */
+  private enabled = false;
+  private running: Promise<void> | null = null;
+  private again = false;
+
   /** @txIndependent two schedules, each registered on its own; neither touches the database. */
   onApplicationBootstrap(): void {
     if (!this.registrar.isEnabled()) return;
+    this.enabled = true;
     this.registrar.register('place-contrib-send', SEND_SCHEDULE, () => this.send());
     this.registrar.register('place-contrib-log-retention', LOG_RETENTION_SCHEDULE, () => this.retain());
   }
 
+  /** A value was queued: send it now instead of at the next tick, which stays for the retries. */
+  sendSoon(): void {
+    if (this.enabled) void this.send();
+  }
+
+  /** One run at a time; a run asked for while one is going follows right after it. */
   async send(): Promise<void> {
+    if (this.running) {
+      this.again = true;
+      return this.running;
+    }
+    this.running = this.runOnce().finally(() => {
+      this.running = null;
+    });
+    return this.running;
+  }
+
+  private async runOnce(): Promise<void> {
+    this.again = false;
     try {
       await this.sender.run();
     } catch (err: unknown) {
       logError(`Places contribution: the run failed: ${err instanceof Error ? err.message : String(err)}`);
     }
+    if (this.again) return this.runOnce();
   }
 
   async retain(now: Date = new Date()): Promise<void> {

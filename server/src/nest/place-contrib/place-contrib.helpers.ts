@@ -1,11 +1,4 @@
-import {
-  ELIGIBLE_DELAY_MAX_MS,
-  ELIGIBLE_DELAY_MIN_MS,
-  MAX_RETRY_AFTER_MS,
-  RETRY_DELAYS_MS,
-  SUMMARY_MAX_CHARS,
-  VALUE_MAX_CHARS,
-} from './place-contrib.constants';
+import { MAX_RETRY_AFTER_MS, RETRY_DELAYS_MS, SUMMARY_MAX_CHARS, VALUE_MAX_CHARS } from './place-contrib.constants';
 import {
   parsePlaceHours,
   placeWebsiteSchema,
@@ -149,11 +142,6 @@ export function newEntryCid(): string {
     .update(`${Date.now()}:${randomInt(2 ** 47)}`)
     .digest('base64url')
     .slice(0, 24);
-}
-
-/** A few minutes, a different share for every place, so a trip's places do not all go together. */
-export function eligibleDelayMs(): number {
-  return randomInt(ELIGIBLE_DELAY_MIN_MS, ELIGIBLE_DELAY_MAX_MS + 1);
 }
 
 /** The wait after `attempts` failed attempts (1 for the first). */

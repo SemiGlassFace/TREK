@@ -1,7 +1,7 @@
 /**
  * The two crons of the community enrichment: registration behind the test
- * gate, the log retention cut-off, and that a failing run or sweep stays
- * inside its tick.
+ * gate, the log retention cut-off, that a failing run or sweep stays inside
+ * its tick, and the run a save starts at once.
  */
 import type { PlaceContribLogRepository } from '../../../../src/db/repositories/PlaceContribLog.repository';
 import { inOrder } from '../../../../src/nest/common/in-order';
@@ -74,5 +74,34 @@ describe('PlaceContribJob', () => {
     await expect(job.send()).resolves.toBeUndefined();
     await expect(job.retain()).resolves.toBeUndefined();
     expect(logMock.logError).toHaveBeenCalledTimes(2);
+  });
+  it('PCJ-006: a save sends at once where the schedules run, and nowhere else', async () => {
+    const off = make(false);
+    off.job.onApplicationBootstrap();
+    off.job.sendSoon();
+    expect(off.sender.run).not.toHaveBeenCalled();
+
+    const on = make();
+    on.job.onApplicationBootstrap();
+    on.job.sendSoon();
+    await vi.waitFor(() => expect(on.sender.run).toHaveBeenCalledTimes(1));
+  });
+
+  it('PCJ-007: one run at a time, and a run asked for meanwhile follows right after it', async () => {
+    const { job, sender } = make();
+    let release: () => void = () => undefined;
+    sender.run.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ skipped: null, places: 1, expired: 0 });
+        }),
+    );
+    const first = job.send();
+    const second = job.send();
+    const third = job.send();
+    expect(sender.run).toHaveBeenCalledTimes(1);
+    release();
+    await Promise.all([first, second, third]);
+    expect(sender.run).toHaveBeenCalledTimes(2);
   });
 });

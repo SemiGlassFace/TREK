@@ -14,10 +14,6 @@ export const PLACE_BODY_MAX_BYTES = 8 * 1024;
 export const ANSWER_MAX_BYTES = 64 * 1024;
 export const REQUEST_TIMEOUT_MS = 15_000;
 
-/** A value waits a few minutes before it goes, a random share of this window per place. */
-export const ELIGIBLE_DELAY_MIN_MS = 2 * 60_000;
-export const ELIGIBLE_DELAY_MAX_MS = 10 * 60_000;
-
 /** The waits after the first, second, ... failed attempt; the last one repeats. */
 export const RETRY_DELAYS_MS = [10 * 60_000, 30 * 60_000, 2 * 3_600_000, 6 * 3_600_000] as const;
 /** After this many failed attempts a value is given up on. */

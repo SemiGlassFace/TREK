@@ -3,17 +3,11 @@
  * a field sends (or why it stays home), the OSM rule a week of hours becomes,
  * and the retry clock.
  */
-import {
-  MAX_RETRY_AFTER_MS,
-  RETRY_DELAYS_MS,
-  ELIGIBLE_DELAY_MAX_MS,
-  ELIGIBLE_DELAY_MIN_MS,
-} from '../../../../src/nest/place-contrib/place-contrib.constants';
+import { MAX_RETRY_AFTER_MS, RETRY_DELAYS_MS } from '../../../../src/nest/place-contrib/place-contrib.constants';
 import {
   baseHashOf,
   contribKeyOf,
   dayOf,
-  eligibleDelayMs,
   gersOf,
   logResultOf,
   newEntryCid,
@@ -154,14 +148,6 @@ describe('the log and the request ids', () => {
 });
 
 describe('the clock', () => {
-  it('PCH-040: a place waits a few minutes, never hours', () => {
-    for (let i = 0; i < 50; i += 1) {
-      const delay = eligibleDelayMs();
-      expect(delay).toBeGreaterThanOrEqual(ELIGIBLE_DELAY_MIN_MS);
-      expect(delay).toBeLessThanOrEqual(ELIGIBLE_DELAY_MAX_MS);
-    }
-  });
-
   it('PCH-041: retries wait 10 min, 30 min, 2 h, then 6 h', () => {
     expect([1, 2, 3, 4, 5, 8].map(retryDelayMs)).toEqual([
       RETRY_DELAYS_MS[0],

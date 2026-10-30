@@ -339,7 +339,7 @@ describe('enqueue', () => {
     expect(await countRows(orm(), PlaceContribLog)).toBe(0);
   });
 
-  it('PCS-031: a user value of a keyed place is queued, normalized, a few minutes out', async () => {
+  it('PCS-031: a user value of a keyed place is queued, normalized and due at once', async () => {
     const placeId = await newPlace();
     await agree();
     await service().enqueue(write(placeId), NOW);
@@ -351,8 +351,7 @@ describe('enqueue', () => {
       country: 'DE',
     });
     const due = Date.parse(`${row?.eligible_at.replace(' ', 'T')}Z`);
-    expect(due - NOW.getTime()).toBeGreaterThanOrEqual(2 * 60_000 - 1000);
-    expect(due - NOW.getTime()).toBeLessThanOrEqual(10 * 60_000 + 1000);
+    expect(Math.abs(due - NOW.getTime())).toBeLessThan(1000);
   });
 
   it('PCS-032: the newest value replaces the queued one, attempts and all', async () => {
