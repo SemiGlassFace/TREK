@@ -4,6 +4,7 @@
  * inside its tick.
  */
 import type { PlaceContribLogRepository } from '../../../../src/db/repositories/PlaceContribLog.repository';
+import { inOrder } from '../../../../src/nest/common/in-order';
 import type { PlaceContribSender } from '../../../../src/nest/place-contrib/place-contrib-sender.service';
 import { PlaceContribJob } from '../../../../src/nest/place-contrib/place-contrib.job';
 import type { CronRegistrarService } from '../../../../src/nest/scheduling/cron-registrar.service';
@@ -51,7 +52,7 @@ describe('PlaceContribJob', () => {
     const { job, registrar, sender, log } = make();
     job.onApplicationBootstrap();
     const ticks = registrar.register.mock.calls.map((call) => (call as unknown[])[2] as () => Promise<void>);
-    for (const tick of ticks) await tick();
+    await inOrder(ticks, (tick) => tick());
     expect(sender.run).toHaveBeenCalledTimes(1);
     expect(log.purgeBefore).toHaveBeenCalledTimes(1);
   });

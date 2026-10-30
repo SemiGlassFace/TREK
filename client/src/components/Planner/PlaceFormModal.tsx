@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback, useId, type ReactNode } from 'react'
-import type { RoadtripStopType, TourListItem } from '@trek/shared'
+import type { PlaceClientOrigin, RoadtripStopType, TourListItem } from '@trek/shared'
 import NoteFormatToolbar from '../shared/NoteFormatToolbar'
 import { useAuthStore } from '../../store/authStore'
 import { useAddonStore } from '../../store/addonStore'
@@ -292,9 +292,9 @@ function usePlaceFormModal(props: PlaceFormModalProps) {
     return findDuplicatePlace(form, places, { byName: false, byOsmId: true })?.name ?? null
   }, [serviceStop, place, form, places])
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string, origin?: PlaceClientOrigin) => {
     if (field === 'category_id') categoryGuessedRef.current = false
-    changeField(field, value)
+    changeField(field, value, origin)
   }
 
   // What is around the pin the form holds (#976).

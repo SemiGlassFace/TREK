@@ -22,17 +22,23 @@ export async function contribJpeg(data: Buffer): Promise<Buffer | null> {
   if (header.width * header.height > IMAGE_MAX_PIXELS) return null;
   try {
     const image = await Jimp.read(data, { 'image/jpeg': { maxResolutionInMP: IMAGE_MAX_PIXELS / 1_000_000 } });
-    for (const edge of EDGES) {
-      const copy = image.clone();
-      if (Math.max(copy.width, copy.height) > edge) {
-        if (copy.width >= copy.height) copy.resize({ w: edge });
-        else copy.resize({ h: edge });
-      }
-      const encoded = Buffer.from(await copy.getBuffer('image/jpeg', { quality: IMAGE_JPEG_QUALITY }));
-      if (encoded.length <= IMAGE_MAX_BYTES) return encoded;
-    }
-    return null;
+    return await fitting(image, EDGES);
   } catch {
     return null;
   }
+}
+
+type Picture = Awaited<ReturnType<typeof Jimp.read>>;
+
+/** The picture at the first of `edges` whose JPEG fits the byte cap, trying them largest first; null when none does. */
+async function fitting(image: Picture, edges: readonly number[]): Promise<Buffer | null> {
+  const [edge, ...smaller] = edges;
+  if (edge === undefined) return null;
+  const copy = image.clone();
+  if (Math.max(copy.width, copy.height) > edge) {
+    if (copy.width >= copy.height) copy.resize({ w: edge });
+    else copy.resize({ h: edge });
+  }
+  const encoded = Buffer.from(await copy.getBuffer('image/jpeg', { quality: IMAGE_JPEG_QUALITY }));
+  return encoded.length <= IMAGE_MAX_BYTES ? encoded : fitting(image, smaller);
 }

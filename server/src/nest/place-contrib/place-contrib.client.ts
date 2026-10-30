@@ -17,6 +17,9 @@ import {
 import { createHash } from 'node:crypto';
 import { z, type ZodType } from 'zod';
 
+/** What the service answers a call without an installation key, given here without asking it. */
+const NO_KEY_STATUS = 401;
+
 /**
  * What one request came back with:
  * - `ok`: a 200 the schema describes;
@@ -142,7 +145,7 @@ export class PlaceContribClient {
   ): Promise<ContribAnswer<T>> {
     const url = new URL(CONTRIB_ORIGIN + path);
     const own = this.identity.headersFor(url);
-    if (!own.Authorization) return { kind: 'refused', status: 401, error: 'no_key', retryAfterMs: null };
+    if (!own.Authorization) return { kind: 'refused', status: NO_KEY_STATUS, error: 'no_key', retryAfterMs: null };
     let res: Response;
     try {
       res = await fetch(url, {

@@ -91,10 +91,12 @@ describe('the guards', () => {
       () => request(server).get(`${BASE}/log`),
       () => request(server).post(`${BASE}/withdraw`).send({ confirm: true }),
     ];
-    for (const route of routes) {
-      expect((await route()).status).toBe(401);
-      expect((await route().set(as(USER))).status).toBe(403);
-    }
+    await Promise.all(
+      routes.map(async (route) => {
+        expect((await route()).status).toBe(401);
+        expect((await route().set(as(USER))).status).toBe(403);
+      }),
+    );
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
@@ -145,15 +147,18 @@ describe('the state and the decisions', () => {
   });
 
   it('PCE2E-013: the pipe refuses a body outside the contract', async () => {
-    for (const body of [
+    const bodies = [
       { action: 'maybe' },
       { action: 'agree', fields: FIELDS },
       { action: 'agree', termsVersion: 1, fields: { website: true } },
       { action: 'fields', fields: FIELDS, withdraw: 'yes' },
-    ]) {
-      const res = await request(server).put(`${BASE}/decision`).set(as(ADMIN)).send(body);
-      expect(res.status, JSON.stringify(body)).toBe(400);
-    }
+    ];
+    await Promise.all(
+      bodies.map(async (body) => {
+        const res = await request(server).put(`${BASE}/decision`).set(as(ADMIN)).send(body);
+        expect(res.status, JSON.stringify(body)).toBe(400);
+      }),
+    );
   });
 
   it('PCE2E-014: "Not now" answers when the prompt comes back for this admin', async () => {

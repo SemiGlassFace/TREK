@@ -33,11 +33,13 @@ export default function PlaceContribLog() {
   const [result, setResult] = useState<PlaceContribLogResult | 'all'>('all');
   const [field, setField] = useState<PlaceContribField | 'all'>('all');
   const [data, setData] = useState<PlaceContribLogResponse | null>(null);
-  const [failed, setFailed] = useState(false);
+  // The query that failed to load, so a new page or filter clears the message by itself.
+  const query = `${page}|${result}|${field}`;
+  const [failedQuery, setFailedQuery] = useState<string | null>(null);
+  const failed = failedQuery === query;
 
   useEffect(() => {
     const controller = new AbortController();
-    setFailed(false);
     placeContribRepo
       .log(
         {
@@ -49,7 +51,7 @@ export default function PlaceContribLog() {
         controller.signal
       )
       .then(setData, () => {
-        if (!controller.signal.aborted) setFailed(true);
+        if (!controller.signal.aborted) setFailedQuery(`${page}|${result}|${field}`);
       });
     return () => controller.abort();
   }, [page, result, field]);

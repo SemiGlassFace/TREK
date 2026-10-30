@@ -12,6 +12,7 @@ import { PlaceContribOutbox } from '../../../../src/db/entities/PlaceContribOutb
 import { PlaceFieldOrigin } from '../../../../src/db/entities/PlaceFieldOrigin.entity';
 import { RuntimeEnvService } from '../../../../src/nest/app-config/runtime-env.service';
 import { servicesConfig } from '../../../../src/nest/app-config/tokens';
+import { inOrder } from '../../../../src/nest/common/in-order';
 import { valueHash } from '../../../../src/nest/common/value-hash';
 import { PlaceContribSender } from '../../../../src/nest/place-contrib/place-contrib-sender.service';
 import { PlaceContribSettings } from '../../../../src/nest/place-contrib/place-contrib-settings';
@@ -144,7 +145,7 @@ async function seed(
     Object.entries(values).map(([field, value]) => [field === 'image' ? 'image_url' : field, value]),
   );
   const place = await makePlace(orm(), trip.id, { osm_id: GERS, name: 'Café Luna', ...columns });
-  for (const [field, value] of Object.entries(values)) {
+  await inOrder(Object.entries(values), async ([field, value]) => {
     await insertRow(orm(), PlaceFieldOrigin, { place: place.id, field, origin: 'user', value_hash: valueHash(value) });
     await insertRow(orm(), PlaceContribOutbox, {
       contrib_key: opts.key ?? GERS,
@@ -161,7 +162,8 @@ async function seed(
       next_attempt_at: DUE,
       ...(opts.created ? { created_at: opts.created } : {}),
     });
-  }
+  });
+
   return { placeId: place.id };
 }
 
@@ -279,9 +281,12 @@ describe('a place request', () => {
   });
 
   it('PCSD-014: at most PLACES_PER_RUN places go in one run', async () => {
-    for (let i = 0; i < PLACES_PER_RUN + 2; i += 1) {
-      await seed({ website: `https://cafe-${i}.de` }, { key: `osm:node/${i + 1}` });
-    }
+    await inOrder(
+      Array.from({ length: PLACES_PER_RUN + 2 }, (_, i) => i),
+      async (i) => {
+        await seed({ website: `https://cafe-${i}.de` }, { key: `osm:node/${i + 1}` });
+      },
+    );
     expect((await sender().run(NOW)).places).toBe(PLACES_PER_RUN);
     expect(client.postPlace).toHaveBeenCalledTimes(PLACES_PER_RUN);
     expect(client.servedPlace).not.toHaveBeenCalled();
@@ -396,7 +401,12 @@ describe('refusals and failures', () => {
 describe('a picture', () => {
   it('PCSD-030: images switched off on the service keep the picture home, out of the retry loop', async () => {
     await seed({ image: '/uploads/places/luna.jpg' });
-    client.postImage.mockResolvedValue({ kind: 'refused', status: 503, error: 'images_disabled', retryAfterMs: null });
+    client.postImage.mockResolvedValueOnce({
+      kind: 'refused',
+      status: 503,
+      error: 'images_disabled',
+      retryAfterMs: null,
+    });
     await sender().run(NOW);
     expect(client.postImage).toHaveBeenCalledWith(GERS, expect.any(String), expect.any(Buffer));
     expect(storage.getStream).toHaveBeenCalledWith('places', 'luna.jpg');

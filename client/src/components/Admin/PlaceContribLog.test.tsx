@@ -60,7 +60,7 @@ describe('PlaceContribLog', () => {
     render(<PlaceContribLog />);
     expect(await screen.findByText('1 / 3')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'admin.contribute.log.next' }));
-    await waitFor(() => expect(queries.at(-1)?.get('page')).toBe('2'));
-    expect(queries.at(-1)?.get('perPage')).toBe('20');
+    await waitFor(() => expect(queries[queries.length - 1]?.get('page')).toBe('2'));
+    expect(queries[queries.length - 1]?.get('perPage')).toBe('20');
   });
 });

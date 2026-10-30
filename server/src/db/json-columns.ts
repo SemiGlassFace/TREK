@@ -34,7 +34,6 @@ import {
   type PaddleRegionBoundary,
   type PaddleRegionGraphStats,
   type PlaceContribConsent,
-  type PlaceContribPauseReason,
   type TourChange,
   type TourFixedLeg,
   type TourSourceHintChange,
@@ -490,17 +489,16 @@ export const PLACES_CONTRIBUTE_SNOOZE: JsonColumn<Record<string, string>> = {
  * refused key (with the fingerprint of the key that was refused, so a new key
  * resumes by itself) or the service asking to wait (until when).
  */
-export interface PlacesContributePause {
-  reason: PlaceContribPauseReason;
-  key: string | null;
-  until: string | null;
-}
+const placesContributePauseSchema = z.object({
+  reason: placeContribPauseReasonSchema,
+  key: z.string().nullable(),
+  until: z.string().nullable(),
+});
+export type PlacesContributePause = z.infer<typeof placesContributePauseSchema>;
 
 export const PLACES_CONTRIBUTE_PAUSE: JsonColumn<PlacesContributePause | null> = {
   column: 'app_settings.places_contribute_pause',
-  schema: z
-    .object({ reason: placeContribPauseReasonSchema, key: z.string().nullable(), until: z.string().nullable() })
-    .nullable(),
+  schema: placesContributePauseSchema.nullable(),
   fallback: () => null,
 };
 

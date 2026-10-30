@@ -31,6 +31,7 @@ import type { OriginWriter } from './place-origins.helpers';
 import { isUpdateConflict } from '../common/conflictResult';
 import { isDirectionsUrl } from '../place-import/place-import.service';
 import { TripAccessService } from '../trip-membership/trip-access.service';
+import { inOrder } from '../common/in-order';
 
 function parseId(value: string | string[]): number | null {
   const n = Number(Array.isArray(value) ? value[0] : value);
@@ -540,15 +541,16 @@ export class PlacesMcp {
       return { content: [{ type: 'text' as const, text: 'Provide at least one field to update.' }], isError: true };
     }
 
-    const before = new Map<number, Awaited<ReturnType<PlaceOriginsService['valuesBefore']>>>();
-    for (const id of placeIds) before.set(id, await this.origins.valuesBefore(id));
+    const before = new Map(
+      await Promise.all(placeIds.map(async (id) => [id, await this.origins.valuesBefore(id)] as const)),
+    );
     const updated = await this.places.updateMany(String(tripId), placeIds, fields);
     // Per place, the event and then the journey hook, in the order POST /places/bulk-update keeps.
-    for (const place of updated) {
+    await inOrder(updated, async (place) => {
       this.guards.safeBroadcast(tripId, 'place:updated', { place });
       await this.origins.record(place.id, before.get(place.id) ?? null, AGENT);
       await this.places.onUpdated(place.id);
-    }
+    });
     return ok({ count: updated.length, updatedIds: updated.map(p => p.id), skipped: placeIds.length - updated.length });
   }
 

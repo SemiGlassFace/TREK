@@ -20,6 +20,13 @@ import { originsAfterPick, resultOrigin, withOrigin } from './placeFieldOrigins'
 import type { PendingPlaceImage } from './placeImageChoice';
 
 type Translate = ReturnType<typeof useTranslation>['t'];
+
+/** The form with another picture, and with it the origin of that picture; null where the save route decides it. */
+const withImage = (
+  prev: PlaceFormData,
+  image: string | null | undefined,
+  origin: PlaceClientOrigin | null = null
+): PlaceFormData => ({ ...prev, image_url: image, fieldOrigins: withOrigin(prev.fieldOrigins, 'image_url', origin) });
 type Toast = ReturnType<typeof useToast>;
 
 export interface PlaceFormOptions {
@@ -118,38 +125,26 @@ export function usePlaceForm({ t, toast, canUploadFiles }: PlaceFormOptions) {
   /** A source's photo picked in the details column, or the place's own picture again. */
   const pickImage = (url: string | null) => {
     setPendingImage(null);
-    setForm((prev) => ({
-      ...prev,
-      image_url: url ?? undefined,
-      fieldOrigins: withOrigin(prev.fieldOrigins, 'image_url', url ? 'enrichment' : null),
-    }));
+    setForm((prev) => withImage(prev, url ?? undefined, url ? 'enrichment' : null));
   };
 
   /** A picture from the device, shown at once and uploaded when the form is saved. */
   const stageUpload = (file: File) => {
     setPendingImage({ kind: 'upload', file, preview: URL.createObjectURL(file) });
     // The upload route records the picture as the user's itself.
-    setForm((prev) => ({
-      ...prev,
-      image_url: undefined,
-      fieldOrigins: withOrigin(prev.fieldOrigins, 'image_url', null),
-    }));
+    setForm((prev) => withImage(prev, undefined));
   };
 
   /** An image already attached to the place, made its picture when the form is saved. */
   const stageAttached = (file: TripFile) => {
     setPendingImage({ kind: 'attached', file });
-    setForm((prev) => ({
-      ...prev,
-      image_url: undefined,
-      fieldOrigins: withOrigin(prev.fieldOrigins, 'image_url', null),
-    }));
+    setForm((prev) => withImage(prev, undefined));
   };
 
   /** No picture at all: the save drops the place's own one. */
   const removeImage = () => {
     setPendingImage(null);
-    setForm((prev) => ({ ...prev, image_url: null, fieldOrigins: withOrigin(prev.fieldOrigins, 'image_url', null) }));
+    setForm((prev) => withImage(prev, null));
   };
 
   /** The details column's description, taken over into the form. */

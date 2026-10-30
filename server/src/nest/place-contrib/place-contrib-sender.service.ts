@@ -8,6 +8,7 @@ import type {
 } from '../../db/repositories/PlaceContribOutbox.repository';
 import { dbNow } from '../../db/types';
 import { logInfo } from '../audit/audit-log.logger';
+import { inOrder } from '../common/in-order';
 import { valueHash } from '../common/value-hash';
 import { UnitOfWork } from '../database/unit-of-work';
 import { StorageService } from '../storage/storage.service';
@@ -100,10 +101,10 @@ export class PlaceContribSender {
     const expired = await this.expire(now);
     const keys = await this.outbox.dueKeys(dbNow(now), PLACES_PER_RUN);
     let places = 0;
-    for (const key of keys) {
+    await inOrder(keys, async (key) => {
       places += 1;
-      if ((await this.sendKey(key, fields, now)) === 'stop') break;
-    }
+      return (await this.sendKey(key, fields, now)) !== 'stop';
+    });
     if (places > 0 || expired > 0) logInfo(`Places contribution: ${places} place(s) sent, ${expired} expired`);
     return { skipped: null, places, expired };
   }
@@ -133,10 +134,9 @@ export class PlaceContribSender {
     await this.finish(stale, now);
     const text = valid.filter((entry) => entry.field !== 'image');
     if (text.length > 0 && (await this.sendText(key, text, now)) === 'stop') return 'stop';
-    for (const image of valid.filter((entry) => entry.field === 'image')) {
-      if ((await this.sendImage(image, now)) === 'stop') return 'stop';
-    }
-    return 'next';
+    const images = valid.filter((entry) => entry.field === 'image');
+    const all = await inOrder(images, async (image) => (await this.sendImage(image, now)) !== 'stop');
+    return all ? 'next' : 'stop';
   }
 
   /** @txIndependent the values the index already serves settle before the request, the rest after it. */

@@ -5,6 +5,7 @@ import type { PlaceContribOutboxRepository } from '../../db/repositories/PlaceCo
 import { dbNow } from '../../db/types';
 import { logWarn } from '../audit/audit-log.logger';
 import { DomainError, badRequest, conflict } from '../common/domain-error';
+import { inOrder } from '../common/in-order';
 import { UnitOfWork } from '../database/unit-of-work';
 import { SettingsService } from '../settings/settings.service';
 import { agreedToCurrentTerms, PlaceContribSettings } from './place-contrib-settings';
@@ -198,7 +199,7 @@ export class PlaceContribService {
         return;
       }
       const due = dbNow(new Date(now.getTime() + eligibleDelayMs()));
-      for (const value of shared) await this.queueOne(write, { key, value, due, now });
+      await inOrder(shared, (value) => this.queueOne(write, { key, value, due, now }));
     });
   }
 
@@ -279,10 +280,12 @@ export class PlaceContribService {
       await this.outbox.deleteFields(removed);
     });
     if (!opts.withdraw) return;
-    for (const field of removed) {
-      const answer = await this.client.withdraw({ field });
-      if (answer.kind !== 'ok') logWarn(`Places contribution: withdrawing ${field} was not confirmed`);
-    }
+    await Promise.all(
+      removed.map(async (field) => {
+        const answer = await this.client.withdraw({ field });
+        if (answer.kind !== 'ok') logWarn(`Places contribution: withdrawing ${field} was not confirmed`);
+      }),
+    );
   }
 }
 
