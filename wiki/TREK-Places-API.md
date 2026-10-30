@@ -125,6 +125,7 @@ Every request goes out from your TREK server, never from a browser, so the servi
 | An `X-TREK-Instance` header | Every request |
 | A `User-Agent` of `TREK/<version>` | Every request |
 | The installation key as an `Authorization` header | Every request to a host in `TREK_SERVICES_HOSTS`, once the installation has one |
+| Place details your users typed: website, phone, e-mail, opening hours, description, picture, with the place's index or OpenStreetMap id | Only after an admin agreed under **Admin > Settings**, and only the fields switched on there. See [Sharing place details](#sharing-place-details). |
 
 The header carries an opaque token derived from your instance's own address, so the service can rate-limit each instance on its own instead of everyone behind one IP. Set `APP_URL` (or `ALLOWED_ORIGINS`): without either, the token is derived from the port alone, and two unconfigured installs on the same port share one rate-limit bucket.
 
@@ -133,6 +134,24 @@ Who is searching never goes along. No user, account, session, cookie or trip id 
 The requests use Node's default HTTP client, so an outbound proxy set with `HTTPS_PROXY` applies to them, and `NO_PROXY` can exempt the service's host. The official image already turns Node's environment proxy on; a source install needs `NODE_USE_ENV_PROXY=1` as well. See [Environment Variables](Environment-Variables#outbound-https-proxy).
 
 The instance's own [Place Search Log](Places-and-Search#place-search-log) is a different thing: it is off by default, lives in your database and never leaves the instance.
+
+## Sharing place details
+
+An installation can give back what its users add. When someone types a website, a phone number, an e-mail address, opening hours or a description for a place the index knows, TREK can send that value to the TREK Places API. After a check it is served to every installation, and this one gets what the others added in return.
+
+It is **off until an admin agrees**. The first time an admin opens **Admin > Settings** on an installation that can share, TREK asks once, with every field switched on. **Agree and share** turns it on with the switches as shown; **Not now** asks that admin again in 14 days; **No, thanks** keeps the question away until the terms change. Closing the dialog decides nothing. Users are not asked: the admin decides for the whole installation.
+
+What is sent:
+
+- Only values a user typed. A value Google or another provider filled in, one the assistant, a plugin or an import wrote, and a picture made from a trip file are never sent.
+- Only for places with an index or OpenStreetMap id. A place without one stays local.
+- The place's id, the field and the value. No user, account, trip, day, note or file goes along.
+
+What happens to it: a value for a field the index has no value for yet is published after automatic checks (format, country of a phone number, links). A value that would replace an existing one, every description and every picture wait for a review first. A picture is re-encoded on your server before it is sent: at most 2048 px on the long edge and one megabyte, with its metadata (the position it was taken at, the camera) removed. The index keeps up to eight pictures per place. Pictures stay off until their review is ready.
+
+Under **Admin > Settings > TREK Places API > Share place details** an admin can switch single fields off, see the figures of the last 30 days and the **Transmission log** (every value sent, with what the service made of it), stop sharing, and **Withdraw everything sent**, which removes every value this installation contributed from the index.
+
+An installation never sends anything when it is not in production, is a demo, uses its own `TREK_PLACES_URL`, runs with `TREK_SERVICES=off` or has `TREK_PLACES_CONTRIBUTE=off` (see [Environment Variables](Environment-Variables)).
 
 ## Switching it off
 

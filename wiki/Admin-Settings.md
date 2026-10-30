@@ -76,6 +76,10 @@ Where place data comes from. The TREK index needs no key; the providers below it
 
 The first block, marked **Recommended default**. It is TREK's own place index: search without a Google key, without a quota and without anyone counting your lookups. There is nothing to configure here. The fold **What is in it** lists the fields a result carries (**Included**), what it does not have (**Not included**: ratings and photos of ordinary businesses) and its **Sources** (Overture Maps Foundation, OpenStreetMap, Wikivoyage, Wikimedia). See [TREK-Places-API](TREK-Places-API).
 
+#### Share place details
+
+Inside the TREK Places API block. One switch turns sharing on for the whole installation, one per field (website, phone, e-mail, opening hours, description, photo) chooses what goes along. The figures show the values accepted in the last 30 days, the ones waiting to be sent and the day of the last accepted one. The fold **Transmission log** lists every value sent with its result, and **Withdraw everything sent** takes all of it back out of the index. The first visit of an admin opens a dialog that asks once; nothing is sent before **Agree and share**. See [Sharing place details](TREK-Places-API#sharing-place-details).
+
 ### Google Maps API Key
 
 Optional. Without a Google key the TREK API is used. With one, photos, ratings and opening hours can be loaded on top, and every such lookup goes to Google. Create a key at console.cloud.google.com.

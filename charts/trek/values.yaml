@@ -113,6 +113,10 @@ env:
   # Base URL of a copy of the Places API you run yourself; it has to answer the same /v1 API. Read from
   # configuration rather than typed by a user, so an in-cluster address works without ALLOW_INTERNAL_NETWORK.
   # Defaults to https://places.liketrek.com.
+  # TREK_PLACES_CONTRIBUTE: "off"
+  # Whether an admin may let this installation send the place details its users typed in (website, phone, e-mail,
+  # opening hours, description, picture) to the TREK Places API. "admin" leaves the choice to the admin panel, where
+  # it stays off until an admin agrees; "off" takes it away. Defaults to admin.
   # TREK_SERVICES: "off"
   # Places search identifies this installation with a key it registers by itself on first use and keeps in the
   # database. "off" sends no key; searches then use the shared pool. A key issued to you goes under

@@ -112,6 +112,9 @@ data:
   {{- if .Values.env.TREK_PLACES_URL }}
   TREK_PLACES_URL: {{ .Values.env.TREK_PLACES_URL | quote }}
   {{- end }}
+  {{- if .Values.env.TREK_PLACES_CONTRIBUTE }}
+  TREK_PLACES_CONTRIBUTE: {{ .Values.env.TREK_PLACES_CONTRIBUTE | quote }}
+  {{- end }}
   {{- if .Values.env.TREK_SERVICES }}
   TREK_SERVICES: {{ .Values.env.TREK_SERVICES | quote }}
   {{- end }}
