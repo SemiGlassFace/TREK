@@ -7,6 +7,7 @@
 import type { AuditService } from '../../../../src/nest/audit/audit.service';
 import { AdminGuard } from '../../../../src/nest/auth-core/admin.guard';
 import { JwtAuthGuard } from '../../../../src/nest/auth-core/jwt-auth.guard';
+import { DomainError } from '../../../../src/nest/common/domain-error';
 import { RESPONSE_CONTRACT_KEY } from '../../../../src/nest/common/response-contract';
 import { PlaceContribController } from '../../../../src/nest/place-contrib/place-contrib.controller';
 import {
@@ -85,6 +86,20 @@ describe('PlaceContribController', () => {
     contrib.decide.mockRejectedValueOnce(new Error('terms'));
     await expect(controller.decide(admin, { action: 'snooze' } as PlaceContribDecisionDto, req)).rejects.toThrow();
     expect(audit.writeAudit).not.toHaveBeenCalled();
+  });
+
+  it('PCCT-010: switching off whose withdrawal the service did not confirm is still audited, then fails', async () => {
+    const refused = new DomainError(502, 'The TREK Places API did not confirm the withdrawal');
+    contrib.decide.mockRejectedValueOnce(refused);
+    await expect(
+      controller.decide(admin, { action: 'off', withdraw: true } as PlaceContribDecisionDto, req),
+    ).rejects.toBe(refused);
+    expect(audit.writeAudit).toHaveBeenCalledWith({
+      userId: 3,
+      action: 'admin.places_contribute_decision',
+      details: { action: 'off', withdraw: true, withdrawFailed: true },
+      ip: '203.0.113.9',
+    });
   });
 
   it('PCCT-006: the log query goes to the service as parsed', async () => {

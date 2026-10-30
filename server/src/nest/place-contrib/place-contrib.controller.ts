@@ -4,6 +4,7 @@ import { getClientIp } from '../audit/client-ip';
 import { AdminGuard } from '../auth-core/admin.guard';
 import { CurrentUser } from '../auth-core/current-user.decorator';
 import { JwtAuthGuard } from '../auth-core/jwt-auth.guard';
+import { DomainError } from '../common/domain-error';
 import { ResponseContract } from '../common/response-contract';
 import { PlaceContribDecisionDto, PlaceContribLogQueryDto, PlaceContribWithdrawDto } from './place-contrib.dto';
 import { PlaceContribService } from './place-contrib.service';
@@ -49,14 +50,26 @@ export class PlaceContribController {
     @Body() body: PlaceContribDecisionDto,
     @Req() req: Request,
   ): Promise<PlaceContribState> {
-    // The pipe validated the body against the full union; the DTO only types its shared fields.
-    const state = await this.contrib.decide(user.id, body as PlaceContribDecisionRequest);
-    await this.audit.writeAudit({
-      userId: user.id,
-      action: 'admin.places_contribute_decision',
-      details: decisionDetails(body),
-      ip: getClientIp(req),
-    });
+    const audit = (details: Record<string, unknown>) =>
+      this.audit.writeAudit({
+        userId: user.id,
+        action: 'admin.places_contribute_decision',
+        details,
+        ip: getClientIp(req),
+      });
+    let state: PlaceContribState;
+    try {
+      // The pipe validated the body against the full union; the DTO only types its shared fields.
+      state = await this.contrib.decide(user.id, body as PlaceContribDecisionRequest);
+    } catch (err) {
+      // Switching off commits before the withdrawal asks the service, so an
+      // unconfirmed withdrawal still leaves a decision that took effect.
+      if (body.action === 'off' && err instanceof DomainError && err.getStatus() === 502) {
+        await audit({ ...decisionDetails(body), withdrawFailed: true });
+      }
+      throw err;
+    }
+    await audit(decisionDetails(body));
     return state;
   }
 
