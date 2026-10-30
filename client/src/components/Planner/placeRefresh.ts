@@ -3,7 +3,7 @@ import type { PlaceFormData } from './PlaceFormModal.helpers';
 import { cleanWeek, weekFromPeriods, writeWeek } from './placeHours';
 
 /** The details a saved place can take over from a fresh lookup. */
-export const REFRESH_FIELDS = ['website', 'phone', 'email', 'opening_hours'] as const;
+const REFRESH_FIELDS = ['website', 'phone', 'email', 'opening_hours'] as const;
 export type RefreshField = (typeof REFRESH_FIELDS)[number];
 
 /** One field where the lookup says something else than the place holds now. */
