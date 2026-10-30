@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from '../../i18n';
 import type { TranslationFn } from '../../types';
 import { getApiErrorMessage } from '../../utils/apiError';
-import { StatusPill } from '../Settings/settingsKit';
+import { SettingsCard, StatusPill } from '../Settings/settingsKit';
 import ToggleSwitch from '../Settings/ToggleSwitch';
 import ConfirmDialog from '../shared/ConfirmDialog';
 import { fs } from '../shared/DialogShell';
@@ -97,38 +97,27 @@ export default function PlaceContribPanel() {
     setConfirm(null);
     contrib.withdraw().then((r) => {
       const total = Object.values(r.withdrawn).reduce((a, b) => a + b, 0);
-      toast.success(t('admin.contribute.withdrawn', { count: total }));
+      toast.success(t('admin.contribute.withdrawn', { total }));
     }, fail);
   };
 
   return (
-    <section
-      className="flex flex-col gap-3 rounded-[14px] border border-edge-faint bg-surface-secondary p-3"
-      aria-labelledby="place-contrib-title"
-    >
-      <div className="flex items-start gap-3">
-        <span className="grid h-9 w-9 flex-none place-items-center rounded-[10px] bg-surface-card text-content shadow-sm">
-          <HeartHandshake size={18} aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 id="place-contrib-title" className="m-0 font-semibold text-content" style={fs(13.5, 'body')}>
-              {t('admin.contribute.title')}
-            </h3>
-            <StatusPill tone={PILL_TONE[status]}>{t(`admin.contribute.status.${status}`)}</StatusPill>
-          </div>
-          <p className="m-0 mt-0.5 leading-normal text-content-muted" style={fs(12, 'body')}>
-            {contribNote(t, state)}
-          </p>
-        </div>
+    <SettingsCard
+      flush
+      icon={HeartHandshake}
+      title={t('admin.contribute.title')}
+      badge={<StatusPill tone={PILL_TONE[status]}>{t(`admin.contribute.status.${status}`)}</StatusPill>}
+      hint={contribNote(t, state)}
+      action={
         <ToggleSwitch
           on={agreed && state.consent.enabled}
           label={t('admin.contribute.title')}
           disabled={!state.eligible || contrib.busy}
           onToggle={() => (agreed && state.consent.enabled ? setConfirm('off') : setPrompting(true))}
         />
-      </div>
-
+      }
+      bodyClassName="flex flex-col gap-3 p-4"
+    >
       {agreed && state.consent.enabled && (
         <>
           <Figures state={state} t={t} />
@@ -206,6 +195,6 @@ export default function PlaceContribPanel() {
         confirmLabel={t('admin.contribute.withdraw')}
         danger
       />
-    </section>
+    </SettingsCard>
   );
 }

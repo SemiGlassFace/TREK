@@ -1,11 +1,12 @@
 import type { ServiceAllowance, ServiceIdentityState, ServiceIdentityStatus, ServiceQuotaView } from '@trek/shared';
-import { MapPin, RefreshCw, Route, Search, type LucideIcon } from 'lucide-react';
+import { MapPin, RefreshCw, Route, Search, Signal, type LucideIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from '../../i18n';
 import { useSettingsStore } from '../../store/settingsStore';
 import type { TranslationFn } from '../../types';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { formatClockTime } from '../../utils/formatters';
+import { SettingsCard } from '../Settings/settingsKit';
 import ConfirmDialog from '../shared/ConfirmDialog';
 import { useToast } from '../shared/Toast';
 import { FigureBadge } from '../Tours/paddle/FigureBadge';
@@ -121,7 +122,7 @@ function stateHint(t: TranslationFn, status: ServiceIdentityStatus | null, faile
 export default function ServiceIdentityPanel({ managed = false }: { managed?: boolean }) {
   const { t } = useTranslation();
   const toast = useToast();
-  const panel = useRef<HTMLElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const { status, failed, regenerating, regenerate } = useServiceIdentity(panel);
   const [confirming, setConfirming] = useState(false);
   const resetAt = useResetTime(status);
@@ -140,31 +141,34 @@ export default function ServiceIdentityPanel({ managed = false }: { managed?: bo
   const canRegenerate = !managed && status !== null && status.keySource !== 'env' && status.state !== 'off';
 
   return (
-    <section
-      ref={panel}
-      aria-label={t('admin.trekApi.quota.title')}
-      className="flex flex-col overflow-hidden rounded-xl border border-edge-faint bg-surface-secondary"
-    >
-      {/* Head band: where the installation stands, apart from the figures below it. */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-edge-faint bg-surface-card px-3 py-2.5">
-        <p className="m-0 inline-flex h-[26px] items-center gap-2 rounded-full bg-surface-card px-2.5 text-caption font-semibold text-content shadow-sm">
-          <span aria-hidden="true" className={`h-2 w-2 flex-none rounded-full ${STATE_DOT[status?.state ?? 'off']}`} />
-          {status ? t(`admin.trekApi.quota.state.${status.state}`) : t('admin.trekApi.quota.title')}
-        </p>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {status?.tier && <FigureBadge value={t(`admin.trekApi.quota.tier.${status.tier}`)} />}
-          {status?.keySource === 'env' && (
-            <FigureBadge
-              label={t('admin.trekApi.quota.key')}
-              value="TREK_SERVICES_KEY"
-              info={t('admin.trekApi.quota.envKey')}
+    <div ref={panel}>
+      <SettingsCard
+        flush
+        icon={Signal}
+        title={t('admin.trekApi.quota.title')}
+        badge={
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-card px-2 py-[2px] text-caption font-semibold text-content shadow-sm">
+            <span
+              aria-hidden="true"
+              className={`h-2 w-2 flex-none rounded-full ${STATE_DOT[status?.state ?? 'off']}`}
             />
-          )}
-          {resetAt && <FigureBadge label={t('admin.trekApi.quota.resets')} value={resetAt} />}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3 p-3">
+            {status ? t(`admin.trekApi.quota.state.${status.state}`) : '…'}
+          </span>
+        }
+        action={
+          <>
+            {status?.tier && <FigureBadge value={t(`admin.trekApi.quota.tier.${status.tier}`)} />}
+            {status?.keySource === 'env' && (
+              <FigureBadge
+                label={t('admin.trekApi.quota.key')}
+                value="TREK_SERVICES_KEY"
+                info={t('admin.trekApi.quota.envKey')}
+              />
+            )}
+            {resetAt && <FigureBadge label={t('admin.trekApi.quota.resets')} value={resetAt} />}
+          </>
+        }
+      >
         {status && status.services.length > 0 && (
           <ul
             aria-label={t('admin.trekApi.quota.title')}
@@ -176,27 +180,27 @@ export default function ServiceIdentityPanel({ managed = false }: { managed?: bo
           </ul>
         )}
         {hint && <p className="m-0 text-caption leading-snug text-content-muted">{hint}</p>}
-      </div>
 
-      {/* Foot band: the one action, kept off the figures. */}
-      {canRegenerate && (
-        <div className="flex items-center justify-end border-t border-edge-faint bg-surface-card px-3 py-2">
-          <button
-            type="button"
-            onClick={() => setConfirming(true)}
-            disabled={regenerating}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-edge-faint bg-surface-card px-2.5 py-1 text-caption font-medium text-content-secondary shadow-sm hover:bg-surface-hover hover:text-content disabled:opacity-50"
-          >
-            <RefreshCw
-              size={13}
-              strokeWidth={2}
-              className={regenerating ? 'motion-safe:animate-spin' : ''}
-              aria-hidden="true"
-            />
-            {t('admin.trekApi.quota.regenerate')}
-          </button>
-        </div>
-      )}
+        {/* The one action, on a rule of its own below the figures. */}
+        {canRegenerate && (
+          <div className="-mx-4 -mb-4 flex items-center justify-end border-t border-edge-faint px-4 py-2.5">
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              disabled={regenerating}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-edge-faint bg-surface-card px-2.5 py-1 text-caption font-medium text-content-secondary shadow-sm hover:bg-surface-hover hover:text-content disabled:opacity-50"
+            >
+              <RefreshCw
+                size={13}
+                strokeWidth={2}
+                className={regenerating ? 'motion-safe:animate-spin' : ''}
+                aria-hidden="true"
+              />
+              {t('admin.trekApi.quota.regenerate')}
+            </button>
+          </div>
+        )}
+      </SettingsCard>
 
       <ConfirmDialog
         isOpen={confirming}
@@ -207,6 +211,6 @@ export default function ServiceIdentityPanel({ managed = false }: { managed?: bo
         confirmLabel={t('admin.trekApi.quota.regenerate')}
         danger={false}
       />
-    </section>
+    </div>
   );
 }
