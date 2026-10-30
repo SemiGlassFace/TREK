@@ -188,6 +188,7 @@ export class PlaceContribService {
    * The newest value replaces a queued one, and the queue is sent at once.
    *
    * @txStandalone a derived write after the place write committed: it never fails that write.
+   * @txIndependent the queue is one transaction; the send run it starts writes its own steps, apart from it.
    */
   async enqueue(write: ContribWrite, now: Date = new Date()): Promise<void> {
     const active = await this.store.activeFields();
