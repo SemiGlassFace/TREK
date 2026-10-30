@@ -151,6 +151,25 @@ describe('Atlas e2e (real auth guard + real service + temp SQLite)', () => {
     expect(res.headers['cache-control']).toBeUndefined();
   });
 
+  it('200 regions/geo/:code serves one country gzipped, 400 for a code that is not two letters', async () => {
+    const res = await request(server).get('/api/addons/atlas/regions/geo/de').set('Cookie', sessionCookie(userId));
+    expect(res.status).toBe(200);
+    expect(res.headers['content-encoding']).toBe('gzip');
+    expect(res.headers['cache-control']).toBe('public, max-age=86400');
+    expect(res.body.type).toBe('FeatureCollection');
+    expect(res.body.features.length).toBeGreaterThan(0);
+    const codes = new Set(res.body.features.map((f: { properties: { iso_a2: string } }) => f.properties.iso_a2));
+    expect(codes).toEqual(new Set(['DE']));
+
+    const bad = await request(server).get('/api/addons/atlas/regions/geo/DEU').set('Cookie', sessionCookie(userId));
+    expect(bad.status).toBe(400);
+  });
+
+  it('401 on regions/geo/:code without a session', async () => {
+    const res = await request(server).get('/api/addons/atlas/regions/geo/DE');
+    expect(res.status).toBe(401);
+  });
+
   it('201 on bucket-list create, row persisted', async () => {
     const res = await request(server)
       .post('/api/addons/atlas/bucket-list')
