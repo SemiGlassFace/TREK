@@ -1,4 +1,4 @@
-// FE-PLANNER-REFRESH-001 to FE-PLANNER-REFRESH-005
+// FE-PLANNER-REFRESH-001 to FE-PLANNER-REFRESH-007
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_FORM, type PlaceFormData } from './PlaceFormModal.helpers';
 import { refreshCandidates } from './placeRefresh';
@@ -44,6 +44,24 @@ describe('refreshCandidates', () => {
     expect(hours?.field).toBe('opening_hours');
     expect(JSON.parse(hours?.next ?? '[]')).toHaveLength(7);
     expect(refreshCandidates(form({ opening_hours: hours?.next }), { opening_periods: PERIODS })).toEqual([]);
+  });
+
+  it('FE-PLANNER-REFRESH-006: a description comes from the index object or the OSM summary', () => {
+    const text = 'An Asian restaurant in Evershagen.';
+    expect(refreshCandidates(form(), { description: { text, source: 'community' } })).toEqual([
+      { field: 'description', current: '', next: text, preselected: true },
+    ]);
+    expect(refreshCandidates(form(), { summary: text, summary_source: 'community' })).toEqual([
+      { field: 'description', current: '', next: text, preselected: true },
+    ]);
+  });
+
+  it('FE-PLANNER-REFRESH-007: the same description under the editor markup is no difference', () => {
+    const text = 'An Asian restaurant in Evershagen.';
+    expect(refreshCandidates(form({ description: `<p>${text}</p>` }), { summary: text })).toEqual([]);
+    expect(refreshCandidates(form({ description: 'Our favourite.' }), { summary: text })).toEqual([
+      { field: 'description', current: 'Our favourite.', next: text, preselected: false },
+    ]);
   });
 
   it('FE-PLANNER-REFRESH-005: what the lookup does not know is never offered, so nothing is emptied', () => {

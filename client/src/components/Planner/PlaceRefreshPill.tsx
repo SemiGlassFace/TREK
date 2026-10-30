@@ -10,6 +10,7 @@ import type { RefreshCandidate, RefreshField } from './placeRefresh';
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
 const LABEL: Record<RefreshField, string> = {
+  description: 'places.formDescription',
   website: 'places.formWebsite',
   phone: 'places.formPhone',
   email: 'places.formEmail',
@@ -100,7 +101,7 @@ export function PlaceRefreshPill({
                       {t('places.refresh.now')}
                     </p>
                     {shown(c.field, c.current, locale, t).map((line) => (
-                      <p key={line} className="m-0 truncate">
+                      <p key={line} className={c.field === 'description' ? 'm-0 line-clamp-3' : 'm-0 truncate'}>
                         {line}
                       </p>
                     ))}
@@ -110,7 +111,7 @@ export function PlaceRefreshPill({
                       {t('places.refresh.new')}
                     </p>
                     {shown(c.field, c.next, locale, t).map((line) => (
-                      <p key={line} className="m-0 truncate">
+                      <p key={line} className={c.field === 'description' ? 'm-0 line-clamp-3' : 'm-0 truncate'}>
                         {line}
                       </p>
                     ))}
