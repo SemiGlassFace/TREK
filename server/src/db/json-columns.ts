@@ -13,6 +13,8 @@ import {
   paddleLockSchema,
   paddleRegionBoundarySchema,
   paddleRegionGraphStatsSchema,
+  placeContribConsentSchema,
+  placeContribPauseReasonSchema,
   skiPlannedLegsSchema,
   skiRouteOptionsSchema,
   tourChangeSchema,
@@ -31,6 +33,8 @@ import {
   type PaddleLock,
   type PaddleRegionBoundary,
   type PaddleRegionGraphStats,
+  type PlaceContribConsent,
+  type PlaceContribPauseReason,
   type TourChange,
   type TourFixedLeg,
   type TourSourceHintChange,
@@ -453,4 +457,60 @@ export const TREK_PHOTO_SIGNAL_PALETTE: JsonColumn<string[]> = {
   column: 'trek_photo_signals.palette',
   schema: z.array(z.string().regex(/^#[0-9a-f]{6}(?::(?:0|1)(?:\.\d{1,2})?)?$/)).max(5),
   fallback: () => [],
+};
+
+/**
+ * The installation's decision on the community enrichment, in the
+ * `places_contribute` app setting. Undecided reads as off, with every field
+ * switch on: that is what the prompt proposes. A broken row reads the same, so
+ * nothing is sent on a value nobody can read.
+ */
+export const PLACES_CONTRIBUTE_CONSENT: JsonColumn<PlaceContribConsent> = {
+  column: 'app_settings.places_contribute',
+  schema: placeContribConsentSchema,
+  fallback: () => ({
+    enabled: false,
+    fields: { website: true, phone: true, email: true, opening_hours: true, description: true, image: true },
+    termsVersion: null,
+    decision: null,
+    decidedBy: null,
+    decidedAt: null,
+  }),
+};
+
+/** Per admin (by user id), the ISO moment their "not now" ends, in `places_contribute_snooze`. */
+export const PLACES_CONTRIBUTE_SNOOZE: JsonColumn<Record<string, string>> = {
+  column: 'app_settings.places_contribute_snooze',
+  schema: z.record(z.string().regex(/^\d+$/), z.string()),
+  fallback: () => ({}),
+};
+
+/**
+ * Why sending waits although an admin agreed, in `places_contribute_pause`: a
+ * refused key (with the fingerprint of the key that was refused, so a new key
+ * resumes by itself) or the service asking to wait (until when).
+ */
+export interface PlacesContributePause {
+  reason: PlaceContribPauseReason;
+  key: string | null;
+  until: string | null;
+}
+
+export const PLACES_CONTRIBUTE_PAUSE: JsonColumn<PlacesContributePause | null> = {
+  column: 'app_settings.places_contribute_pause',
+  schema: z
+    .object({ reason: placeContribPauseReasonSchema, key: z.string().nullable(), until: z.string().nullable() })
+    .nullable(),
+  fallback: () => null,
+};
+
+/**
+ * A cached details or enrichment record in `place_details_cache.payload_json`,
+ * read by the origin tracking to see what a provider handed out for a place.
+ * Only its object shape is checked here; the reader picks the fields it knows.
+ */
+export const PLACE_DETAILS_CACHE_PAYLOAD: JsonColumn<Record<string, unknown> | null> = {
+  column: 'place_details_cache.payload_json',
+  schema: z.record(z.string(), z.unknown()).nullable(),
+  fallback: () => null,
 };

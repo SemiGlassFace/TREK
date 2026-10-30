@@ -98,6 +98,8 @@ export interface TrekPlace {
   hours: { osm: string; source: string | null; sourceUrl: string | null } | null;
   /** Quoted from the place's own site, when it publishes one for machines. */
   description?: { text: string; source: string | null; sourceUrl: string | null } | null;
+  /** Bumped by the service whenever the community values it overlays for this place change. */
+  community?: { version?: number } | null;
   score?: number;
 }
 
@@ -673,6 +675,8 @@ export function toPlaceRecord(p: TrekPlace): Record<string, unknown> {
     // place cost two full round trips to the index. Left as the service shaped
     // it — the reader validates the URL before it becomes a link.
     description: p.description ?? null,
+    // Where the cached enrichment of this place has to be read again (place-enrichment).
+    community_version: typeof p.community?.version === 'number' ? p.community.version : null,
     source: 'trek-places',
   };
 }

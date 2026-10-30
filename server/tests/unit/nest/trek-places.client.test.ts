@@ -840,6 +840,12 @@ describe('toPlaceRecord', () => {
     expect(r.brand).toBe("L'Osteria");
   });
 
+  it('carries the community version the service overlays, null when it names none', () => {
+    expect(toPlaceRecord({ ...PLACE, community: { version: 4 } }).community_version).toBe(4);
+    expect(toPlaceRecord(PLACE).community_version).toBeNull();
+    expect(toPlaceRecord({ ...PLACE, community: null }).community_version).toBeNull();
+  });
+
   it('reports no rating rather than a made-up one', () => {
     // Ratings exist in no open dataset. Null says so; 0 would be a claim.
     expect(toPlaceRecord(PLACE).rating).toBeNull();

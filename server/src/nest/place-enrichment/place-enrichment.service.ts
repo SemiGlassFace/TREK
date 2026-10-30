@@ -160,6 +160,22 @@ interface CachedEnrichment {
 
 interface CachePayload extends CachedEnrichment {
   v?: number;
+  /** The community version the index served for a gers place when the row was written. */
+  cv?: number | null;
+}
+
+/**
+ * The community version the index serves for a gers place, from the details
+ * record the request carries; null for any other place, or when it says none.
+ * A cached answer written under another version is read again, so a value
+ * another installation contributed shows up on the next open, not a week later.
+ * A sender who puts another number here only makes their own request compute
+ * afresh: nothing of the record is what gets cached.
+ */
+function communityVersion(placeId: string, details: Record<string, unknown> | null | undefined): number | null {
+  if (!placeId.startsWith('gers:')) return null;
+  const version = details?.community_version;
+  return typeof version === 'number' && Number.isInteger(version) && version >= 0 ? version : null;
 }
 
 /**
@@ -385,7 +401,8 @@ export class PlaceEnrichmentService {
     const placeId = req.placeId?.trim() || `coords:${req.lat}:${req.lng}`;
     const lang = req.lang;
 
-    const cached = await this.readCache(placeId, lang);
+    const served = communityVersion(placeId, req.details);
+    const cached = await this.readCache(placeId, lang, served);
     if (cached) return cached;
 
     // One details lookup feeds all three halves: the pictures need its Commons
@@ -434,7 +451,7 @@ export class PlaceEnrichmentService {
     // A summary or a link the lookup here fetched itself is the map's and keeps.
     const fromCaller =
       req.details != null && (description?.source === 'osm' || ownFacts.some((fact) => fact.url != null));
-    if (!fromCaller) await this.writeCache(placeId, lang, result);
+    if (!fromCaller) await this.writeCache(placeId, lang, { ...result, cv: communityVersion(placeId, details) });
     return result;
   }
 
@@ -866,12 +883,17 @@ export class PlaceEnrichmentService {
 
   // ── Result cache ───────────────────────────────────────────────────────────
 
-  private async readCache(placeId: string, lang: string | undefined): Promise<CachedEnrichment | null> {
+  private async readCache(
+    placeId: string,
+    lang: string | undefined,
+    servedVersion: number | null,
+  ): Promise<CachedEnrichment | null> {
     try {
       const row = await this.cache.findEntry(placeId, lang ?? '', CACHE_KIND);
       if (!row) return null;
       const parsed = JSON.parse(row.payload_json) as CachePayload;
       if (parsed.v !== CACHE_VERSION) return null;
+      if (servedVersion !== null && (parsed.cv ?? null) !== servedVersion) return null;
 
       // A cached candidate is only usable while its bytes are still on disk, and
       // the nightly sweep deletes every picture nobody picked — which is most of
@@ -898,7 +920,11 @@ export class PlaceEnrichmentService {
     }
   }
 
-  private async writeCache(placeId: string, lang: string | undefined, value: CachedEnrichment): Promise<void> {
+  private async writeCache(
+    placeId: string,
+    lang: string | undefined,
+    value: CachedEnrichment & { cv: number | null },
+  ): Promise<void> {
     try {
       await this.cache.upsertEntry({
         place_id: placeId,

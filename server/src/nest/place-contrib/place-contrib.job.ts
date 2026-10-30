@@ -1,0 +1,49 @@
+import { PlaceContribLog } from '../../db/entities/PlaceContribLog.entity';
+import type { PlaceContribLogRepository } from '../../db/repositories/PlaceContribLog.repository';
+import { logError, logInfo } from '../audit/audit-log.logger';
+import { CronRegistrarService } from '../scheduling/cron-registrar.service';
+import { PlaceContribSender } from './place-contrib-sender.service';
+import { LOG_RETENTION_DAYS, LOG_RETENTION_SCHEDULE, SEND_SCHEDULE } from './place-contrib.constants';
+import { dayOf } from './place-contrib.helpers';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
+
+const DAY_MS = 24 * 3_600_000;
+
+/**
+ * The two crons of the community enrichment: the sender every two minutes,
+ * which does nothing unless the installation is eligible and an admin agreed,
+ * and the nightly retention of the transmission log (90 days), which runs
+ * whatever the decision so a log switched off still ages out.
+ */
+@Injectable()
+export class PlaceContribJob implements OnApplicationBootstrap {
+  constructor(
+    private readonly sender: PlaceContribSender,
+    @InjectRepository(PlaceContribLog) private readonly log: PlaceContribLogRepository,
+    private readonly registrar: CronRegistrarService,
+  ) {}
+
+  onApplicationBootstrap(): void {
+    if (!this.registrar.isEnabled()) return;
+    this.registrar.register('place-contrib-send', SEND_SCHEDULE, () => this.send());
+    this.registrar.register('place-contrib-log-retention', LOG_RETENTION_SCHEDULE, () => this.retain());
+  }
+
+  async send(): Promise<void> {
+    try {
+      await this.sender.run();
+    } catch (err: unknown) {
+      logError(`Places contribution: the run failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async retain(now: Date = new Date()): Promise<void> {
+    try {
+      const removed = await this.log.purgeBefore(dayOf(new Date(now.getTime() - LOG_RETENTION_DAYS * DAY_MS)));
+      if (removed > 0) logInfo(`Places contribution: removed ${removed} log line(s) past ${LOG_RETENTION_DAYS} days`);
+    } catch (err: unknown) {
+      logError(`Places contribution: log retention failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+}

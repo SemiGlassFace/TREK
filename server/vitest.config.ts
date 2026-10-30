@@ -154,6 +154,9 @@ export default defineConfig({
         // Landed on dev without an entry, so it sat on the 80 catch-all while
         // measuring 99.5/99.0/97.4/100 — the gap the per-domain ratchet exists to
         // close. Set with a few points of slack against the Linux/Windows drift.
+        // New domain: community enrichment of place details. On the floor until a
+        // full CI run measures it; raise it with scripts/coverage-thresholds.mjs then.
+        'src/nest/place-contrib/**/*.ts': { statements: 80, branches: 80, functions: 80, lines: 80 },
         'src/nest/place-enrichment/**/*.ts': { statements: 96, branches: 95, functions: 94, lines: 97 },
         // New domain: the file and list readers that moved out of places/ and
         // collections/. On the floor until a full CI run measures it; raise it

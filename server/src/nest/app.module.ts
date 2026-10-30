@@ -69,6 +69,7 @@ import { PaddleObstaclesModule } from './paddle-obstacles/paddle-obstacles.modul
 import { PaddleRoutingModule } from './paddle-routing/paddle-routing.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { PhotosModule } from './photos/photos.module';
+import { PlaceContribModule } from './place-contrib/place-contrib.module';
 import { PlaceEnrichmentModule } from './place-enrichment/place-enrichment.module';
 import { PlaceImportModule } from './place-import/place-import.module';
 import { PlaceShadowModule } from './place-shadow/place-shadow.module';
@@ -142,6 +143,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
     MapsModule,
     PlaceImportModule,
     GoogleQuotaModule,
+    PlaceContribModule,
     PlaceEnrichmentModule,
     PlaceShadowModule,
     RouteUsageModule,

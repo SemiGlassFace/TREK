@@ -116,6 +116,7 @@ export * from './collection/collection-file.schema';
 export * from './trip/trip.schema';
 export * from './place/place-hours';
 export * from './place/place-kind';
+export * from './place/place-contrib.schema';
 export * from './trip/day-grid';
 export * from './trip-invite/trip-invite.schema';
 export * from './collab/collab.schema';

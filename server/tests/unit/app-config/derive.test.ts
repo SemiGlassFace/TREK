@@ -438,6 +438,14 @@ describe('deriveMaps', () => {
     }
   });
 
+  it('TREK_PLACES_CONTRIBUTE leaves the choice to an admin unless it says off, and fails closed on anything else', () => {
+    expect(deriveMaps({} as never).trekPlacesContribute).toBe('admin');
+    expect(deriveMaps({ TREK_PLACES_CONTRIBUTE: ' Admin ' } as never).trekPlacesContribute).toBe('admin');
+    for (const value of ['off', 'OFF', 'false', 'yes']) {
+      expect(deriveMaps({ TREK_PLACES_CONTRIBUTE: value } as never).trekPlacesContribute, value).toBe('off');
+    }
+  });
+
   it('TREK_PLACES_ENABLED fails open when unset, blank or outside the family', () => {
     // A typo must not silently drop a whole install back to Nominatim, whose
     // usage policy forbids what TREK was doing with it. Outside the family the

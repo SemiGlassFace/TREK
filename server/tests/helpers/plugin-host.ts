@@ -60,6 +60,7 @@ import { PackingService } from '../../src/nest/packing/packing.service';
 import { PermissionsService } from '../../src/nest/permissions/permissions.service';
 import { TrekPhotoRegistrationService } from '../../src/nest/photos/trek-photo-registration.service';
 import { PlacePhotoCacheService } from '../../src/nest/place-photos/place-photo-cache.service';
+import type { PlaceOriginsService } from '../../src/nest/places/place-origins.service';
 import { PlacesRpc } from '../../src/nest/places/places.rpc';
 import { PlacesService } from '../../src/nest/places/places.service';
 import { PluginRpcHostFactory } from '../../src/nest/plugins/host/plugin-rpc-host.factory';
@@ -184,6 +185,19 @@ import {
 import type { ModuleRef } from '@nestjs/core';
 
 import type Database from 'better-sqlite3';
+
+/**
+ * The places surface records the origin of what a plugin writes; these
+ * runtime tests are about the RPC wiring, so the recording is a no-op here
+ * (its own suite is place-origins.service.test.ts).
+ */
+function placeOriginsStub(): PlaceOriginsService {
+  return {
+    valuesBefore: async () => null,
+    record: async () => undefined,
+    recordImported: async () => undefined,
+  } as unknown as PlaceOriginsService;
+}
 
 /**
  * Hand-wired counterpart of the PluginsModule DI graph for no-Nest tests
@@ -562,7 +576,7 @@ export async function createPluginRpcHostParts(
     new DayNotesRpc(dayNotes, realtime, guards),
     new PackingRpc(packing, realtime, guards),
     new FilesRpc(files, realtime, usersRepo, guards, generalStorage),
-    new PlacesRpc(places, journey, realtime, guards),
+    new PlacesRpc(places, journey, realtime, guards, placeOriginsStub()),
     new DaysRpc(
       days,
       realtime,

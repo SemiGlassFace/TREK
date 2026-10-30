@@ -165,6 +165,13 @@ export function deriveMaps(raw: RawEnv) {
      * the install back to Nominatim.
      */
     trekPlacesEnabled: parseBool(raw.TREK_PLACES_ENABLED) !== false,
+    /**
+     * The ceiling over sending place details back to the TREK Places API.
+     * `admin` (the default) lets an admin decide in the admin panel; `off` takes
+     * the choice away. Anything but `admin` reads as off, so a typo fails closed.
+     */
+    trekPlacesContribute:
+      (raw.TREK_PLACES_CONTRIBUTE?.trim().toLowerCase() || 'admin') === 'admin' ? ('admin' as const) : ('off' as const),
     placesApiKey: raw.PLACES_API_KEY || undefined,
     /** The same two knobs for Amap (高德), which an install in China uses instead. */
     amapApiBase: raw.AMAP_API_BASE || undefined,

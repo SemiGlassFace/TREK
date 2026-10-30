@@ -713,6 +713,34 @@ describe('result cache', () => {
     expect(written.expanded).toBe(2);
   });
 
+  it('ENRICH-027: a gers place is read again once the index serves another community version', async () => {
+    const GERS_REQ = { ...REQ, placeId: 'gers:ceba0e62-172b-4343-bb3b-78b915a18383' };
+    const row = {
+      payload_json: JSON.stringify({ photos: [], description: null, facts: [], v: 4, cv: 1 }),
+      fetched_at: Date.now(),
+    };
+    const maps = mapsStub({ fetchCommonsCandidates: vi.fn(async () => [commonsCandidate()]) });
+
+    mockFindEntry.mockResolvedValue(row);
+    await make(maps, cacheStub()).enrich(1, { ...GERS_REQ, details: { community_version: 1 } });
+    expect(maps.fetchCommonsCandidates).not.toHaveBeenCalled();
+
+    await make(maps, cacheStub()).enrich(1, { ...GERS_REQ, details: { community_version: 2 } });
+    expect(maps.fetchCommonsCandidates).toHaveBeenCalled();
+    const [written] = mockUpsertEntry.mock.calls.at(-1) as [{ payload_json: string }];
+    expect(JSON.parse(written.payload_json).cv).toBe(2);
+  });
+
+  it('ENRICH-028: any other place keeps its week, whatever a request says about versions', async () => {
+    const maps = mapsStub();
+    mockFindEntry.mockResolvedValue({
+      payload_json: JSON.stringify({ photos: [], description: null, facts: [], v: 4 }),
+      fetched_at: Date.now(),
+    });
+    await make(maps, cacheStub()).enrich(1, { ...REQ, details: { community_version: 9 } });
+    expect(maps.fetchCommonsCandidates).not.toHaveBeenCalled();
+  });
+
   it('ENRICH-026: keeps working when the cache write fails', async () => {
     const maps = mapsStub({ fetchCommonsCandidates: vi.fn(async () => [commonsCandidate()]) });
     mockUpsertEntry.mockRejectedValue(new Error('db locked'));

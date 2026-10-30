@@ -80,7 +80,10 @@ import { PasswordResetTokensSchema } from './PasswordResetTokens.entity';
 import { PhotoProviderFieldsSchema } from './PhotoProviderFields.entity';
 import { PhotoProvidersSchema } from './PhotoProviders.entity';
 import { PhotosSchema } from './Photos.entity';
+import { PlaceContribLogSchema } from './PlaceContribLog.entity';
+import { PlaceContribOutboxSchema } from './PlaceContribOutbox.entity';
 import { PlaceDetailsCacheSchema } from './PlaceDetailsCache.entity';
+import { PlaceFieldOriginSchema } from './PlaceFieldOrigin.entity';
 import { PlaceRatingsSchema } from './PlaceRatings.entity';
 import { PlaceRegionsSchema } from './PlaceRegions.entity';
 import { PlaceShadowPicksSchema } from './PlaceShadowPicks.entity';
@@ -244,7 +247,10 @@ export const ALL_ENTITIES: readonly EntitySchema[] = [
   PhotoProviderFieldsSchema,
   PhotoProvidersSchema,
   PhotosSchema,
+  PlaceContribLogSchema,
+  PlaceContribOutboxSchema,
   PlaceDetailsCacheSchema,
+  PlaceFieldOriginSchema,
   PlaceRatingsSchema,
   PlaceRegionsSchema,
   PlaceShadowPicksSchema,

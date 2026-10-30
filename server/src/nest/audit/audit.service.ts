@@ -31,6 +31,8 @@ const ACTION_LABELS: Record<string, string> = {
   'admin.storage_backfill': 'started a storage sync',
   'admin.storage_backfill_cancel': 'cancelled a storage sync',
   'admin.storage_stats_refresh': 'refreshed storage usage stats',
+  'admin.places_contribute_decision': 'decided on sharing place details with TREK Places',
+  'admin.places_contribute_withdraw': 'withdrew the place details this installation shared',
   'immich.private_ip_configured': 'configured Immich with private IP',
   'oidc.role_change': 'role changed by OIDC claim mapping',
 };
