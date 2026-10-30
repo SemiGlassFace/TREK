@@ -19,6 +19,7 @@ import type { MapsService } from '../../../src/nest/maps/maps.service';
 import type { GooglePlacesClient } from '../../../src/nest/maps/providers/google-places.provider';
 import type { OsmClient } from '../../../src/nest/maps/providers/osm.client';
 import type { WikimediaClient } from '../../../src/nest/maps/providers/wikimedia.client';
+import type { TrekCommunityService } from '../../../src/nest/maps/trek-community.service';
 import {
   candidateKey,
   PlaceEnrichmentService,
@@ -60,7 +61,11 @@ vi.mock('../../../src/nest/maps/trek-places.client', async (importOriginal) => (
 
 /** Every seam enrichment reaches: the maps orchestrator and the outbound clients it injects beside it. */
 type Seams<T> = { [K in keyof T]: T[K] };
-type EnrichmentSeams = Seams<MapsService> & Seams<GooglePlacesClient> & Seams<OsmClient> & Seams<WikimediaClient>;
+type EnrichmentSeams = Seams<MapsService> &
+  Seams<GooglePlacesClient> &
+  Seams<OsmClient> &
+  Seams<WikimediaClient> &
+  Seams<TrekCommunityService>;
 
 function appSettingsStub(): AppSettingsRepository {
   return { getValue: mockGetValue } as unknown as AppSettingsRepository;
@@ -99,6 +104,8 @@ function mapsStub(over: Partial<Record<keyof EnrichmentSeams, unknown>> = {}) {
     ),
     details: vi.fn(async () => ({ place: null })),
     trekPlacesEnabled: vi.fn(() => true),
+    photoPaths: vi.fn(async () => [] as string[]),
+    imageBytes: vi.fn(async () => null as Buffer | null),
     ...over,
   } as unknown as EnrichmentSeams;
 }
@@ -124,6 +131,7 @@ function make(maps: EnrichmentSeams, cache: PlacePhotoCacheService) {
     maps as unknown as GooglePlacesClient,
     maps as unknown as OsmClient,
     maps as unknown as WikimediaClient,
+    maps as unknown as TrekCommunityService,
   );
 }
 
@@ -225,6 +233,38 @@ describe('collectPhotos', () => {
 
     expect(out.photos).toHaveLength(1);
     expect(maps.fetchGooglePhotoRefs).not.toHaveBeenCalled();
+  });
+
+  it('ENRICH-005b: puts the community pictures first, credited to the TREK community', async () => {
+    const maps = mapsStub({
+      getMapsKey: vi.fn(() => 'key'),
+      fetchGooglePhotoRefs: vi.fn(async () => [{ name: 'places/p/photos/a', attribution: 'Bob' }]),
+      fetchGooglePhotoBytes: vi.fn(async () => Buffer.from([1, 2, 3])),
+      fetchCommonsCandidates: vi.fn(async () => [commonsCandidate()]),
+      photoPaths: vi.fn(async () => ['/v1/contrib/img/0123456789abcdef.webp']),
+      imageBytes: vi.fn(async () => Buffer.from([4, 5, 6])),
+    });
+
+    const out = await make(maps, cacheStub()).enrich(1, OSM_REQ);
+
+    expect(maps.photoPaths).toHaveBeenCalledWith('way:12345');
+    expect(maps.imageBytes).toHaveBeenCalledWith('/v1/contrib/img/0123456789abcdef.webp');
+    expect(out.photos[0]).toMatchObject({
+      source: 'community',
+      attribution: 'TREK Community',
+      license: 'CC BY 4.0',
+      sourceUrl: null,
+    });
+  });
+
+  it('ENRICH-005c: asks no community pictures for a Google place or when the API is off', async () => {
+    const maps = mapsStub({ photoPaths: vi.fn(async () => ['/v1/contrib/img/0123456789abcdef.webp']) });
+    await make(maps, cacheStub()).enrich(1, REQ);
+    expect(maps.photoPaths).not.toHaveBeenCalled();
+
+    const off = mapsStub({ trekPlacesEnabled: vi.fn(() => false), photoPaths: vi.fn(async () => []) });
+    await make(off, cacheStub()).enrich(1, OSM_REQ);
+    expect(off.photoPaths).not.toHaveBeenCalled();
   });
 
   it('ENRICH-005: puts Google pictures ahead of Commons when a key is configured', async () => {

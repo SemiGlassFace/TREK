@@ -18,6 +18,7 @@ import { GooglePlacesClient } from './providers/google-places.provider';
 import { OsmClient } from './providers/osm.client';
 import { PhotonClient } from './providers/photon.client';
 import { WikimediaClient } from './providers/wikimedia.client';
+import { TrekCommunityService } from './trek-community.service';
 import { TrekPlacesLayersService } from './trek-places-layers.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
@@ -66,7 +67,8 @@ import { Module } from '@nestjs/common';
     PlaceDetailsResolver,
     PoisAlongResolver,
     TrekPlacesLayersService,
+    TrekCommunityService,
   ],
-  exports: [MapsService, GooglePlacesClient, OsmClient, WikimediaClient, TrekPlacesLayersService],
+  exports: [MapsService, GooglePlacesClient, OsmClient, WikimediaClient, TrekPlacesLayersService, TrekCommunityService],
 })
 export class MapsModule {}

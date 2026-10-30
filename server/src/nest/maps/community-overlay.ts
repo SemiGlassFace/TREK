@@ -1,4 +1,5 @@
 import { buildOsmDetails } from './maps.helpers';
+import { communityKeyOf } from './trek-community.service';
 import { trekCommunityByKeys, type TrekCommunityValues } from './trek-places.client';
 import { normalizePlaceWebsite } from '@trek/shared';
 
@@ -9,12 +10,6 @@ import { normalizePlaceWebsite } from '@trek/shared';
  * /v1/community, so a value one installation sent shows on the next open of
  * the same place everywhere.
  */
-
-/** The service's key of an OSM details id: `relation:3389505` is `osm:relation/3389505`. */
-export function communityKeyOf(placeId: string): string | null {
-  const match = /^(node|way|relation):(\d+)$/.exec(placeId);
-  return match ? `osm:${match[1]}/${match[2]}` : null;
-}
 
 /** The details record with what the community published laid over it; untouched where nothing was. */
 export function withCommunityValues(

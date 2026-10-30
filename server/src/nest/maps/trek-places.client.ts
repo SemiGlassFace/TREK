@@ -98,6 +98,7 @@ export interface TrekPlace {
   hours: { osm: string; source: string | null; sourceUrl: string | null } | null;
   /** Quoted from the place's own site, when it publishes one for machines. */
   description?: { text: string; source: string | null; sourceUrl: string | null } | null;
+  images?: { url?: string; cover?: boolean }[] | null;
   /** Bumped by the service whenever the community values it overlays for this place change. */
   community?: { version?: number } | null;
   score?: number;
@@ -642,6 +643,7 @@ export interface TrekCommunityValues {
   contact?: { website?: string | null; phone?: string | null; email?: string | null } | null;
   hours?: { osm?: string | null } | null;
   description?: { text?: string | null } | null;
+  images?: { url?: string; cover?: boolean }[] | null;
   community?: { version?: number; fields?: string[] } | null;
 }
 

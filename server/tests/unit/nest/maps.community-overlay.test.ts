@@ -3,7 +3,8 @@
  * what is laid over the record, and that a place without published values, or
  * a service that does not answer, leaves the details as they were.
  */
-import { communityKeyOf, osmDetailsWithCommunity, withCommunityValues } from '../../../src/nest/maps/community-overlay';
+import { osmDetailsWithCommunity, withCommunityValues } from '../../../src/nest/maps/community-overlay';
+import { communityKeyOf } from '../../../src/nest/maps/trek-community.service';
 import { trekCommunityByKeys } from '../../../src/nest/maps/trek-places.client';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';

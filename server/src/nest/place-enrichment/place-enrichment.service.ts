@@ -23,6 +23,7 @@ import {
 import { GooglePlacesClient } from '../maps/providers/google-places.provider';
 import { OsmClient } from '../maps/providers/osm.client';
 import { WikimediaClient } from '../maps/providers/wikimedia.client';
+import { communityKeyOf, TrekCommunityService } from '../maps/trek-community.service';
 import { trekPlacesById } from '../maps/trek-places.client';
 import { PlacePhotoCacheService } from '../place-photos/place-photo-cache.service';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -165,15 +166,15 @@ interface CachePayload extends CachedEnrichment {
 }
 
 /**
- * The community version the index serves for a gers place, from the details
- * record the request carries; null for any other place, or when it says none.
+ * The community version the service serves for a gers or OSM place, from the
+ * details record the request carries; null for any other place, or when it says none.
  * A cached answer written under another version is read again, so a value
  * another installation contributed shows up on the next open, not a week later.
  * A sender who puts another number here only makes their own request compute
  * afresh: nothing of the record is what gets cached.
  */
 function communityVersion(placeId: string, details: Record<string, unknown> | null | undefined): number | null {
-  if (!placeId.startsWith('gers:')) return null;
+  if (!placeId.startsWith('gers:') && !communityKeyOf(placeId)) return null;
   const version = details?.community_version;
   return typeof version === 'number' && Number.isInteger(version) && version >= 0 ? version : null;
 }
@@ -382,6 +383,7 @@ export class PlaceEnrichmentService {
     private readonly googlePlaces: GooglePlacesClient,
     private readonly osm: OsmClient,
     private readonly wiki: WikimediaClient,
+    private readonly community: TrekCommunityService,
   ) {}
 
   /**
@@ -588,8 +590,26 @@ export class PlaceEnrichmentService {
     // One ranking pass over everything: the same file reaches us from several
     // rungs and only the page id catches that.
     const ranked = rankCommonsCandidates(commonsPool, COMMONS_CAP, { perAuthor: curated > 0 ? 2 : 1 });
-    // Google leads the strip — its pictures are of the business itself.
+    // The community's pictures lead: a person checked each one in review, and
+    // they show the place as someone who was there saw it. Then Google, whose
+    // pictures are of the business itself.
+    // Only index and OSM places have any; off means nothing leaves for the API.
+    const communityPlace = placeId.startsWith('gers:') || communityKeyOf(placeId) !== null;
+    const community = communityPlace && this.maps.trekPlacesEnabled() ? await this.community.photoPaths(placeId) : [];
     const pending: PendingCandidate[] = [
+      ...community.map((path) => ({
+        identity: `community:${path}`,
+        candidate: {
+          key: '',
+          url: '',
+          attribution: 'TREK Community',
+          license: 'CC BY 4.0',
+          licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+          sourceUrl: null,
+          source: 'community' as const,
+        },
+        fetchBytes: () => this.community.imageBytes(path),
+      })),
       ...googleRefs.map((ref) => ({
         identity: `google:${ref.name}`,
         candidate: {
