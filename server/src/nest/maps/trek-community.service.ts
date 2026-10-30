@@ -1,3 +1,4 @@
+import { readCapped } from '../../utils/cappedFetch';
 import { trekCommunityByKeys, trekPlacesBaseUrl, trekPlacesById } from './trek-places.client';
 import { identifiedFetch } from './trek-places.fetch';
 import { Injectable } from '@nestjs/common';
@@ -81,8 +82,9 @@ export class TrekCommunityService {
         await res.body?.cancel();
         return null;
       }
-      const bytes = Buffer.from(await res.arrayBuffer());
-      return bytes.length && bytes.length <= IMAGE_MAX_BYTES ? bytes : null;
+      // A chunked answer declares no length, so the read itself stops at the cap.
+      const { bytes, truncated } = await readCapped(res, IMAGE_MAX_BYTES);
+      return bytes.length && !truncated ? bytes : null;
     } catch {
       return null;
     } finally {

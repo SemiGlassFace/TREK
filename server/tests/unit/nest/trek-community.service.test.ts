@@ -91,4 +91,18 @@ describe('TrekCommunityService.imageBytes', () => {
     fetchWithKey.mockRejectedValueOnce(new Error('timeout'));
     expect(await svc.imageBytes(A)).toBeNull();
   });
+
+  it('TCOM-007: an answer that declares no length stops being read at the cap', async () => {
+    // An endless body in 1 MB chunks, without a content-length, as a chunked answer comes.
+    let pulled = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled += 1;
+        controller.enqueue(new Uint8Array(1_000_000));
+      },
+    });
+    fetchWithKey.mockResolvedValueOnce(new Response(body, { status: 200 }));
+    expect(await new TrekCommunityService().imageBytes(A)).toBeNull();
+    expect(pulled).toBeLessThanOrEqual(6);
+  });
 });
