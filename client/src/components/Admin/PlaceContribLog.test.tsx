@@ -1,4 +1,4 @@
-// FE-ADMIN-CONTRIB-LOG-001 to FE-ADMIN-CONTRIB-LOG-003
+// FE-ADMIN-CONTRIB-LOG-001 to FE-ADMIN-CONTRIB-LOG-004
 import userEvent from '@testing-library/user-event';
 import type { PlaceContribLogEntry } from '@trek/shared';
 import { http, HttpResponse } from 'msw';
@@ -58,9 +58,23 @@ describe('PlaceContribLog', () => {
   it('FE-ADMIN-CONTRIB-LOG-003: pages through a long log', async () => {
     const queries = serve([ENTRY], 45);
     render(<PlaceContribLog />);
+    await userEvent.click(await screen.findByRole('button', { name: /common\.showMore/ }));
     expect(await screen.findByText('1 / 3')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'admin.contribute.log.next' }));
     await waitFor(() => expect(queries[queries.length - 1]?.get('page')).toBe('2'));
     expect(queries[queries.length - 1]?.get('perPage')).toBe('20');
+  });
+
+  it('FE-ADMIN-CONTRIB-LOG-004: shows the newest five until the list is opened', async () => {
+    serve(Array.from({ length: 8 }, (_, i) => ({ ...ENTRY, id: i + 1, placeName: `Place ${i + 1}` })));
+    render(<PlaceContribLog />);
+    expect(await screen.findByText('Place 5')).toBeInTheDocument();
+    expect(screen.queryByText('Place 6')).not.toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: 'common.showMore (3)' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(toggle);
+    expect(screen.getByText('Place 8')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'common.showLess' }));
+    expect(screen.queryByText('Place 8')).not.toBeInTheDocument();
   });
 });

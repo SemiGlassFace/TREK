@@ -4,7 +4,7 @@ import {
   type PlaceContribLogResponse,
   type PlaceContribLogResult,
 } from '@trek/shared';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from '../../i18n';
 import { placeContribRepo } from '../../repo/placeContribRepo';
@@ -13,6 +13,8 @@ import { fs } from '../shared/DialogShell';
 import { fieldLabel } from './placeContribModel';
 
 const PER_PAGE = 20;
+/** Rows shown before the list is opened; a busy log should not push the page down. */
+const FOLDED = 5;
 const RESULTS: PlaceContribLogResult[] = ['accepted', 'duplicate', 'rejected', 'withheld', 'retracted'];
 const RESULT_LOOK: Record<PlaceContribLogResult, string> = {
   accepted: 'bg-success-soft text-success',
@@ -25,7 +27,7 @@ const RESULT_LOOK: Record<PlaceContribLogResult, string> = {
 /**
  * What this installation sent, newest first: the place, the field, a short
  * form of the value and what the service made of it. Read only while the fold
- * is open, a page at a time.
+ * is open, a page at a time, and only the newest FOLDED rows until opened.
  */
 export default function PlaceContribLog() {
   const { t, locale } = useTranslation();
@@ -33,6 +35,7 @@ export default function PlaceContribLog() {
   const [result, setResult] = useState<PlaceContribLogResult | 'all'>('all');
   const [field, setField] = useState<PlaceContribField | 'all'>('all');
   const [data, setData] = useState<PlaceContribLogResponse | null>(null);
+  const [open, setOpen] = useState(false);
   // The query that failed to load, so a new page or filter clears the message by itself.
   const query = `${page}|${result}|${field}`;
   const [failedQuery, setFailedQuery] = useState<string | null>(null);
@@ -57,6 +60,8 @@ export default function PlaceContribLog() {
   }, [page, result, field]);
 
   const pages = data ? Math.max(1, Math.ceil(data.total / PER_PAGE)) : 1;
+  const foldable = !!data && (data.entries.length > FOLDED || pages > 1);
+  const rows = data ? (open || !foldable ? data.entries : data.entries.slice(0, FOLDED)) : [];
   const day = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
 
   return (
@@ -102,7 +107,7 @@ export default function PlaceContribLog() {
       )}
       {data && data.entries.length > 0 && (
         <ul className="m-0 list-none divide-y divide-edge-faint overflow-hidden rounded-[12px] border border-edge-faint bg-surface-card p-0">
-          {data.entries.map((e) => (
+          {rows.map((e) => (
             <li key={e.id} className="flex flex-wrap items-center gap-x-2.5 gap-y-1 px-3 py-2">
               <span className="w-12 flex-none tabular-nums text-content-faint" style={fs(11.5)}>
                 {day.format(new Date(`${e.day}T12:00:00`))}
@@ -135,7 +140,24 @@ export default function PlaceContribLog() {
         </ul>
       )}
 
-      {data && pages > 1 && (
+      {foldable && (
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="inline-flex items-center gap-1 self-start font-medium text-content-muted hover:text-content"
+          style={fs(12, 'body')}
+        >
+          <ChevronDown
+            size={14}
+            aria-hidden="true"
+            className={open ? 'rotate-180 transition-transform' : 'transition-transform'}
+          />
+          {open ? t('common.showLess') : `${t('common.showMore')} (${(data?.total ?? 0) - FOLDED})`}
+        </button>
+      )}
+
+      {data && open && pages > 1 && (
         <div className="flex items-center justify-end gap-2 text-content-muted" style={fs(12, 'body')}>
           <button
             type="button"
