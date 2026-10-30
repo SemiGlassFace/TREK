@@ -6,10 +6,14 @@ import type { PlaceFormData } from './PlaceFormModal.helpers';
 import { resultOrigin } from './placeFieldOrigins';
 import { refreshCandidates, type RefreshCandidate } from './placeRefresh';
 
-/** The id the details lookup takes for a saved place: its Google id, else its OSM or index id. */
-function detailIdOf(place: Place | null | undefined): string | null {
+/**
+ * The id the details lookup takes for a saved place: its Google id, else its
+ * OSM or index id. A place picked anew in the search box brings its own ids
+ * into the form, and those win, so the details compared are the picked place's.
+ */
+function detailIdOf(place: Place | null | undefined, form: PlaceFormData): string | null {
   if (!place) return null;
-  return place.google_place_id || place.osm_id || null;
+  return form.google_place_id || form.osm_id || place.google_place_id || place.osm_id || null;
 }
 
 /**
@@ -26,7 +30,7 @@ export function usePlaceRefresh({
   form: PlaceFormData;
   language: string;
 }): { candidates: RefreshCandidate[]; origin: PlaceClientOrigin } {
-  const detailId = detailIdOf(place);
+  const detailId = detailIdOf(place, form);
   // Keyed by what was asked, so a stale answer for another place is never read.
   const [fresh, setFresh] = useState<{ key: string; details: Record<string, unknown> } | null>(null);
   const key = detailId ? `${detailId}|${language}` : null;
