@@ -491,7 +491,6 @@ export async function createPluginRpcHostParts(
     usersRepo,
     buildPlaceImportService(),
     places,
-    placeOriginsStub(),
   );
   // After accommodations: a hotel booking writes the stay's day stop through it.
   const reservations = new ReservationsService(

@@ -106,7 +106,7 @@ import { MulterModule } from '@nestjs/platform-express';
   ],
   controllers: [PlacesController],
   providers: [PlacesService, PlacesMcp, PlacesRpc, PlaceOriginsService],
-  // The origin bookkeeping too: the copy from a collection and the booking import write places as well.
+  // The origin bookkeeping too: the booking import writes places as well.
   exports: [PlacesService, PlaceOriginsService],
 })
 export class PlacesModule {}

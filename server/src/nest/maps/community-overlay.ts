@@ -1,3 +1,4 @@
+import { buildOsmDetails } from './maps.helpers';
 import { trekCommunityByKeys, type TrekCommunityValues } from './trek-places.client';
 import { normalizePlaceWebsite } from '@trek/shared';
 
@@ -26,8 +27,16 @@ export function withCommunityValues(
   if (website) out.website = website;
   if (values.contact?.phone) out.phone = values.contact.phone;
   if (values.contact?.email) out.email = values.contact.email;
-  if (values.hours?.osm) out.opening_hours = values.hours.osm;
-  if (values.description?.text) out.description = values.description.text;
+  if (values.hours?.osm) {
+    // The same shape OSM's own hours take in the details: one line per day, open now, the periods.
+    const hours = buildOsmDetails({ opening_hours: values.hours.osm }, '', '');
+    if (hours.opening_hours) {
+      out.opening_hours = hours.opening_hours;
+      out.open_now = hours.open_now;
+      out.opening_periods = hours.opening_periods;
+    }
+  }
+  if (values.description?.text) out.summary = values.description.text;
   if (typeof values.community.version === 'number') out.community_version = values.community.version;
   return out;
 }

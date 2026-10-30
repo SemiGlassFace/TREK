@@ -320,7 +320,7 @@ it("OSM-PHOTON-021: an element in TREK's own details layer asks no Overpass, and
   const details = await osm.elementDetails('way:518071791', 'en');
   expect(details).toMatchObject({
     website: 'https://example.org',
-    opening_hours: '24/7',
+    opening_hours: expect.arrayContaining(['Monday: 00:00-24:00']),
     phone: '+49 30 1234567',
     community_version: 2,
     lat: 52.5163,

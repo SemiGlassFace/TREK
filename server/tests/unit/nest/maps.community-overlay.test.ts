@@ -40,11 +40,12 @@ describe('community values on OSM details', () => {
     expect(got.website).toMatch(/^https:\/\/www\.skybldg\.co\.jp\/?$/);
     expect(got).toMatchObject({
       phone: '+81 6 6440 3855',
-      opening_hours: 'Mo-Su 09:30-22:30',
-      description: 'A tower of two linked blocks.',
+      summary: 'A tower of two linked blocks.',
       community_version: 3,
       name: 'Umeda Sky Building',
     });
+    expect(got.opening_hours).toEqual(expect.arrayContaining(['Monday: 09:30-22:30', 'Sunday: 09:30-22:30']));
+    expect(got.opening_periods).toBeTruthy();
     expect(got.email).toBeUndefined();
   });
 
