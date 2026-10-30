@@ -705,10 +705,14 @@ export class PlaceEnrichmentService {
     if (!this.maps.trekPlacesEnabled()) return null;
     try {
       const got = (
-        (await trekPlacesById(placeId.slice(5))) as { description?: { text?: string; sourceUrl?: string } } | null
+        (await trekPlacesById(placeId.slice(5))) as {
+          description?: { text?: string; sourceUrl?: string; source?: string };
+        } | null
       )?.description;
       const text = typeof got?.text === 'string' ? got.text.trim() : '';
       if (!text) return null;
+      // A description installations shared and review published, laid over the index row.
+      if (got?.source === 'community') return { text, source: 'community', sourceUrl: null, license: 'CC BY 4.0' };
       // Through the same allow-list a place's website goes through: this
       // becomes an href on the client, and the value comes from whatever the
       // configured index answered with. Anything but http(s) loses the link and
@@ -739,6 +743,9 @@ export class PlaceEnrichmentService {
     // OpenStreetMap first: it costs nothing, it is already fetched, and a
     // description someone wrote into the map data beats a generated blurb.
     const osmSummary = typeof details?.summary === 'string' ? details.summary.trim() : '';
+    if (osmSummary && details?.summary_source === 'community') {
+      return { text: osmSummary, source: 'community', sourceUrl: null, license: 'CC BY 4.0' };
+    }
     if (osmSummary && details?.source === 'openstreetmap') {
       return {
         text: osmSummary,

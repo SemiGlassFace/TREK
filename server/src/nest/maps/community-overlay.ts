@@ -36,7 +36,11 @@ export function withCommunityValues(
       out.opening_periods = hours.opening_periods;
     }
   }
-  if (values.description?.text) out.summary = values.description.text;
+  if (values.description?.text) {
+    out.summary = values.description.text;
+    // The details panel credits it to the community, not to OpenStreetMap.
+    out.summary_source = 'community';
+  }
   if (typeof values.community.version === 'number') out.community_version = values.community.version;
   return out;
 }

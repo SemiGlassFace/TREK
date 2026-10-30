@@ -185,6 +185,8 @@ export const placeDescriptionSourceSchema = z.enum([
   'wikipedia',
   /** Quoted from the place's own site, via the TREK Places API. */
   'website',
+  /** Written by a TREK user, shared by an installation and checked before it was published. */
+  'community',
 ]);
 export type PlaceDescriptionSource = z.infer<typeof placeDescriptionSourceSchema>;
 

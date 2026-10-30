@@ -41,6 +41,7 @@ describe('community values on OSM details', () => {
     expect(got).toMatchObject({
       phone: '+81 6 6440 3855',
       summary: 'A tower of two linked blocks.',
+      summary_source: 'community',
       community_version: 3,
       name: 'Umeda Sky Building',
     });

@@ -281,6 +281,29 @@ describe('description source order', () => {
     expect(bare.description).toMatchObject({ source: 'google', sourceUrl: 'https://maps.google.com/x' });
   });
 
+  it('ENRICH-075b: a description installations shared is credited to the TREK community, not to OpenStreetMap', async () => {
+    const maps = mapsStub({
+      details: vi.fn(async () => ({
+        place: {
+          source: 'openstreetmap',
+          summary: 'An Asian restaurant in Evershagen.',
+          summary_source: 'community',
+          osm_url: 'https://osm.org/n/1',
+        },
+      })),
+      fetchWikiExtractFor: vi.fn(async () => EXTRACT),
+    });
+
+    const out = await make(maps).enrich(1, OSM_REQ);
+
+    expect(out.description).toEqual({
+      text: 'An Asian restaurant in Evershagen.',
+      source: 'community',
+      sourceUrl: null,
+      license: 'CC BY 4.0',
+    });
+  });
+
   it('ENRICH-075: keeps the OpenStreetMap description ahead of everything', async () => {
     const maps = mapsStub({
       details: vi.fn(async () => ({
