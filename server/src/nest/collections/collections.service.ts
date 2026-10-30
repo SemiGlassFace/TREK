@@ -7,6 +7,7 @@ import { PermissionsService } from '../permissions/permissions.service';
 import { RealtimeService } from '../realtime/realtime.service';
 import { isUploadedPlaceImage } from '../places/place-image';
 import { PlacesService } from '../places/places.service';
+import { PlaceOriginsService } from '../places/place-origins.service';
 import { StorageService } from '../storage/storage.service';
 import { Collections } from '../../db/entities/Collections.entity';
 import { CollectionsRepository, type CollectionPlaceRow } from '../../db/repositories/Collections.repository';
@@ -130,6 +131,7 @@ export class CollectionsService {
     @InjectRepository(Users) private readonly users: UsersRepository,
     private readonly placeImport: PlaceImportService,
     private readonly places: PlacesService, // the journey hook of every place copyToTrip adds
+    private readonly origins: PlaceOriginsService,
   ) {}
 
   /**
@@ -1186,6 +1188,8 @@ export class CollectionsService {
         created.push({ id: newPlaceId, source_id: s.id });
       }
     });
+    // A copied value is the collection's, not typed in this write: recorded as an import, never shared.
+    if (created.length > 0) await this.origins.recordImported(created.map(({ id }) => id));
     const rows = await Promise.all(created.map(({ id }) => this.tripPlaces.findWithTagsAndRatings(id))); // reads only
     for (const [i, place] of rows.entries()) {
       if (place) events.emit('place:created', { place }); // as the place routes send it

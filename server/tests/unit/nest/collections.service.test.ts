@@ -120,6 +120,9 @@ const removeIfUnreferenced = (id: string) => photoCache.removeIfUnreferenced(id)
 // (part B) finished the conversion: `DatabaseService` is GONE from the constructor
 // entirely (savePlace onward was its last use) — the trip/place/tag/user
 // repositories below are Task 2's own additions.
+// The origin bookkeeping after a copy; its own suite is place-origins.service.test.ts.
+const originsForSpy = { recordImported: vi.fn(async () => undefined) };
+
 beforeAll(async () => {
   tripsRepoForSpy = await createTestTripsRepo(testDb);
   permissionsForSpy = new PermissionsService(await createTestAppSettingsRepo(testDb), await createTestUnitOfWork(testDb));
@@ -134,6 +137,7 @@ beforeAll(async () => {
     await createTestTagsRepo(testDb), await createTestUsersRepo(testDb),
     buildPlaceImportService(),
     placesHooks as never,
+    originsForSpy as never,
   );
   photoCache = new PlacePhotoCacheService(
     makeStorageFixture('photos/google/').storage,
@@ -504,6 +508,8 @@ describe('copyToTrip', () => {
     const res = await svc.copyToTrip(u.id, { trip_id: trip.id, place_ids: [p1.id, p2.id] }, copyEvents(trip.id));
     expect(res.copied).toBe(1);
     expect(res.skipped.map((s) => s.name)).toEqual(['Pantheon']);
+    // What was copied is the collection's, so it is recorded as an import, never as typed.
+    expect(originsForSpy.recordImported).toHaveBeenLastCalledWith(res.created.map((c) => c.id));
 
     const inserted = (await findRow(await orm(), Places, { trip: trip.id, name: 'Colosseum' }))!;
     expect(inserted.reservation_status).toBe('none'); // itinerary column took the table default

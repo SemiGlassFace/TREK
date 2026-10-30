@@ -16,6 +16,8 @@ vi.mock('../../../../src/db/database', () => ({
   getPlaceWithTags: () => null,
 }));
 const permissionsStub = { checkPermission: vi.fn(() => true) };
+// The origin bookkeeping of the venues a confirm creates; its own suite is place-origins.service.test.ts.
+const origins = { recordImported: vi.fn(async () => undefined) };
 // Runs the callback in place; the tests that care about the boundary wrap it to record it.
 const uowStub = { transactional: <T>(fn: () => Promise<T>) => fn() };
 
@@ -58,6 +60,7 @@ function make(opts: { kit?: boolean; ai?: boolean; extract?: any; parse?: any })
       maps as never,
       places as never,
       uowStub as never,
+      origins as never,
     ),
     extractor,
     llmParse,
@@ -264,6 +267,7 @@ describe('BookingImportService.confirm venue website (#2483)', () => {
       { geocodeQuery: vi.fn() } as never,
       places as never,
       uowStub as never,
+      origins as never,
     );
     const item = (website?: string) => ({
       type: 'restaurant',
@@ -284,6 +288,8 @@ describe('BookingImportService.confirm venue website (#2483)', () => {
       undefined,
       undefined,
     ]);
+    // The venues' details came from the booking: recorded once, as an import, after the loop.
+    expect(origins.recordImported).toHaveBeenLastCalledWith([7, 7, 7]);
   });
 });
 
@@ -355,6 +361,7 @@ describe('BookingImportService.confirm writes the booking with its cost', () => 
       { geocodeQuery: vi.fn() } as never,
       places as never,
       uow as never,
+      origins as never,
     );
     return { svc, reservations, budget, places, realtime, order, costEvents };
   }

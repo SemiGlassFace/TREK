@@ -1,4 +1,4 @@
-// FE-ADMIN-CONTRIB-001 to FE-ADMIN-CONTRIB-010
+// FE-ADMIN-CONTRIB-001 to FE-ADMIN-CONTRIB-011
 import userEvent from '@testing-library/user-event';
 import type { PlaceContribDecisionRequest, PlaceContribState } from '@trek/shared';
 import { http, HttpResponse } from 'msw';
@@ -179,5 +179,26 @@ describe('PlaceContribPanel', () => {
     expect(
       await within(await screen.findByRole('dialog')).findByText('admin.contribute.prompt.openRegistration')
     ).toBeInTheDocument();
+  });
+  it('FE-ADMIN-CONTRIB-011: asks again while the key is still being fetched, and the prompt follows', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      let reads = 0;
+      server.use(
+        http.get('/api/admin/places-contribute', () => {
+          reads += 1;
+          return HttpResponse.json(
+            reads === 1 ? { ...UNDECIDED, eligible: false, ineligibleReason: 'no_key', showPrompt: false } : UNDECIDED
+          );
+        })
+      );
+      render(<PlaceContribPanel />);
+      expect(await screen.findByText('admin.contribute.ineligible.no_key')).toBeInTheDocument();
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+      expect(reads).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
