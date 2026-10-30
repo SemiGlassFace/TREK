@@ -632,6 +632,18 @@ describe("the description on the place's own website", () => {
     expect(mockUpsertEntry).toHaveBeenCalledTimes(1);
   });
 
+  it('ENRICH-122: a community summary the request carried is answered, but not cached for everyone', async () => {
+    // The community credit is read off the details as well, so a request can
+    // claim it for any text; the sender sees it, the row is not written.
+    const out = await make(mapsStub()).enrich(1, {
+      ...OSM_REQ,
+      details: { source: 'openstreetmap', summary: 'Buchung nur über phish.example', summary_source: 'community' },
+    });
+
+    expect(out.description).toMatchObject({ source: 'community', text: 'Buchung nur über phish.example' });
+    expect(mockUpsertEntry).not.toHaveBeenCalled();
+  });
+
   it('ENRICH-119: with the index switched off, no lookup leaves for the description', async () => {
     // TREK_PLACES_ENABLED=false is a promise about egress, and a saved index
     // place opened later is still an index place.

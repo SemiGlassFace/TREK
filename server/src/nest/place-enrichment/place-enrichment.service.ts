@@ -454,15 +454,18 @@ export class PlaceEnrichmentService {
       rating: collectRating(details) ?? collectRating(osmDetails),
     };
     // The cache is keyed by place and language, so a row written here is what
-    // every user of the instance sees for a week. An OpenStreetMap summary and
-    // a menu link are the two things read straight off the request's own
-    // `details` that become a link on every screen, and when the request
-    // carried those, the text and the link are the caller's word rather than
-    // the map's: fine to answer them with, not to serve to everyone else. The
-    // row simply is not written, and the next request computes its own answer.
-    // A summary or a link the lookup here fetched itself is the map's and keeps.
+    // every user of the instance sees for a week. An OpenStreetMap or community
+    // summary and a menu link are the things read straight off the request's
+    // own `details` that end up on every screen, and when the request carried
+    // those, the text and the link are the caller's word rather than the
+    // map's: fine to answer them with, not to serve to everyone else. The row
+    // simply is not written, and the next request computes its own answer. A
+    // summary or a link the lookup here fetched itself is the map's and keeps.
     const fromCaller =
-      req.details != null && (description?.source === 'osm' || ownFacts.some((fact) => fact.url != null));
+      req.details != null &&
+      (description?.source === 'osm' ||
+        description?.source === 'community' ||
+        ownFacts.some((fact) => fact.url != null));
     if (!fromCaller) await this.writeCache(placeId, lang, { ...result, cv: communityVersion(placeId, details) });
     return result;
   }
