@@ -44,7 +44,7 @@ export class PlaceContribJob implements OnApplicationBootstrap {
 
   /** One run at a time; a run asked for while one is going follows right after it. */
   async send(): Promise<void> {
-    if (this.running) {
+    if (this.running !== null) {
       this.again = true;
       return this.running;
     }

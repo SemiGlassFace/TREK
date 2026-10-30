@@ -1925,12 +1925,14 @@ describe('getPlaceDetails (fetch stubbed)', () => {
     expect(place.lat).toBeCloseTo(48.85);
     expect(place.lng).toBeCloseTo(2.29);
     expect(place.source).toBe('openstreetmap');
-    // Overpass first, then Nominatim — two total fetch calls
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    // Overpass first, then Nominatim, then the community values for the element
+    // from the TREK index, which answer nothing here and leave the details as they are.
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     const overpassUrl = fetchMock.mock.calls[0][0] as string;
     const nominatimUrl = fetchMock.mock.calls[1][0] as string;
     expect(overpassUrl).toContain('overpass');
     expect(nominatimUrl).toContain('nominatim');
+    expect(String(fetchMock.mock.calls[2][0])).toContain('/v1/community?keys=osm%3Away%2F5');
   });
 
   it('MAPS-041e: open_now is null when regularOpeningHours.openNow is undefined', async () => {
