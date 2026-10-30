@@ -1,0 +1,51 @@
+import type { PlaceClientOrigin } from '@trek/shared';
+import { useEffect, useMemo, useState } from 'react';
+import { mapsApi } from '../../api/client';
+import type { Place } from '../../types';
+import type { PlaceFormData } from './PlaceFormModal.helpers';
+import { resultOrigin } from './placeFieldOrigins';
+import { refreshCandidates, type RefreshCandidate } from './placeRefresh';
+
+/** The id the details lookup takes for a saved place: its Google id, else its OSM or index id. */
+function detailIdOf(place: Place | null | undefined): string | null {
+  if (!place) return null;
+  return place.google_place_id || place.osm_id || null;
+}
+
+/**
+ * Fresh details for a place being edited, and the fields where they differ
+ * from the form. Asked once per opened place and language; a place without a
+ * provider id, and a new place, have nothing to refresh from.
+ */
+export function usePlaceRefresh({
+  place,
+  form,
+  language,
+}: {
+  place: Place | null | undefined;
+  form: PlaceFormData;
+  language: string;
+}): { candidates: RefreshCandidate[]; origin: PlaceClientOrigin } {
+  const detailId = detailIdOf(place);
+  // Keyed by what was asked, so a stale answer for another place is never read.
+  const [fresh, setFresh] = useState<{ key: string; details: Record<string, unknown> } | null>(null);
+  const key = detailId ? `${detailId}|${language}` : null;
+
+  useEffect(() => {
+    if (!detailId || !key) return;
+    let live = true;
+    mapsApi.details(detailId, language).then(
+      (answer: { place?: Record<string, unknown> | null }) => {
+        if (live && answer?.place) setFresh({ key, details: answer.place });
+      },
+      () => undefined
+    );
+    return () => {
+      live = false;
+    };
+  }, [detailId, key, language]);
+
+  const details = fresh && fresh.key === key ? fresh.details : null;
+  const candidates = useMemo(() => refreshCandidates(form, details), [form, details]);
+  return { candidates, origin: details ? resultOrigin(details) : 'enrichment' };
+}

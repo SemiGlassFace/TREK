@@ -94,6 +94,10 @@ The hours stay folded away until you click **Add opening hours**. Each weekday t
 
 The place inspector shows the phone and the e-mail address as pills in its head band (a click calls or writes), and your own hours win over the ones a provider knows.
 
+### Newer place details
+
+When you edit a saved place, TREK looks the place up again. If the lookup knows a website, phone number, e-mail address or opening hours that differ from what the place holds, a **New place details** pill with the number of differences appears in the head of the form. It opens a list with what the place holds now beside what the lookup has. A field that is empty is ticked; a field that already has a value is not, and says that it would replace it. **Take over** writes only the ticked fields into the form, and the place keeps them once you save it. A field the lookup knows nothing about is never offered, so refreshing never empties anything.
+
 ### Costs for a place
 
 With the [Costs](Budget-Tracking) addon enabled, the place form carries the same **Costs** block that bookings and transports have. **Create expense** saves the place and then opens the Costs editor for a new expense linked to it: the museum ticket, the guided tour, the entry fee. On a saved place, **Link existing expense** ties one that is already in Costs. Every linked expense is listed with edit, **Unlink, keep the expense** and **Remove expense**, and a place can carry several.
