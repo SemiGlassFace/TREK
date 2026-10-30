@@ -1,6 +1,7 @@
 import { buildOsmDetails } from './maps.helpers';
+import type { TrekCommunityValues } from './trek-community.schema';
 import { communityKeyOf } from './trek-community.service';
-import { trekCommunityByKeys, type TrekCommunityValues } from './trek-places.client';
+import { trekCommunityByKeys } from './trek-places.client';
 import { normalizePlaceWebsite } from '@trek/shared';
 
 /**

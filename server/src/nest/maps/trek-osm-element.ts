@@ -1,12 +1,17 @@
-import { getJson, type TrekCommunityValues } from './trek-places.client';
+import { trekCommunityValuesSchema } from './trek-community.schema';
+import { getJson } from './trek-places.client';
+
+import { z } from 'zod';
 
 /** An OSM element as the TREK Places API's details layer answers it: the tags, the point, and the community values. */
-interface TrekOsmElement extends TrekCommunityValues {
-  name: string;
-  lat: number;
-  lng: number;
-  tags: Record<string, string>;
-}
+const trekOsmElementSchema = trekCommunityValuesSchema.extend({
+  name: z.string().nullish(),
+  lat: z.number(),
+  lng: z.number(),
+  tags: z.record(z.string(), z.string()),
+});
+
+type TrekOsmElement = z.infer<typeof trekOsmElementSchema>;
 
 /** The details layer answers in well under a second or not at all; Overpass is the fallback, not this. */
 const TIMEOUT_MS = 3_000;
@@ -19,13 +24,14 @@ const TIMEOUT_MS = 3_000;
  */
 export async function trekOsmElement(osmType: string, osmId: string): Promise<TrekOsmElement | null> {
   try {
-    const body = await getJson<{ place?: TrekOsmElement }>(
+    const body = await getJson<{ place?: unknown } | null>(
       `/v1/osm/${encodeURIComponent(osmType)}/${encodeURIComponent(osmId)}`,
       {},
       { timeoutMs: TIMEOUT_MS },
     );
-    const place = body.place;
-    return place && typeof place.lat === 'number' && typeof place.lng === 'number' && place.tags ? place : null;
+    // An answer outside the published shape is no element: Overpass is asked instead.
+    const place = trekOsmElementSchema.safeParse(body?.place);
+    return place.success ? place.data : null;
   } catch {
     return null;
   }

@@ -14,6 +14,7 @@
  */
 import { readEnv } from '../../app-config';
 import { toApiLang } from './maps.helpers';
+import { trekCommunityValuesSchema, type TrekCommunityValues } from './trek-community.schema';
 import { identifiedFetch } from './trek-places.fetch';
 import {
   normalizePlaceWebsite,
@@ -638,14 +639,7 @@ export async function trekPlacesById(gers: string, opts: { lang?: string } = {})
   }
 }
 
-/** What the service publishes for a place found elsewhere (Photon, Overpass): the overlay of its own rows. */
-export interface TrekCommunityValues {
-  contact?: { website?: string | null; phone?: string | null; email?: string | null } | null;
-  hours?: { osm?: string | null } | null;
-  description?: { text?: string | null } | null;
-  images?: { url?: string; cover?: boolean }[] | null;
-  community?: { version?: number; fields?: string[] } | null;
-}
+const communityAnswerSchema = z.object({ places: z.record(z.string(), z.unknown()).optional() });
 
 /**
  * The published community values of places that are no rows of the index, by
@@ -655,10 +649,16 @@ export interface TrekCommunityValues {
 export async function trekCommunityByKeys(keys: string[]): Promise<Record<string, TrekCommunityValues>> {
   if (keys.length === 0) return {};
   try {
-    const body = await getJson<{ places?: Record<string, TrekCommunityValues> }>('/v1/community', {
-      keys: keys.slice(0, 50).join(','),
-    });
-    return body.places ?? {};
+    const body = await getJson<unknown>('/v1/community', { keys: keys.slice(0, 50).join(',') });
+    const places = communityAnswerSchema.safeParse(body);
+    if (!places.success) return {};
+    // A place whose values are not in the published shape is left out, the others still count.
+    const out: Record<string, TrekCommunityValues> = {};
+    for (const [key, raw] of Object.entries(places.data.places ?? {})) {
+      const values = trekCommunityValuesSchema.safeParse(raw);
+      if (values.success) out[key] = values.data;
+    }
+    return out;
   } catch {
     return {};
   }

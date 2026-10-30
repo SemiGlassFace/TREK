@@ -1219,6 +1219,14 @@ describe('trekCommunityByKeys', () => {
     expect(url.searchParams.get('keys')).toBe('osm:relation/3389505,osm:node/1');
   });
 
+  it('leaves out a place whose values are not in the published shape, and keeps the others', async () => {
+    const good = { contact: { phone: '+49 30 1' }, community: { version: 1 } };
+    stubFetch({ places: { 'osm:node/1': good, 'osm:node/2': { hours: { osm: 7 } } } });
+    expect(await trekCommunityByKeys(['osm:node/1', 'osm:node/2'])).toEqual({ 'osm:node/1': good });
+    stubFetch({ places: ['not', 'a', 'map'] });
+    expect(await trekCommunityByKeys(['osm:node/1'])).toEqual({});
+  });
+
   it('asks nothing without keys, and a failing service is an empty map', async () => {
     stubFetch({ places: {} });
     expect(await trekCommunityByKeys([])).toEqual({});

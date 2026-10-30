@@ -300,6 +300,15 @@ it('OSM-PHOTON-009: a lookup by id is Overpass for the tags and the place, Photo
   expect(hosts).toEqual(['places.liketrek.com', 'overpass-api.de', 'photon.liketrek.com']);
 });
 
+it('OSM-PHOTON-022: an answer of the details layer outside its shape is no element, and Overpass is asked', async () => {
+  const place = { name: 'Brandenburger Tor', lat: 52.5163, lng: 13.3777, tags: { level: 2 } };
+  placesReply = () =>
+    new Response(JSON.stringify({ place }), { status: 200, headers: { 'content-type': 'application/json' } });
+  const details = await osm.elementDetails('way:518071791', 'en');
+  expect(details).toMatchObject({ name: 'Brandenburg Gate', website: 'https://example.org' });
+  expect(hosts).toEqual(['places.liketrek.com', 'overpass-api.de', 'photon.liketrek.com']);
+});
+
 it("OSM-PHOTON-021: an element in TREK's own details layer asks no Overpass, and carries the community values", async () => {
   placesReply = (url) => {
     expect(url.pathname).toBe('/v1/osm/way/518071791');
