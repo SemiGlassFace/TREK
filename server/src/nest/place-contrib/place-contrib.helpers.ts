@@ -133,9 +133,12 @@ export function baseHashOf(value: string | null | undefined): string | null {
  * retry after a lost answer is recognised as the same contribution, and new
  * as soon as one of them was replaced.
  */
+/** Plain code-unit order: the same on every server, where a locale's collation is not. */
+const byCodeUnit = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
 export function requestCid(entryCids: readonly string[]): string {
   const digest = createHash('sha256')
-    .update([...entryCids].sort().join(','))
+    .update([...entryCids].sort(byCodeUnit).join(','))
     .digest('base64url');
   return digest.slice(0, 32);
 }
