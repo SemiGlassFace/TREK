@@ -51,6 +51,19 @@ describe('TrekCommunityService.photoPaths', () => {
     expect(await new TrekCommunityService().photoPaths('node:1')).toEqual([A]);
   });
 
+  it('TCOM-003b: takes an absolute URL on the configured service as its path, never another host', async () => {
+    byKeys.mockResolvedValue({
+      'osm:node/2': {
+        images: [
+          { url: `https://places.example${A}`, cover: true },
+          { url: `https://other.example${B}` },
+          { url: `https://places.example${B}?x=1` },
+        ],
+      },
+    });
+    expect(await new TrekCommunityService().photoPaths('node:2')).toEqual([A]);
+  });
+
   it('TCOM-004: nothing for another kind of place, or when the service fails', async () => {
     expect(await new TrekCommunityService().photoPaths('ChIJgoogle')).toEqual([]);
     byId.mockRejectedValue(new Error('down'));

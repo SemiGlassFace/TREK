@@ -173,8 +173,13 @@ interface CachePayload extends CachedEnrichment {
  * A sender who puts another number here only makes their own request compute
  * afresh: nothing of the record is what gets cached.
  */
+/** Whether the TREK Places API can hold community values for the place: an index place or an OSM element. */
+function isCommunityPlace(placeId: string): boolean {
+  return placeId.startsWith('gers:') || communityKeyOf(placeId) !== null;
+}
+
 function communityVersion(placeId: string, details: Record<string, unknown> | null | undefined): number | null {
-  if (!placeId.startsWith('gers:') && !communityKeyOf(placeId)) return null;
+  if (!isCommunityPlace(placeId)) return null;
   const version = details?.community_version;
   return typeof version === 'number' && Number.isInteger(version) && version >= 0 ? version : null;
 }
@@ -403,7 +408,12 @@ export class PlaceEnrichmentService {
     const placeId = req.placeId?.trim() || `coords:${req.lat}:${req.lng}`;
     const lang = req.lang;
 
-    const served = communityVersion(placeId, req.details);
+    // A saved place being edited comes without details, so without the community
+    // version: read them first for a place that has one, or a picture another
+    // installation contributed since would wait a week behind the cached answer.
+    const communityPlace = isCommunityPlace(placeId);
+    const early = !req.details && communityPlace ? await this.readDetails(userId, placeId, lang) : null;
+    const served = communityVersion(placeId, req.details ?? early);
     const cached = await this.readCache(placeId, lang, served);
     if (cached) return cached;
 
@@ -414,7 +424,7 @@ export class PlaceEnrichmentService {
     // The dialog already fetched this when the user picked the result, so it
     // comes along with the request. Refetching cost 12.8 seconds on a large
     // OSM relation, and it ran in parallel with the client's own lookup.
-    const details = req.details ?? (await this.readDetails(userId, placeId, lang));
+    const details = req.details ?? (communityPlace ? early : await this.readDetails(userId, placeId, lang));
     const identity = await this.resolveIdentity(req, details);
 
     const [photos, description] = await Promise.all([
@@ -594,8 +604,8 @@ export class PlaceEnrichmentService {
     // they show the place as someone who was there saw it. Then Google, whose
     // pictures are of the business itself.
     // Only index and OSM places have any; off means nothing leaves for the API.
-    const communityPlace = placeId.startsWith('gers:') || communityKeyOf(placeId) !== null;
-    const community = communityPlace && this.maps.trekPlacesEnabled() ? await this.community.photoPaths(placeId) : [];
+    const community =
+      isCommunityPlace(placeId) && this.maps.trekPlacesEnabled() ? await this.community.photoPaths(placeId) : [];
     const pending: PendingCandidate[] = [
       ...community.map((path) => ({
         identity: `community:${path}`,

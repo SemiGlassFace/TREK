@@ -14,6 +14,26 @@ export function communityKeyOf(placeId: string): string | null {
 }
 
 /**
+ * The picture store path of a URL the service gave out: as it is when relative,
+ * the path when absolute on the configured service, null for anything else.
+ * The service writes absolute URLs once TREK_CONTRIB_PUBLIC_URL is set.
+ */
+function storePath(url: unknown): string | null {
+  if (typeof url !== 'string') return null;
+  let path = url;
+  if (!url.startsWith('/')) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.origin !== new URL(trekPlacesBaseUrl()).origin || parsed.search) return null;
+      path = parsed.pathname;
+    } catch {
+      return null;
+    }
+  }
+  return IMAGE_PATH.test(path) ? path : null;
+}
+
+/**
  * The pictures the TREK community published for a place, read from the TREK
  * Places API: which ones (cover first, then the order review set) and their
  * bytes. An index place carries them on its own row, an OSM place gets them
@@ -37,7 +57,7 @@ export class TrekCommunityService {
     }
     if (!Array.isArray(images)) return [];
     const ordered = [...images.filter((i) => i?.cover), ...images.filter((i) => !i?.cover)];
-    return ordered.map((i) => i?.url).filter((u): u is string => typeof u === 'string' && IMAGE_PATH.test(u));
+    return ordered.map((i) => storePath(i?.url)).filter((u): u is string => u !== null);
   }
 
   /**

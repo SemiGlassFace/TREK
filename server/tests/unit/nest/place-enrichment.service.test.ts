@@ -771,6 +771,29 @@ describe('result cache', () => {
     expect(JSON.parse(written.payload_json).cv).toBe(2);
   });
 
+  it('ENRICH-027b: an OSM place opened for editing, without details, reads its version and drops a stale answer', async () => {
+    // Installation A cached the place before installation B's picture was approved (version 1 -> 2).
+    const row = {
+      payload_json: JSON.stringify({ photos: [], description: null, facts: [], v: 4, cv: 1 }),
+      fetched_at: Date.now(),
+    };
+    const maps = mapsStub({
+      details: vi.fn(async () => ({
+        place: { source: 'openstreetmap', name: 'Helgas Kitchen', community_version: 2 },
+      })),
+      photoPaths: vi.fn(async () => ['/v1/contrib/img/0123456789abcdef.webp']),
+      imageBytes: vi.fn(async () => Buffer.from([7, 8, 9])),
+    });
+    mockFindEntry.mockResolvedValue(row);
+
+    const out = await make(maps, cacheStub()).enrich(1, OSM_REQ);
+
+    expect(maps.details).toHaveBeenCalledTimes(1);
+    expect(out.photos.map((p) => p.source)).toEqual(['community']);
+    const [written] = mockUpsertEntry.mock.calls.at(-1) as [{ payload_json: string }];
+    expect(JSON.parse(written.payload_json).cv).toBe(2);
+  });
+
   it('ENRICH-028: any other place keeps its week, whatever a request says about versions', async () => {
     const maps = mapsStub();
     mockFindEntry.mockResolvedValue({
