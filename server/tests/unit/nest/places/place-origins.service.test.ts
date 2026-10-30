@@ -138,6 +138,21 @@ describe('an update', () => {
     expect((await origins(id)).website).toEqual({ origin: 'agent', value_hash: valueHash('https://agent.example') });
   });
 
+  it('POS-015: a picture route records the picture only; a value another writer changed meanwhile keeps its origin', async () => {
+    const id = await place({ website: 'https://mine.example' });
+    await service().record(id, null, { kind: 'fixed', origin: 'agent' });
+    const before = await service().valuesBefore(id);
+    // The assistant changes the website while the picture uploads.
+    await updateRows(orm(), Places, { id }, { website: 'https://agent.example', image_url: '/uploads/places/b.jpg' });
+    await service().record(id, before, { kind: 'fixed', origin: 'user', field: 'image' });
+    const rows = await origins(id);
+    expect(rows.image).toEqual({ origin: 'user', value_hash: valueHash('/uploads/places/b.jpg') });
+    expect(rows.website?.origin).toBe('agent');
+    expect(contrib.enqueue).toHaveBeenLastCalledWith(
+      expect.objectContaining({ values: [{ field: 'image', value: '/uploads/places/b.jpg' }], dropped: [] }),
+    );
+  });
+
   it('POS-013: nothing changed, nothing is recorded or queued', async () => {
     const id = await place({ website: 'https://same.example' });
     const before = await service().valuesBefore(id);

@@ -100,7 +100,9 @@ export class PlaceOriginsService {
     const row = await this.origins.placeValues(placeId);
     if (!row) return;
     const after = snapshotOf(row);
-    const changed = changedFields(before, after);
+    const changed = changedFields(before, after).filter(
+      (field) => writer.kind !== 'fixed' || writer.field === undefined || writer.field === field,
+    );
     if (changed.length === 0) return;
     const providers = needsProviders(writer, changed) ? await this.providerValues(row) : [];
     const updatedAt = dbNow();

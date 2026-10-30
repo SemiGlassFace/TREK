@@ -9,9 +9,14 @@ import {
   type PlaceFieldOrigins,
 } from '@trek/shared';
 
-/** Who wrote a place: a client reporting per field, or a path that decides the origin of all it changed. */
+/**
+ * Who wrote a place: a client reporting per field, or a path that decides the
+ * origin of all it changed. A path that writes one field only names it in
+ * `field`, so a value another writer changed meanwhile keeps its own origin.
+ */
 export type OriginWriter =
-  { kind: 'client'; claims: PlaceFieldOrigins | undefined } | { kind: 'fixed'; origin: PlaceFieldOrigin };
+  | { kind: 'client'; claims: PlaceFieldOrigins | undefined }
+  | { kind: 'fixed'; origin: PlaceFieldOrigin; field?: PlaceContribField };
 
 /** The shareable values of a place, one per field, null where it holds none. */
 export type OriginSnapshot = Record<PlaceContribField, string | null>;

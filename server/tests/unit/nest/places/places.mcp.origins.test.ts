@@ -56,7 +56,7 @@ describe('PlacesMcp origin tracking', () => {
 
   it('PMO-003: a trip file made the picture is an attachment', async () => {
     await mcp.setPlaceImageFromFile({ tripId: 1, placeId: 8, fileId: 4 }, ctx);
-    expect(origins.record).toHaveBeenCalledWith(8, BEFORE, { kind: 'fixed', origin: 'attachment' });
+    expect(origins.record).toHaveBeenCalledWith(8, BEFORE, { kind: 'fixed', origin: 'attachment', field: 'image' });
   });
 
   it('PMO-004: a bulk update records every place it changed as the agent', async () => {

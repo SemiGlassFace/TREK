@@ -76,9 +76,9 @@ describe('PlaceOriginsInterceptor', () => {
 
   it('POI-003: the upload is the user own picture, a trip file the attachment', async () => {
     await run('upload', { params: { id: '3' } }, { place: { id: 3 } });
-    expect(origins.record).toHaveBeenLastCalledWith(3, BEFORE, { kind: 'fixed', origin: 'user' });
+    expect(origins.record).toHaveBeenLastCalledWith(3, BEFORE, { kind: 'fixed', origin: 'user', field: 'image' });
     await run('fromFile', { params: { id: '3' } }, { place: { id: 3 } });
-    expect(origins.record).toHaveBeenLastCalledWith(3, BEFORE, { kind: 'fixed', origin: 'attachment' });
+    expect(origins.record).toHaveBeenLastCalledWith(3, BEFORE, { kind: 'fixed', origin: 'attachment', field: 'image' });
   });
 
   it('POI-004: an import records the places it answered with, in one pass', async () => {

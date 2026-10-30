@@ -265,7 +265,7 @@ export class PlacesMcp {
     if (result === 'too_large') return errorResult('That image is too large.');
     if (!result || isUpdateConflict(result)) return errorResult('Place not found.');
     this.guards.safeBroadcast(tripId, 'place:updated', { place: result });
-    await this.origins.record(result.id, before, { kind: 'fixed', origin: 'attachment' });
+    await this.origins.record(result.id, before, { kind: 'fixed', origin: 'attachment', field: 'image' });
     await this.places.onUpdated(result.id);
     return ok({ place: result });
   }

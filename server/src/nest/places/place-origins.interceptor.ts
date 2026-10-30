@@ -74,8 +74,9 @@ export class PlaceOriginsInterceptor implements NestInterceptor {
 }
 
 function writerFor(route: Exclude<PlaceOriginRoute, 'import'>, body: unknown): OriginWriter {
-  if (route === 'upload') return { kind: 'fixed', origin: 'user' };
-  if (route === 'attachment') return { kind: 'fixed', origin: 'attachment' };
+  // A picture route writes the picture only; whatever else changed while it ran keeps its own origin.
+  if (route === 'upload') return { kind: 'fixed', origin: 'user', field: 'image' };
+  if (route === 'attachment') return { kind: 'fixed', origin: 'attachment', field: 'image' };
   // The pipe has refused a malformed body before the handler ran; this reads the same field again.
   const parsed = placeFieldOriginsSchema.safeParse((body as { fieldOrigins?: unknown } | null)?.fieldOrigins);
   return { kind: 'client', claims: parsed.success ? parsed.data : undefined };
