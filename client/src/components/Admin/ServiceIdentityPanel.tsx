@@ -143,9 +143,10 @@ export default function ServiceIdentityPanel({ managed = false }: { managed?: bo
     <section
       ref={panel}
       aria-label={t('admin.trekApi.quota.title')}
-      className="flex flex-col gap-3 rounded-xl border border-edge-faint bg-surface-secondary p-3"
+      className="flex flex-col overflow-hidden rounded-xl border border-edge-faint bg-surface-secondary"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      {/* Head band: where the installation stands, apart from the figures below it. */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-edge-faint bg-surface-card px-3 py-2.5">
         <p className="m-0 inline-flex h-[26px] items-center gap-2 rounded-full bg-surface-card px-2.5 text-caption font-semibold text-content shadow-sm">
           <span aria-hidden="true" className={`h-2 w-2 flex-none rounded-full ${STATE_DOT[status?.state ?? 'off']}`} />
           {status ? t(`admin.trekApi.quota.state.${status.state}`) : t('admin.trekApi.quota.title')}
@@ -163,33 +164,38 @@ export default function ServiceIdentityPanel({ managed = false }: { managed?: bo
         </div>
       </div>
 
-      {status && status.services.length > 0 && (
-        <ul
-          aria-label={t('admin.trekApi.quota.title')}
-          className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-3"
-        >
-          {status.services.map((allowance) => (
-            <ServiceTile key={allowance.service} allowance={allowance} />
-          ))}
-        </ul>
-      )}
-      {hint && <p className="m-0 text-caption leading-snug text-content-muted">{hint}</p>}
+      <div className="flex flex-col gap-3 p-3">
+        {status && status.services.length > 0 && (
+          <ul
+            aria-label={t('admin.trekApi.quota.title')}
+            className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-3"
+          >
+            {status.services.map((allowance) => (
+              <ServiceTile key={allowance.service} allowance={allowance} />
+            ))}
+          </ul>
+        )}
+        {hint && <p className="m-0 text-caption leading-snug text-content-muted">{hint}</p>}
+      </div>
 
+      {/* Foot band: the one action, kept off the figures. */}
       {canRegenerate && (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          disabled={regenerating}
-          className="inline-flex items-center gap-1.5 self-start rounded-lg text-caption font-medium text-content-secondary hover:text-content disabled:opacity-50"
-        >
-          <RefreshCw
-            size={13}
-            strokeWidth={2}
-            className={regenerating ? 'motion-safe:animate-spin' : ''}
-            aria-hidden="true"
-          />
-          {t('admin.trekApi.quota.regenerate')}
-        </button>
+        <div className="flex items-center justify-end border-t border-edge-faint bg-surface-card px-3 py-2">
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            disabled={regenerating}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-edge-faint bg-surface-card px-2.5 py-1 text-caption font-medium text-content-secondary shadow-sm hover:bg-surface-hover hover:text-content disabled:opacity-50"
+          >
+            <RefreshCw
+              size={13}
+              strokeWidth={2}
+              className={regenerating ? 'motion-safe:animate-spin' : ''}
+              aria-hidden="true"
+            />
+            {t('admin.trekApi.quota.regenerate')}
+          </button>
+        </div>
       )}
 
       <ConfirmDialog
