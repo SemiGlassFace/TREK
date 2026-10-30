@@ -66,10 +66,7 @@ describe('PlaceContribOutboxRepository', () => {
   it('PCOUTREPO-001: a newer value for the same key and field replaces the queued one and starts its attempts over', async () => {
     const placeId = await aPlace();
     await queue(placeId);
-    await outbox.scheduleRetry(
-      (await outbox.dueFor('osm:node/1', NOW)).map((row) => row.id),
-      PAST,
-    );
+    await outbox.scheduleRetry(await outbox.dueFor('osm:node/1', NOW), PAST);
     await queue(placeId, { value: 'https://luna.example', cid: 'cid-website-0002' });
     const rows = await outbox.dueFor('osm:node/1', NOW);
     expect(rows).toEqual([
@@ -94,9 +91,9 @@ describe('PlaceContribOutboxRepository', () => {
     await queue(placeId);
     const [row] = await outbox.dueFor('osm:node/1', NOW);
     if (!row) throw new Error('the queued value is missing');
-    await outbox.scheduleRetry([row.id], LATER);
+    await outbox.scheduleRetry([row], LATER);
     expect(await outbox.dueFor('osm:node/1', NOW)).toEqual([]);
-    await outbox.postpone([row.id], PAST);
+    await outbox.postpone([row], PAST);
     const [again] = await outbox.dueFor('osm:node/1', NOW);
     expect(again).toEqual(expect.objectContaining({ attempts: 1 }));
     await outbox.scheduleRetry([], LATER);
@@ -132,12 +129,11 @@ describe('PlaceContribOutboxRepository', () => {
 
     expect(await outbox.deleteForPlace(one, [])).toBe(0);
     expect(await outbox.deleteFields([])).toBe(0);
-    expect(await outbox.deleteIds([])).toBe(0);
+    expect(await outbox.deleteSent([])).toBe(0);
 
     expect(await outbox.deleteForPlace(one, ['phone'])).toBe(1);
     expect(await outbox.deleteFields(['email'])).toBe(1);
-    const left = (await outbox.dueFor('osm:node/2', NOW)).map((row) => row.id);
-    expect(await outbox.deleteIds(left)).toBe(1);
+    expect(await outbox.deleteSent(await outbox.dueFor('osm:node/2', NOW))).toBe(1);
     expect(await outbox.deleteAll()).toBe(1);
     expect(await countRows(t, PlaceContribOutbox)).toBe(0);
   });
@@ -161,5 +157,38 @@ describe('PlaceContribOutboxRepository', () => {
         expect.objectContaining({ field: 'phone', origin: null, value_hash: null, phone: '+49 381 1' }),
       ]),
     );
+  });
+
+  it('PCOUTREPO-007: a value replaced after the sender read it is neither deleted nor charged nor postponed', async () => {
+    const placeId = await aPlace();
+    await queue(placeId);
+    const read = await outbox.dueFor('osm:node/1', NOW);
+    await queue(placeId, { value: 'https://luna.example', cid: 'cid-website-0002' });
+
+    await outbox.scheduleRetry(read, LATER);
+    await outbox.postpone(read, LATER);
+    expect(await outbox.deleteSent(read)).toBe(0);
+
+    expect(await outbox.dueFor('osm:node/1', NOW)).toEqual([
+      expect.objectContaining({ value: 'https://luna.example', cid: 'cid-website-0002', attempts: 0 }),
+    ]);
+  });
+
+  it('PCOUTREPO-008: a replaced value counts its age from the replacement, not from the value it replaced', async () => {
+    const placeId = await aPlace();
+    await insertRow(t, PlaceContribOutbox, {
+      contrib_key: 'osm:node/1',
+      field: 'website',
+      value: 'https://cafe-luna.de',
+      place: placeId,
+      place_name: 'Café Luna',
+      cid: 'cid-website-0001',
+      eligible_at: PAST,
+      next_attempt_at: PAST,
+      created_at: '2026-01-01 00:00:00',
+    });
+    expect(await outbox.queuedBefore('2026-06-01 00:00:00', 10)).toHaveLength(1);
+    await queue(placeId, { value: 'https://luna.example', cid: 'cid-website-0002' });
+    expect(await outbox.queuedBefore('2026-06-01 00:00:00', 10)).toEqual([]);
   });
 });

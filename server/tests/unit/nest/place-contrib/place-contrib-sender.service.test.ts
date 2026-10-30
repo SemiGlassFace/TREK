@@ -292,6 +292,26 @@ describe('a place request', () => {
     expect(client.servedPlace).not.toHaveBeenCalled();
     expect(await countRows(orm(), PlaceContribOutbox)).toBe(2);
   });
+
+  it('PCSD-015: a value the user replaces while its request is out stays queued for the next run', async () => {
+    await seed({ website: 'https://cafe-luna.de' });
+    client.postPlace.mockImplementation(async (body) => {
+      // The user saves a newer website while the request for the old one is out.
+      await updateRows(
+        orm(),
+        PlaceContribOutbox,
+        { field: 'website' },
+        { value: 'https://luna.example', cid: 'cid-website-0002' },
+      );
+      return accepted(resultsFor(body, 'published'));
+    });
+    await sender().run(NOW);
+    // The old value went out and is logged; the newer one waits for its own request.
+    expect(await logLines()).toEqual([{ field: 'website', result: 'accepted', reason: 'published' }]);
+    expect(await findRows(orm(), PlaceContribOutbox, {})).toEqual([
+      expect.objectContaining({ value: 'https://luna.example', cid: 'cid-website-0002', attempts: 0 }),
+    ]);
+  });
 });
 
 describe('refusals and failures', () => {

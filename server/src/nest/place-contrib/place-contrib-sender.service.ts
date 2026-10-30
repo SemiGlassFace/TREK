@@ -235,7 +235,7 @@ export class PlaceContribSender {
     if (refusal.status === 401 || refusal.status === 403) {
       // The key is not taken: wait for another one, never fall back to sending without.
       await this.store.pauseFor(refusal.status === 401 ? 'key_invalid' : 'key_refused', null);
-      await this.outbox.postpone(ids(entries), dbNow(new Date(now.getTime() + NOT_ACCEPTING_WAIT_MS)));
+      await this.outbox.postpone(entries, dbNow(new Date(now.getTime() + NOT_ACCEPTING_WAIT_MS)));
       return 'stop';
     }
     if (refusal.status === 429) {
@@ -245,7 +245,7 @@ export class PlaceContribSender {
     if (refusal.status === 503) {
       const until = new Date(now.getTime() + (refusal.retryAfterMs ?? NOT_ACCEPTING_WAIT_MS));
       await this.store.pauseFor('not_accepting', until);
-      await this.outbox.postpone(ids(entries), dbNow(until));
+      await this.outbox.postpone(entries, dbNow(until));
       return 'stop';
     }
     const refusedField = /^field_not_accepted:([a-z_]+)$/.exec(refusal.error)?.[1];
@@ -257,7 +257,7 @@ export class PlaceContribSender {
         taken.map((entry): Final => ({ entry, result: 'rejected', reason: refusal.error })),
         now,
       );
-      await this.outbox.postpone(ids(others), dbNow(now));
+      await this.outbox.postpone(others, dbNow(now));
       return 'next';
     }
     await this.finish(
@@ -273,7 +273,7 @@ export class PlaceContribSender {
     const attempts = Math.max(1, ...again.map((entry) => entry.attempts + 1));
     const next = dbNow(new Date(opts.now.getTime() + (opts.retryAfterMs ?? retryDelayMs(attempts))));
     await this.uow.transactional(async () => {
-      await this.outbox.scheduleRetry(ids(again), next);
+      await this.outbox.scheduleRetry(again, next);
       await this.finishInTx(
         givenUp.map((entry): Final => ({ entry, result: 'withheld', reason: 'gave_up' })),
         opts.now,
@@ -291,7 +291,7 @@ export class PlaceContribSender {
   private async finishInTx(finals: Final[], now: Date): Promise<void> {
     if (finals.length === 0) return;
     await this.log.insertLines(finals.map((final) => logLine(final, now)));
-    await this.outbox.deleteIds(finals.map((final) => final.entry.id));
+    await this.outbox.deleteSent(finals.map((final) => final.entry));
   }
 
   /** The bytes of an uploaded place picture, null when it is gone or heavier than any upload could be. */
@@ -383,10 +383,6 @@ function logLine(final: Final, now: Date): PlaceContribLogWrite {
     result: final.result,
     reason: final.reason?.slice(0, 200) ?? null,
   };
-}
-
-function ids(entries: OutboxRow[]): number[] {
-  return entries.map((entry) => entry.id);
 }
 
 function partition<T>(items: T[], test: (item: T) => boolean): [T[], T[]] {

@@ -20,6 +20,12 @@ export interface OutboxRow {
   created_at: string;
 }
 
+/**
+ * A value the sender read: its settle writes touch the row only while it still
+ * holds that value, since a newer one keeps the row's id but brings a new cid.
+ */
+export type OutboxSent = Pick<OutboxRow, 'id' | 'cid'>;
+
 /** A value to queue: the newest one for its key and field replaces what waits there. */
 interface OutboxWrite {
   contrib_key: string;
@@ -73,7 +79,7 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
     return this.kysely<OutboxKyselyDB>();
   }
 
-  /** Queues a value, replacing whatever waited for the same key and field, attempts included. */
+  /** Queues a value, replacing whatever waited for the same key and field, attempts and age included. */
   async upsertEntry(row: OutboxWrite): Promise<void> {
     await this.db()
       .insertInto('place_contrib_outbox')
@@ -88,6 +94,7 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
           country: (eb) => eb.ref('excluded.country'),
           cid: (eb) => eb.ref('excluded.cid'),
           attempts: 0,
+          created_at: (eb) => eb.ref('excluded.created_at'),
           eligible_at: (eb) => eb.ref('excluded.eligible_at'),
           next_attempt_at: (eb) => eb.ref('excluded.next_attempt_at'),
         }),
@@ -124,9 +131,14 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
     return Number(result.numDeletedRows);
   }
 
-  async deleteIds(ids: number[]): Promise<number> {
-    if (ids.length === 0) return 0;
-    const result = await this.db().deleteFrom('place_contrib_outbox').where('id', 'in', ids).executeTakeFirst();
+  /** Drops the values the sender settled; a row that took a newer value since stays queued. */
+  async deleteSent(sent: OutboxSent[]): Promise<number> {
+    if (sent.length === 0) return 0;
+    const result = await this.db()
+      .deleteFrom('place_contrib_outbox')
+      .where('id', 'in', sent.map((row) => row.id))
+      .where('cid', 'in', sent.map((row) => row.cid))
+      .executeTakeFirst();
     return Number(result.numDeletedRows);
   }
 
@@ -182,23 +194,31 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
       .execute();
   }
 
-  /** Counts the attempt and moves the values to their next try. */
-  async scheduleRetry(ids: number[], nextAttemptAt: string): Promise<void> {
-    if (ids.length === 0) return;
+  /**
+   * Counts the attempt and moves the values to their next try; a row that took
+   * a newer value since is left as it is.
+   */
+  async scheduleRetry(sent: OutboxSent[], nextAttemptAt: string): Promise<void> {
+    if (sent.length === 0) return;
     await this.db()
       .updateTable('place_contrib_outbox')
       .set((eb) => ({ attempts: eb('attempts', '+', 1), next_attempt_at: nextAttemptAt }))
-      .where('id', 'in', ids)
+      .where('id', 'in', sent.map((row) => row.id))
+      .where('cid', 'in', sent.map((row) => row.cid))
       .execute();
   }
 
-  /** Moves the values to a later try without counting one (the service is pausing, not failing). */
-  async postpone(ids: number[], nextAttemptAt: string): Promise<void> {
-    if (ids.length === 0) return;
+  /**
+   * Moves the values to a later try without counting one (the service is
+   * pausing, not failing); a row that took a newer value since is left as it is.
+   */
+  async postpone(sent: OutboxSent[], nextAttemptAt: string): Promise<void> {
+    if (sent.length === 0) return;
     await this.db()
       .updateTable('place_contrib_outbox')
       .set({ next_attempt_at: nextAttemptAt })
-      .where('id', 'in', ids)
+      .where('id', 'in', sent.map((row) => row.id))
+      .where('cid', 'in', sent.map((row) => row.cid))
       .execute();
   }
 
