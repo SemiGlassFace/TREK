@@ -1,6 +1,6 @@
 import type { PlaceClientOrigin } from '@trek/shared';
 import { useEffect, useMemo, useState } from 'react';
-import { mapsApi } from '../../api/client';
+import { placeDetailsRepo } from '../../repo/placeDetailsRepo';
 import type { Place } from '../../types';
 import type { PlaceFormData } from './PlaceFormModal.helpers';
 import { resultOrigin } from './placeFieldOrigins';
@@ -34,9 +34,9 @@ export function usePlaceRefresh({
   useEffect(() => {
     if (!detailId || !key) return;
     let live = true;
-    mapsApi.details(detailId, language).then(
-      (answer: { place?: Record<string, unknown> | null }) => {
-        if (live && answer?.place) setFresh({ key, details: answer.place });
+    placeDetailsRepo.details(detailId, language).then(
+      (details) => {
+        if (live && details) setFresh({ key, details });
       },
       () => undefined
     );

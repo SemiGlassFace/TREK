@@ -486,9 +486,6 @@ const SIDE_BUTTON = 'grid w-[38px] flex-none place-items-center rounded-[10px] t
  * for them; this gives them the eyebrow every other field here has.
  */
 const SERVICE_STOP_LABELS = '[&_label]:mb-[5px] [&_label]:block [&_label]:font-geist [&_label]:text-[length:calc(9.5px*var(--fs-scale-caption,1))] [&_label]:font-bold [&_label]:uppercase [&_label]:tracking-[.08em] [&_label]:text-content-faint'
-/** A round white button in the head band's pill row, as tall as the pills beside it. */
-
-type Translate = (key: string, params?: Record<string, string | number>) => string
 
 export default function PlaceFormModal(props: PlaceFormModalProps) {
   const S = usePlaceFormModal(props)
