@@ -1145,5 +1145,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Teď ne',
   'admin.contribute.prompt.decline': 'Ne, děkuji',
   'admin.contribute.prompt.thanks': 'Děkujeme. Údaje o místech se nyní sdílejí.',
+  'admin.servicesCard.title': 'Vyhledávání míst a trasování',
+  'admin.servicesCard.hint':
+    'Vlastní služby TREK, který poskytovatel odpovídá na vyhledávání a veřejnou dopravu, a protokol vyhledávání.',
 };
 export default admin;

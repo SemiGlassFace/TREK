@@ -1169,6 +1169,9 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'İndi yox',
   'admin.contribute.prompt.decline': 'Xeyr, təşəkkürlər',
   'admin.contribute.prompt.thanks': 'Təşəkkür edirik. Məkan məlumatları indi paylaşılır.',
+  'admin.servicesCard.title': 'Məkan axtarışı və marşrutlaşdırma',
+  'admin.servicesCard.hint':
+    'TREK-in öz xidmətləri, axtarışa və ictimai nəqliyyata hansı provayderin cavab verdiyi və axtarış jurnalı.',
 };
 
 export default admin;

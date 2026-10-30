@@ -2,7 +2,7 @@ import React from 'react'
 import { adminApi } from '../../api/client'
 import { getApiErrorMessage } from '../../types'
 import {
-  AlertTriangle, CheckCircle, Eye, EyeOff, FileType, Fingerprint, KeyRound, Loader2, LockKeyhole, LogIn,
+  AlertTriangle, CheckCircle, Compass, Eye, EyeOff, FileType, Fingerprint, KeyRound, Loader2, LockKeyhole, LogIn,
   RefreshCw, Save, ShieldCheck, XCircle,
 } from 'lucide-react'
 import ToggleSwitch from '../../components/Settings/ToggleSwitch'
@@ -350,9 +350,7 @@ export default function AdminSettingsTab({ admin, t }: AdminSettingsTabProps): R
             />
           </SettingsCard>
           )}
-        </div>
 
-        <div className="min-w-0">
         {/* Allowed File Types */}
         <SettingsCard icon={FileType} title={t('admin.fileTypes')} hint={t('admin.fileTypesHint')}>
           <div>
@@ -372,24 +370,134 @@ export default function AdminSettingsTab({ admin, t }: AdminSettingsTabProps): R
             onClick={saveFileTypes}
           />
         </SettingsCard>
+        </div>
 
-          {/* API Keys.
-              The card itself stays on a managed install: the TREK index needs no key,
-              and which keyed provider answers place search is the admin's call there
-              too (server managed.ts). What folds away is the operator's: the keys,
-              what a lookup costs, and the per-place Google switches. Those switches
-              sit under the keys rather than flat beside them because they are set
-              once and then never touched, and side by side a rarely-used option
-              looked as important as the key it depends on. Weather is a quiet row
-              for the same reason in reverse: it had the loudest treatment on the
-              card and is the one thing here with nothing to configure. */}
+        <div className="min-w-0">
+
+          {/* Place search and routing: TREK's own services first, then which provider
+              answers search and transit, and the search log. Apart from the keys, so a
+              keyless install reads its whole setup in one card. Everything here saves
+              as it is changed. */}
+          <SettingsCard icon={Compass} title={t('admin.servicesCard.title')} hint={t('admin.servicesCard.hint')}>
+          <TrekApiCard t={t} managed={managed} />
+          {!managed && (<>
+          {/* Transit Backend (#1699) — Transitous has no GTFS for much of Asia,
+              so an install can point transit search at Google instead, on the
+              same key. Falls back to Transitous when no key resolves. A block of
+              its own rather than a row inside the Google one: picking Transitous
+              is a decision about a provider that has nothing to do with a key. */}
+          <ProviderBlock title={t('admin.transitProvider.title')}>
+            <SettingsHint>{t('admin.transitProvider.subtitle')}</SettingsHint>
+            {/* The app's own select rather than the browser's: a native option list
+                is drawn by the OS, so it ignores the scheme, the radius and the
+                text-size setting the rest of this card follows. The menu portals to
+                the body, which is what lets it escape the card's overflow-hidden. */}
+            <CustomSelect
+              value={transitProvider}
+              onChange={async value => {
+                // A native select stayed silent when the option already selected was
+                // picked again; this one reports every pick, and a no-op PUT is still
+                // a write on an audited settings route.
+                if (value === transitProvider) return
+                const next = value === 'google' ? 'google' : 'transitous'
+                const previous = transitProvider
+                setTransitProviderState(next)
+                try {
+                  const saved = await adminApi.updateTransitProvider(next)
+                  setTransitGoogleKeySource(saved.googleKeySource)
+                } catch (err: unknown) {
+                  // The select springs back on its own; without a word that reads
+                  // as a broken control, not as a save that failed.
+                  setTransitProviderState(previous)
+                  toast.error(getApiErrorMessage(err, t('common.error')))
+                }
+              }}
+              options={[
+                { value: 'transitous', label: t('admin.transitProvider.transitous') },
+                { value: 'google', label: t('admin.transitProvider.google') },
+              ]}
+            />
+            <SettingsHint className="-mt-1.5">
+              {transitProvider === 'google' ? t('admin.transitProvider.googleHint') : t('admin.transitProvider.transitousHint')}
+            </SettingsHint>
+
+            {/* Picking Google without a key that resolves changes nothing — the
+                request-time fallback is silent, so this is the only place it can
+                be said. 'user-row' is the subtler half: the resolver's last step
+                is the caller's own row, so a personal key serves this admin and
+                nobody else. */}
+            {transitProvider === 'google' && transitGoogleKeySource === null && (
+              <Callout>{t('admin.transitProvider.noKeyWarning')}</Callout>
+            )}
+            {transitProvider === 'google' && transitGoogleKeySource === 'user-row' && (
+              <Callout>{t('admin.transitProvider.personalKeyWarning')}</Callout>
+            )}
+          </ProviderBlock>
+          </>)}
+          {/* Which keyed provider answers place search. Outside the managed guard
+              on purpose: the operator owns the credentials, but what their users
+              search against is still the admin's call (see server managed.ts). */}
+          <ProviderBlock title={t('admin.placesProvider.title')}>
+            <SettingsHint>{t('admin.placesProvider.subtitle')}</SettingsHint>
+            <div className={savingPlacesProvider ? 'opacity-60' : undefined}>
+              <CustomSelect
+                value={placesProvider}
+                disabled={savingPlacesProvider}
+                onChange={value => {
+                  if (value === placesProvider) return
+                  void handleSavePlacesProvider(String(value))
+                }}
+                options={[
+                  { value: 'auto', label: t('admin.placesProvider.auto') },
+                  { value: 'google', label: t('admin.placesProvider.google') },
+                  { value: 'amap', label: t('admin.placesProvider.amap') },
+                  { value: 'openstreetmap', label: t('admin.placesProvider.openstreetmap') },
+                ]}
+              />
+            </div>
+            {/* A provider chosen without a key behind it answers with
+                OpenStreetMap rather than failing, which is quiet enough to be
+                mistaken for the provider working. Say so. Asked of app-config
+                and not of the fields above: those are empty on a managed
+                install and on an operator key that came from the environment,
+                and saying "falls back to OpenStreetMap" to an admin whose
+                search works is worse than saying nothing. */}
+            {((placesProvider === 'google' && !hasMapsKey) || (placesProvider === 'amap' && !hasAmapKey)) && (
+              <Callout>{t('admin.placesProvider.missingKey')}</Callout>
+            )}
+          </ProviderBlock>
+
+          {/* The search log sits with the index rather than with a provider:
+              it records which result somebody picked, so a candidate index can
+              be judged against real searches later. Off unless switched on,
+              and nothing it records leaves the instance. */}
+          <SettingRows>
+            <SettingRow
+              label={t('admin.placeShadow.title')}
+              hint={t('admin.placeShadow.subtitle')}
+              control={
+                <ToggleSwitch
+                  on={placeShadowEnabled}
+                  label={t('admin.placeShadow.title')}
+                  onToggle={() => togglePlaceShadow(!placeShadowEnabled)}
+                />
+              }
+            />
+          </SettingRows>
+
+          </SettingsCard>
+
+          {/* API Keys: only the keyed providers, Google, Unsplash and Amap. They are
+              the operator's on a managed install, so the card is not shown there;
+              which provider answers search stays the admin's call in the card above
+              (server managed.ts). The per-place Google switches sit under the key
+              because they are set once and then never touched. */}
+          {!managed && (
           <SettingsCard icon={KeyRound} title={t('admin.apiKeys')} hint={t('admin.apiKeysHint')}>
           {/* Three comparable blocks, in the order we would have people choose
               them. Weather moved out entirely: it needs no key and had nothing
               to configure, so it had no business in a card about keys. */}
-          <TrekApiCard t={t} managed={managed} />
 
-          {!managed && (<>
           <ProviderBlock title={t('admin.mapsKey')}>
             {/* Said before the field, not after it. Someone about to paste a key
                 should read this while deciding, not once they already have. */}
@@ -530,113 +638,10 @@ export default function AdminSettingsTab({ admin, t }: AdminSettingsTabProps): R
             />
             <SettingsHint className="-mt-1.5">{t('admin.amapKeyHint')}</SettingsHint>
           </ProviderBlock>
-          {/* Transit Backend (#1699) — Transitous has no GTFS for much of Asia,
-              so an install can point transit search at Google instead, on the
-              same key. Falls back to Transitous when no key resolves. A block of
-              its own rather than a row inside the Google one: picking Transitous
-              is a decision about a provider that has nothing to do with a key. */}
-          <ProviderBlock title={t('admin.transitProvider.title')}>
-            <SettingsHint>{t('admin.transitProvider.subtitle')}</SettingsHint>
-            {/* The app's own select rather than the browser's: a native option list
-                is drawn by the OS, so it ignores the scheme, the radius and the
-                text-size setting the rest of this card follows. The menu portals to
-                the body, which is what lets it escape the card's overflow-hidden. */}
-            <CustomSelect
-              value={transitProvider}
-              onChange={async value => {
-                // A native select stayed silent when the option already selected was
-                // picked again; this one reports every pick, and a no-op PUT is still
-                // a write on an audited settings route.
-                if (value === transitProvider) return
-                const next = value === 'google' ? 'google' : 'transitous'
-                const previous = transitProvider
-                setTransitProviderState(next)
-                try {
-                  const saved = await adminApi.updateTransitProvider(next)
-                  setTransitGoogleKeySource(saved.googleKeySource)
-                } catch (err: unknown) {
-                  // The select springs back on its own; without a word that reads
-                  // as a broken control, not as a save that failed.
-                  setTransitProviderState(previous)
-                  toast.error(getApiErrorMessage(err, t('common.error')))
-                }
-              }}
-              options={[
-                { value: 'transitous', label: t('admin.transitProvider.transitous') },
-                { value: 'google', label: t('admin.transitProvider.google') },
-              ]}
-            />
-            <SettingsHint className="-mt-1.5">
-              {transitProvider === 'google' ? t('admin.transitProvider.googleHint') : t('admin.transitProvider.transitousHint')}
-            </SettingsHint>
 
-            {/* Picking Google without a key that resolves changes nothing — the
-                request-time fallback is silent, so this is the only place it can
-                be said. 'user-row' is the subtler half: the resolver's last step
-                is the caller's own row, so a personal key serves this admin and
-                nobody else. */}
-            {transitProvider === 'google' && transitGoogleKeySource === null && (
-              <Callout>{t('admin.transitProvider.noKeyWarning')}</Callout>
-            )}
-            {transitProvider === 'google' && transitGoogleKeySource === 'user-row' && (
-              <Callout>{t('admin.transitProvider.personalKeyWarning')}</Callout>
-            )}
-          </ProviderBlock>
-          </>)}
-
-          {/* Which keyed provider answers place search. Outside the managed guard
-              on purpose: the operator owns the credentials, but what their users
-              search against is still the admin's call (see server managed.ts). */}
-          <ProviderBlock title={t('admin.placesProvider.title')}>
-            <SettingsHint>{t('admin.placesProvider.subtitle')}</SettingsHint>
-            <div className={savingPlacesProvider ? 'opacity-60' : undefined}>
-              <CustomSelect
-                value={placesProvider}
-                disabled={savingPlacesProvider}
-                onChange={value => {
-                  if (value === placesProvider) return
-                  void handleSavePlacesProvider(String(value))
-                }}
-                options={[
-                  { value: 'auto', label: t('admin.placesProvider.auto') },
-                  { value: 'google', label: t('admin.placesProvider.google') },
-                  { value: 'amap', label: t('admin.placesProvider.amap') },
-                  { value: 'openstreetmap', label: t('admin.placesProvider.openstreetmap') },
-                ]}
-              />
-            </div>
-            {/* A provider chosen without a key behind it answers with
-                OpenStreetMap rather than failing, which is quiet enough to be
-                mistaken for the provider working. Say so. Asked of app-config
-                and not of the fields above: those are empty on a managed
-                install and on an operator key that came from the environment,
-                and saying "falls back to OpenStreetMap" to an admin whose
-                search works is worse than saying nothing. */}
-            {((placesProvider === 'google' && !hasMapsKey) || (placesProvider === 'amap' && !hasAmapKey)) && (
-              <Callout>{t('admin.placesProvider.missingKey')}</Callout>
-            )}
-          </ProviderBlock>
-
-          {/* The search log sits with the index rather than with a provider:
-              it records which result somebody picked, so a candidate index can
-              be judged against real searches later. Off unless switched on,
-              and nothing it records leaves the instance. */}
-          <SettingRows>
-            <SettingRow
-              label={t('admin.placeShadow.title')}
-              hint={t('admin.placeShadow.subtitle')}
-              control={
-                <ToggleSwitch
-                  on={placeShadowEnabled}
-                  label={t('admin.placeShadow.title')}
-                  onToggle={() => togglePlaceShadow(!placeShadowEnabled)}
-                />
-              }
-            />
-          </SettingRows>
-
-          {!managed && <SaveBar onClick={handleSaveApiKeys} saving={savingKeys} label={t('common.save')} />}
+          <SaveBar onClick={handleSaveApiKeys} saving={savingKeys} label={t('common.save')} />
           </SettingsCard>
+          )}
         </div>
       </div>
 

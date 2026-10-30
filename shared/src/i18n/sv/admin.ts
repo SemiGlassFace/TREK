@@ -1141,5 +1141,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Inte nu',
   'admin.contribute.prompt.decline': 'Nej tack',
   'admin.contribute.prompt.thanks': 'Tack. Platsuppgifter delas nu.',
+  'admin.servicesCard.title': 'Platssökning och vägvisning',
+  'admin.servicesCard.hint':
+    'TREKs egna tjänster, vilken leverantör som svarar på sökning och kollektivtrafik, och sökloggen.',
 };
 export default admin;

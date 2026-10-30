@@ -1158,5 +1158,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Most nem',
   'admin.contribute.prompt.decline': 'Nem, köszönöm',
   'admin.contribute.prompt.thanks': 'Köszönjük. A helyadatok megosztása elindult.',
+  'admin.servicesCard.title': 'Helykeresés és útvonaltervezés',
+  'admin.servicesCard.hint':
+    'A TREK saját szolgáltatásai, melyik szolgáltató válaszol a keresésre és a tömegközlekedésre, valamint a keresési napló.',
 };
 export default admin;

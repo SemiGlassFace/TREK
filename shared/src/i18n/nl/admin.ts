@@ -1150,5 +1150,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Nu niet',
   'admin.contribute.prompt.decline': 'Nee, bedankt',
   'admin.contribute.prompt.thanks': 'Bedankt. Plaatsdetails worden nu gedeeld.',
+  'admin.servicesCard.title': 'Plaatsen zoeken en routeplanning',
+  'admin.servicesCard.hint':
+    'De eigen diensten van TREK, welke aanbieder zoeken en openbaar vervoer beantwoordt, en het zoeklogboek.',
 };
 export default admin;

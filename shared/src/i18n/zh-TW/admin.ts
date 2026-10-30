@@ -1030,5 +1030,7 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': '暫不',
   'admin.contribute.prompt.decline': '不，謝謝',
   'admin.contribute.prompt.thanks': '謝謝。地點詳情現在已開始分享。',
+  'admin.servicesCard.title': '地點搜尋與路線',
+  'admin.servicesCard.hint': 'TREK 自有服務、負責搜尋與大眾運輸的提供者，以及搜尋紀錄。',
 };
 export default admin;

@@ -1150,5 +1150,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Şimdi değil',
   'admin.contribute.prompt.decline': 'Hayır, teşekkürler',
   'admin.contribute.prompt.thanks': 'Teşekkürler. Yer ayrıntıları artık paylaşılıyor.',
+  'admin.servicesCard.title': 'Yer arama ve rota',
+  'admin.servicesCard.hint':
+    "TREK'in kendi hizmetleri, aramaya ve toplu taşımaya hangi sağlayıcının yanıt verdiği ve arama kaydı.",
 };
 export default admin;

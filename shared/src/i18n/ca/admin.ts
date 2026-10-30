@@ -1158,5 +1158,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Ara no',
   'admin.contribute.prompt.decline': 'No, gràcies',
   'admin.contribute.prompt.thanks': 'Gràcies. Els detalls dels llocs ja es comparteixen.',
+  'admin.servicesCard.title': 'Cerca de llocs i rutes',
+  'admin.servicesCard.hint':
+    'Els serveis propis de TREK, quin proveïdor respon la cerca i el transport públic, i el registre de cerques.',
 };
 export default admin;

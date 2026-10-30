@@ -1127,5 +1127,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Để sau',
   'admin.contribute.prompt.decline': 'Không, cảm ơn',
   'admin.contribute.prompt.thanks': 'Cảm ơn bạn. Chi tiết địa điểm hiện đã được chia sẻ.',
+  'admin.servicesCard.title': 'Tìm kiếm địa điểm và chỉ đường',
+  'admin.servicesCard.hint':
+    'Các dịch vụ riêng của TREK, nhà cung cấp trả lời tìm kiếm và giao thông công cộng, và nhật ký tìm kiếm.',
 };
 export default admin;

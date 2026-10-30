@@ -1128,5 +1128,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Nanti saja',
   'admin.contribute.prompt.decline': 'Tidak, terima kasih',
   'admin.contribute.prompt.thanks': 'Terima kasih. Detail tempat sekarang dibagikan.',
+  'admin.servicesCard.title': 'Pencarian tempat dan rute',
+  'admin.servicesCard.hint':
+    'Layanan milik TREK sendiri, penyedia yang menjawab pencarian dan transportasi umum, serta log pencarian.',
 };
 export default admin;

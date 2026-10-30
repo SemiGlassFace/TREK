@@ -25,6 +25,9 @@ function renderTab(overrides: Record<string, unknown> = {}) {
 }
 
 /** The card (a settingsKit SettingsCard, a <section>) whose <h2> matches the given heading text. */
+/** The card with the TREK services, the providers and the search log, apart from the keys. */
+const SERVICES = 'Place search and routing';
+
 function card(heading: string | RegExp): HTMLElement {
   return screen.getByRole('heading', { name: heading }).closest<HTMLElement>('section')!;
 }
@@ -305,14 +308,14 @@ describe('AdminSettingsTab', () => {
     // failing, which is quiet enough to be mistaken for the provider working.
     renderTab({ placesProvider: 'amap', hasAmapKey: false });
     expect(
-      within(card('API Keys')).getByText(/TREK index and OpenStreetMap alone/i),
+      within(card(SERVICES)).getByText(/TREK index and OpenStreetMap alone/i),
     ).toBeInTheDocument();
   });
 
   it('FE-ADMSET-022d: saving the provider goes through updateAppSettings, not the keys', () => {
     const admin = renderTab({ placesProvider: 'auto' });
     // A CustomSelect: the trigger shows the current choice, the menu is portaled.
-    fireEvent.click(within(card('API Keys')).getByRole('button', { name: 'Automatic' }));
+    fireEvent.click(within(card(SERVICES)).getByRole('button', { name: 'Automatic' }));
     fireEvent.click(screen.getByRole('button', { name: 'Amap (高德地图)' }));
     expect(admin.handleSavePlacesProvider).toHaveBeenCalledWith('amap');
   });
@@ -322,10 +325,9 @@ describe('AdminSettingsTab', () => {
     // still the admin's call (server managed.ts lists places_provider as theirs).
     renderTab({ managed: true, placesProvider: 'auto' });
 
-    const keys = within(card('API Keys'));
-    expect(keys.queryByLabelText('Google Maps API Key')).not.toBeInTheDocument();
-    expect(keys.queryByLabelText(/Amap/)).not.toBeInTheDocument();
-    expect(keys.getByRole('button', { name: 'Automatic' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'API Keys' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Google Maps API Key')).not.toBeInTheDocument();
+    expect(within(card(SERVICES)).getByRole('button', { name: 'Automatic' })).toBeInTheDocument();
   });
 
   it('FE-ADMSET-022f: an operator key keeps the managed install quiet', () => {
@@ -334,7 +336,7 @@ describe('AdminSettingsTab', () => {
     renderTab({ managed: true, placesProvider: 'google', mapsKey: '', hasMapsKey: true });
 
     expect(
-      within(card('API Keys')).queryByText(/falls back to OpenStreetMap/i),
+      within(card(SERVICES)).queryByText(/falls back to OpenStreetMap/i),
     ).not.toBeInTheDocument();
   });
 
@@ -479,10 +481,10 @@ describe('AdminSettingsTab', () => {
     expect(hint.textContent).toMatch(/provider/i);
   });
 
-  it('FE-ADMSET-031: the API keys card leads with the TREK index and no weather panel', () => {
+  it('FE-ADMSET-031: the place search card leads with the TREK index and no weather panel', () => {
     renderTab();
 
-    const keys = card('API Keys');
+    const keys = card(SERVICES);
     expect(within(keys).getByRole('img', { name: 'TREK Places API' })).toBeInTheDocument();
     expect(within(keys).getByText('Recommended default')).toBeInTheDocument();
     // Weather needs no key, so it left a card about keys. The panel itself lives

@@ -1029,5 +1029,7 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': '暂不',
   'admin.contribute.prompt.decline': '不，谢谢',
   'admin.contribute.prompt.thanks': '谢谢。地点详情现在已开始分享。',
+  'admin.servicesCard.title': '地点搜索与路线',
+  'admin.servicesCard.hint': 'TREK 自有服务、负责搜索和公共交通的提供方，以及搜索日志。',
 };
 export default admin;

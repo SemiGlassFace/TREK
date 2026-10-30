@@ -1087,5 +1087,7 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': '今はしない',
   'admin.contribute.prompt.decline': 'いいえ',
   'admin.contribute.prompt.thanks': 'ありがとうございます。場所の詳細の共有を開始しました。',
+  'admin.servicesCard.title': '場所検索とルート案内',
+  'admin.servicesCard.hint': 'TREK独自のサービス、検索と公共交通に応答するプロバイダー、そして検索ログ。',
 };
 export default admin;

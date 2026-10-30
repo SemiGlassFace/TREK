@@ -1181,5 +1181,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Не зараз',
   'admin.contribute.prompt.decline': 'Ні, дякую',
   'admin.contribute.prompt.thanks': 'Дякуємо. Дані про місця тепер передаються.',
+  'admin.servicesCard.title': 'Пошук місць і маршрути',
+  'admin.servicesCard.hint':
+    'Власні сервіси TREK, який постачальник відповідає на пошук і громадський транспорт, та журнал пошуку.',
 };
 export default admin;

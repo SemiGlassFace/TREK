@@ -1138,5 +1138,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Mitte praegu',
   'admin.contribute.prompt.decline': 'Ei, aitäh',
   'admin.contribute.prompt.thanks': 'Aitäh. Kohtade andmeid nüüd jagatakse.',
+  'admin.servicesCard.title': 'Kohtade otsing ja marsruutimine',
+  'admin.servicesCard.hint':
+    'TREKi enda teenused, milline teenusepakkuja vastab otsingule ja ühistranspordile, ning otsingulogi.',
 };
 export default admin;

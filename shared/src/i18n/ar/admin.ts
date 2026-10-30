@@ -1181,5 +1181,7 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'ليس الآن',
   'admin.contribute.prompt.decline': 'لا، شكرًا',
   'admin.contribute.prompt.thanks': 'شكرًا لك. تُشارك تفاصيل الأماكن الآن.',
+  'admin.servicesCard.title': 'البحث عن الأماكن والتوجيه',
+  'admin.servicesCard.hint': 'خدمات TREK الخاصة، والمزوّد الذي يجيب عن البحث والنقل العام، وسجل البحث.',
 };
 export default admin;

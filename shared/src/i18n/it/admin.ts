@@ -1154,5 +1154,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Non ora',
   'admin.contribute.prompt.decline': 'No, grazie',
   'admin.contribute.prompt.thanks': 'Grazie. I dettagli dei luoghi ora sono condivisi.',
+  'admin.servicesCard.title': 'Ricerca luoghi e percorsi',
+  'admin.servicesCard.hint':
+    'I servizi propri di TREK, quale fornitore risponde alla ricerca e ai trasporti pubblici, e il registro delle ricerche.',
 };
 export default admin;

@@ -1194,5 +1194,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Nie teraz',
   'admin.contribute.prompt.decline': 'Nie, dziękuję',
   'admin.contribute.prompt.thanks': 'Dziękujemy. Dane miejsc są teraz udostępniane.',
+  'admin.servicesCard.title': 'Wyszukiwanie miejsc i wyznaczanie tras',
+  'admin.servicesCard.hint':
+    'Własne usługi TREK, dostawca odpowiadający na wyszukiwanie i transport publiczny oraz dziennik wyszukiwań.',
 };
 export default admin;

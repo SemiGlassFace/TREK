@@ -1171,5 +1171,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Όχι τώρα',
   'admin.contribute.prompt.decline': 'Όχι, ευχαριστώ',
   'admin.contribute.prompt.thanks': 'Σας ευχαριστούμε. Τα στοιχεία των τόπων κοινοποιούνται πλέον.',
+  'admin.servicesCard.title': 'Αναζήτηση τοποθεσιών και δρομολόγηση',
+  'admin.servicesCard.hint':
+    'Οι δικές υπηρεσίες του TREK, ποιος πάροχος απαντά στην αναζήτηση και στα μέσα μεταφοράς, και το αρχείο αναζητήσεων.',
 };
 export default admin;

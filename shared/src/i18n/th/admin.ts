@@ -1083,5 +1083,7 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'ไว้ก่อน',
   'admin.contribute.prompt.decline': 'ไม่ ขอบคุณ',
   'admin.contribute.prompt.thanks': 'ขอบคุณ ตอนนี้รายละเอียดสถานที่ถูกแชร์แล้ว',
+  'admin.servicesCard.title': 'การค้นหาสถานที่และเส้นทาง',
+  'admin.servicesCard.hint': 'บริการของ TREK เอง ผู้ให้บริการที่ตอบการค้นหาและการขนส่งสาธารณะ และบันทึกการค้นหา',
 };
 export default admin;

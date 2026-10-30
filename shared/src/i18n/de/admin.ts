@@ -1152,5 +1152,8 @@ const admin: TranslationStrings = {
   'admin.contribute.prompt.snooze': 'Nicht jetzt',
   'admin.contribute.prompt.decline': 'Nein, danke',
   'admin.contribute.prompt.thanks': 'Danke! Ortsdetails werden jetzt geteilt.',
+  'admin.servicesCard.title': 'Ortssuche und Routing',
+  'admin.servicesCard.hint':
+    'TREKs eigene Dienste, welcher Anbieter Suche und ÖPNV beantwortet, und das Suchprotokoll.',
 };
 export default admin;
