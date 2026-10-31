@@ -265,6 +265,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'בקשת תכונה',
   'settings.about.featureRequestHint': 'הציעו תכונה חדשה',
   'settings.about.wikiHint': 'תיעוד ומדריכים',
+  'settings.about.sponsor.eyebrow': 'תשתית בחסות',
+  'settings.about.sponsor.title': 'השרתים של TREK עצמו רצים על dataforest cloud',
+  'settings.about.sponsor.body':
+    'חיפוש מקומות, חיפוש כתובות וניתוב מגיעים מהשרתים של TREK עצמו במקום מ-Google ודומיה, ו-dataforest cloud נותנת חסות למכונות שעליהן הם רצים.',
+  'settings.about.sponsor.cta': 'בקרו ב-dataforest cloud',
+  'settings.about.sponsor.search': 'חיפוש מקומות',
+  'settings.about.sponsor.address': 'חיפוש כתובות',
+  'settings.about.sponsor.routing': 'ניתוב',
   'settings.about.descriptionManaged':
     'TREK עוזר לכם לארגן את הטיולים מהרעיון הראשון ועד הזיכרון האחרון. תכנון ימים, תקציב, רשימות אריזה, תמונות ועוד — הכל במקום אחד.',
   'settings.about.sourceTitle': 'קוד מקור',

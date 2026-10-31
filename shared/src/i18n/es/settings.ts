@@ -213,6 +213,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Solicitar función',
   'settings.about.featureRequestHint': 'Sugiere una nueva función',
   'settings.about.wikiHint': 'Documentación y guías',
+  'settings.about.sponsor.eyebrow': 'Infraestructura patrocinada',
+  'settings.about.sponsor.title': 'Los servidores de TREK funcionan en dataforest cloud',
+  'settings.about.sponsor.body':
+    'La búsqueda de lugares, la búsqueda de direcciones y el cálculo de rutas salen de servidores propios de TREK en lugar de Google y compañía, y dataforest cloud patrocina las máquinas en las que funcionan.',
+  'settings.about.sponsor.cta': 'Visitar dataforest cloud',
+  'settings.about.sponsor.search': 'Búsqueda de lugares',
+  'settings.about.sponsor.address': 'Búsqueda de direcciones',
+  'settings.about.sponsor.routing': 'Rutas',
   'settings.about.descriptionManaged':
     'TREK te ayuda a organizar tus viajes desde la primera idea hasta el último recuerdo. Planificación de días, presupuesto, listas de equipaje, fotos y mucho más, todo en un solo lugar.',
   'settings.about.sourceTitle': 'Código fuente',

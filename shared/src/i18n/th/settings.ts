@@ -255,6 +255,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'คำขอคุณลักษณะ',
   'settings.about.featureRequestHint': 'ขอแนะนำฟีเจอร์ใหม่',
   'settings.about.wikiHint': 'เอกสารและคำแนะนำ',
+  'settings.about.sponsor.eyebrow': 'โครงสร้างพื้นฐานที่ได้รับการสนับสนุน',
+  'settings.about.sponsor.title': 'เซิร์ฟเวอร์ของ TREK เองทำงานบน dataforest cloud',
+  'settings.about.sponsor.body':
+    'การค้นหาสถานที่ การค้นหาที่อยู่ และการคำนวณเส้นทาง มาจากเซิร์ฟเวอร์ของ TREK เองแทน Google และรายอื่นๆ โดยมี dataforest cloud สนับสนุนเครื่องที่ใช้รันเซิร์ฟเวอร์เหล่านี้',
+  'settings.about.sponsor.cta': 'ไปที่ dataforest cloud',
+  'settings.about.sponsor.search': 'ค้นหาสถานที่',
+  'settings.about.sponsor.address': 'ค้นหาที่อยู่',
+  'settings.about.sponsor.routing': 'คำนวณเส้นทาง',
   'settings.about.descriptionManaged':
     'TREK ช่วยคุณจัดทริปตั้งแต่ไอเดียแรกไปจนถึงความทรงจำสุดท้าย การวางแผนวัน งบประมาณ รายการสิ่งของที่ต้องเตรียมไป รูปภาพ และอื่นๆ อีกมากมาย รวมอยู่ในที่เดียว',
   'settings.about.sourceTitle': 'ซอร์สโค้ด',

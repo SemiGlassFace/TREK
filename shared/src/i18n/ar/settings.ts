@@ -227,6 +227,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'اقتراح ميزة',
   'settings.about.featureRequestHint': 'اقترح ميزة جديدة',
   'settings.about.wikiHint': 'التوثيق والأدلة',
+  'settings.about.sponsor.eyebrow': 'بنية تحتية برعاية',
+  'settings.about.sponsor.title': 'خوادم TREK الخاصة تعمل على dataforest cloud',
+  'settings.about.sponsor.body':
+    'يأتي البحث عن الأماكن والبحث عن العناوين وتخطيط المسارات من خوادم TREK الخاصة بدلًا من Google وأمثالها، وترعى dataforest cloud الأجهزة التي تعمل عليها.',
+  'settings.about.sponsor.cta': 'زيارة dataforest cloud',
+  'settings.about.sponsor.search': 'البحث عن الأماكن',
+  'settings.about.sponsor.address': 'البحث عن العناوين',
+  'settings.about.sponsor.routing': 'تخطيط المسارات',
   'settings.about.descriptionManaged':
     'يساعدك TREK على تنظيم رحلاتك من الفكرة الأولى حتى آخر ذكرى. تخطيط الأيام والميزانية وقوائم الأمتعة والصور وأكثر من ذلك بكثير، كل ذلك في مكان واحد.',
   'settings.about.sourceTitle': 'الشيفرة المصدرية',

@@ -212,6 +212,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Feature aanvragen',
   'settings.about.featureRequestHint': 'Stel een nieuwe functie voor',
   'settings.about.wikiHint': 'Documentatie en handleidingen',
+  'settings.about.sponsor.eyebrow': 'Gesponsorde infrastructuur',
+  'settings.about.sponsor.title': 'De eigen servers van TREK draaien op dataforest cloud',
+  'settings.about.sponsor.body':
+    'Plaatsen zoeken, adressen zoeken en routeplanning komen van eigen servers van TREK in plaats van Google en co., en dataforest cloud sponsort de machines waarop ze draaien.',
+  'settings.about.sponsor.cta': 'Naar dataforest cloud',
+  'settings.about.sponsor.search': 'Plaatsen zoeken',
+  'settings.about.sponsor.address': 'Adressen zoeken',
+  'settings.about.sponsor.routing': 'Routeplanning',
   'settings.about.descriptionManaged':
     "TREK helpt je je reizen te organiseren, van het eerste idee tot de laatste herinnering. Dagplanning, budget, paklijsten, foto's en nog veel meer, allemaal op één plek.",
   'settings.about.sourceTitle': 'Broncode',

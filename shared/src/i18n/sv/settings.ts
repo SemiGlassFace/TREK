@@ -269,6 +269,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Förslag på ny funktion',
   'settings.about.featureRequestHint': 'Föreslå en ny funktion',
   'settings.about.wikiHint': 'Dokumentation och handledningar',
+  'settings.about.sponsor.eyebrow': 'Sponsrad infrastruktur',
+  'settings.about.sponsor.title': 'TREKs egna servrar körs på dataforest cloud',
+  'settings.about.sponsor.body':
+    'Platssökning, adressökning och ruttplanering kommer från TREKs egna servrar i stället för Google och co., och dataforest cloud sponsrar maskinerna de körs på.',
+  'settings.about.sponsor.cta': 'Besök dataforest cloud',
+  'settings.about.sponsor.search': 'Platssökning',
+  'settings.about.sponsor.address': 'Adressökning',
+  'settings.about.sponsor.routing': 'Ruttplanering',
   'settings.about.descriptionManaged':
     'TREK hjälper dig att organisera dina resor, från den första idén till det sista minnet. Dagsplanering, budget, packlistor, foton och mycket mer, allt på ett ställe.',
   'settings.about.sourceTitle': 'Källkod',

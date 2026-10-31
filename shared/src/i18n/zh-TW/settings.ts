@@ -249,6 +249,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': '功能建議',
   'settings.about.featureRequestHint': '建議新功能',
   'settings.about.wikiHint': '文件與指南',
+  'settings.about.sponsor.eyebrow': '贊助的基礎設施',
+  'settings.about.sponsor.title': 'TREK 自己的伺服器執行於 dataforest cloud',
+  'settings.about.sponsor.body':
+    '地點搜尋、地址搜尋和路線規劃都來自 TREK 自己的伺服器，而不是 Google 等服務，執行這些伺服器的機器由 dataforest cloud 贊助。',
+  'settings.about.sponsor.cta': '前往 dataforest cloud',
+  'settings.about.sponsor.search': '地點搜尋',
+  'settings.about.sponsor.address': '地址搜尋',
+  'settings.about.sponsor.routing': '路線規劃',
   'settings.about.descriptionManaged':
     'TREK 協助你整理旅行，從第一個想法到最後一份回憶。每日規劃、預算、行李清單、照片等功能，全都集中在同一處。',
   'settings.about.sourceTitle': '原始碼',

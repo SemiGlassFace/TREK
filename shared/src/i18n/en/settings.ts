@@ -273,6 +273,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Feature Request',
   'settings.about.featureRequestHint': 'Suggest a new feature',
   'settings.about.wikiHint': 'Documentation & guides',
+  'settings.about.sponsor.eyebrow': 'Sponsored infrastructure',
+  'settings.about.sponsor.title': "TREK's own servers run on dataforest cloud",
+  'settings.about.sponsor.body':
+    "Place search, address search and routing come from TREK's own servers instead of Google and co., and dataforest cloud sponsors the machines they run on.",
+  'settings.about.sponsor.cta': 'Visit dataforest cloud',
+  'settings.about.sponsor.search': 'Place search',
+  'settings.about.sponsor.address': 'Address search',
+  'settings.about.sponsor.routing': 'Routing',
   'settings.about.descriptionManaged':
     'TREK helps you organize your trips from the first idea to the last memory. Day planning, budget, packing lists, photos and much more — all in one place.',
   'settings.about.sourceTitle': 'Source code',

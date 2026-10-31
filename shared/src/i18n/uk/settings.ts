@@ -207,6 +207,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Запропонувати функцію',
   'settings.about.featureRequestHint': 'Запропонуйте нову функцію',
   'settings.about.wikiHint': 'Документація та керівництва',
+  'settings.about.sponsor.eyebrow': 'Спонсорована інфраструктура',
+  'settings.about.sponsor.title': 'Власні сервери TREK працюють на dataforest cloud',
+  'settings.about.sponsor.body':
+    'Пошук місць, пошук адрес і маршрути працюють на власних серверах TREK замість Google і компанії, а машини для них спонсорує dataforest cloud.',
+  'settings.about.sponsor.cta': 'Перейти на dataforest cloud',
+  'settings.about.sponsor.search': 'Пошук місць',
+  'settings.about.sponsor.address': 'Пошук адрес',
+  'settings.about.sponsor.routing': 'Маршрути',
   'settings.about.descriptionManaged':
     'TREK допомагає організувати подорожі від першої ідеї до останнього спогаду. Планування днів, бюджет, списки речей, фото та багато іншого в одному місці.',
   'settings.about.sourceTitle': 'Вихідний код',

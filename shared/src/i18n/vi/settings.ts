@@ -270,6 +270,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Yêu cầu tính năng',
   'settings.about.featureRequestHint': 'Đề xuất tính năng mới',
   'settings.about.wikiHint': 'Tài liệu & hướng dẫn',
+  'settings.about.sponsor.eyebrow': 'Hạ tầng được tài trợ',
+  'settings.about.sponsor.title': 'Máy chủ riêng của TREK chạy trên dataforest cloud',
+  'settings.about.sponsor.body':
+    'Tìm địa điểm, tìm địa chỉ và chỉ đường đến từ máy chủ riêng của TREK thay vì Google và các dịch vụ khác, còn dataforest cloud tài trợ những máy mà chúng chạy trên đó.',
+  'settings.about.sponsor.cta': 'Ghé thăm dataforest cloud',
+  'settings.about.sponsor.search': 'Tìm địa điểm',
+  'settings.about.sponsor.address': 'Tìm địa chỉ',
+  'settings.about.sponsor.routing': 'Chỉ đường',
   'settings.about.descriptionManaged':
     'TREK giúp bạn tổ chức các chuyến đi từ ý tưởng đầu tiên đến kỷ niệm cuối cùng. Lên kế hoạch theo ngày, ngân sách, danh sách đồ cần mang, ảnh và nhiều hơn nữa, tất cả ở một nơi.',
   'settings.about.sourceTitle': 'Mã nguồn',

@@ -209,6 +209,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Navrhnout funkci',
   'settings.about.featureRequestHint': 'Navrhněte novou funkci',
   'settings.about.wikiHint': 'Dokumentace a návody',
+  'settings.about.sponsor.eyebrow': 'Sponzorovaná infrastruktura',
+  'settings.about.sponsor.title': 'Vlastní servery TREK běží na dataforest cloud',
+  'settings.about.sponsor.body':
+    'Hledání míst, hledání adres a trasy pocházejí z vlastních serverů TREK místo od Google a spol. a stroje, na kterých běží, sponzoruje dataforest cloud.',
+  'settings.about.sponsor.cta': 'Navštívit dataforest cloud',
+  'settings.about.sponsor.search': 'Hledání míst',
+  'settings.about.sponsor.address': 'Hledání adres',
+  'settings.about.sponsor.routing': 'Trasy',
   'settings.about.descriptionManaged':
     'TREK vám pomáhá organizovat cesty od prvního nápadu po poslední vzpomínku. Plánování dnů, rozpočet, balicí seznamy, fotky a mnohem víc, vše na jednom místě.',
   'settings.about.sourceTitle': 'Zdrojový kód',

@@ -258,6 +258,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Özellik İsteği',
   'settings.about.featureRequestHint': 'Yeni bir özellik önerin',
   'settings.about.wikiHint': 'Belgeler ve kılavuzlar',
+  'settings.about.sponsor.eyebrow': 'Sponsorlu altyapı',
+  'settings.about.sponsor.title': "TREK'in kendi sunucuları dataforest cloud üzerinde çalışır",
+  'settings.about.sponsor.body':
+    "Yer arama, adres arama ve rota hesaplama Google ve benzerleri yerine TREK'in kendi sunucularından gelir; bu sunucuların çalıştığı makinelerin sponsoru da dataforest cloud.",
+  'settings.about.sponsor.cta': "dataforest cloud'u ziyaret edin",
+  'settings.about.sponsor.search': 'Yer arama',
+  'settings.about.sponsor.address': 'Adres arama',
+  'settings.about.sponsor.routing': 'Rota hesaplama',
   'settings.about.descriptionManaged':
     'TREK, gezilerini ilk fikirden son anıya kadar düzenlemene yardım eder. Gün planı, bütçe, bavul listeleri, fotoğraflar ve çok daha fazlası: hepsi tek yerde.',
   'settings.about.sourceTitle': 'Kaynak kodu',

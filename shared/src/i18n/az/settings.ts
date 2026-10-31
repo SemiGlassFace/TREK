@@ -305,6 +305,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Funksiya təklifi',
   'settings.about.featureRequestHint': 'Yeni funksiya təklif edin',
   'settings.about.wikiHint': 'Sənədlər və təlimatlar',
+  'settings.about.sponsor.eyebrow': 'Sponsorlu infrastruktur',
+  'settings.about.sponsor.title': 'TREK-in öz serverləri dataforest cloud üzərində işləyir',
+  'settings.about.sponsor.body':
+    'Məkan axtarışı, ünvan axtarışı və marşrutlaşdırma Google və digərlərindən deyil, TREK-in öz serverlərindən gəlir, bu serverlərin işlədiyi maşınlara isə dataforest cloud sponsorluq edir.',
+  'settings.about.sponsor.cta': 'dataforest cloud-a keçin',
+  'settings.about.sponsor.search': 'Məkan axtarışı',
+  'settings.about.sponsor.address': 'Ünvan axtarışı',
+  'settings.about.sponsor.routing': 'Marşrutlaşdırma',
   'settings.about.descriptionManaged':
     'TREK səyahətlərinizi ilk ideyadan son xatirəyədək təşkil etməyə kömək edir. Günlük planlaşdırma, büdcə, baqaj siyahıları, fotolar və daha çoxu — hamısı bir yerdə.',
   'settings.about.sourceTitle': 'Mənbə kodu',

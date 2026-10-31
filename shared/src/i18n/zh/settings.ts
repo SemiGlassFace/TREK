@@ -200,6 +200,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': '功能建议',
   'settings.about.featureRequestHint': '建议一个新功能',
   'settings.about.wikiHint': '文档和指南',
+  'settings.about.sponsor.eyebrow': '赞助的基础设施',
+  'settings.about.sponsor.title': 'TREK 自己的服务器运行在 dataforest cloud 上',
+  'settings.about.sponsor.body':
+    '地点搜索、地址搜索和路线规划都来自 TREK 自己的服务器，而不是 Google 等服务，运行这些服务器的机器由 dataforest cloud 赞助。',
+  'settings.about.sponsor.cta': '访问 dataforest cloud',
+  'settings.about.sponsor.search': '地点搜索',
+  'settings.about.sponsor.address': '地址搜索',
+  'settings.about.sponsor.routing': '路线规划',
   'settings.about.descriptionManaged':
     'TREK 帮你从最初的想法到最后的回忆，全程组织你的旅行。日程规划、预算、行李清单、照片等等，一应俱全。',
   'settings.about.sourceTitle': '源代码',

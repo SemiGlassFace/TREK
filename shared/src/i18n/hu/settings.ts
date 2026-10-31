@@ -212,6 +212,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Funkció javaslat',
   'settings.about.featureRequestHint': 'Javasolj egy új funkciót',
   'settings.about.wikiHint': 'Dokumentáció és útmutatók',
+  'settings.about.sponsor.eyebrow': 'Szponzorált infrastruktúra',
+  'settings.about.sponsor.title': 'A TREK saját szerverei a dataforest cloud gépein futnak',
+  'settings.about.sponsor.body':
+    'A helykeresés, a címkeresés és az útvonaltervezés a TREK saját szervereiről érkezik a Google és társai helyett, a gépeket pedig, amelyeken futnak, a dataforest cloud szponzorálja.',
+  'settings.about.sponsor.cta': 'dataforest cloud megnyitása',
+  'settings.about.sponsor.search': 'Helykeresés',
+  'settings.about.sponsor.address': 'Címkeresés',
+  'settings.about.sponsor.routing': 'Útvonaltervezés',
   'settings.about.descriptionManaged':
     'A TREK segít megszervezni az utazásaidat az első ötlettől az utolsó emlékig. Napi tervezés, költségvetés, csomagolólisták, fotók és még sok más, egy helyen.',
   'settings.about.sourceTitle': 'Forráskód',

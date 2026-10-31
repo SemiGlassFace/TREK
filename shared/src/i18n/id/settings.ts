@@ -262,6 +262,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Permintaan Fitur',
   'settings.about.featureRequestHint': 'Sarankan fitur baru',
   'settings.about.wikiHint': 'Dokumentasi & panduan',
+  'settings.about.sponsor.eyebrow': 'Infrastruktur bersponsor',
+  'settings.about.sponsor.title': 'Server milik TREK sendiri berjalan di dataforest cloud',
+  'settings.about.sponsor.body':
+    'Pencarian tempat, pencarian alamat, dan perutean berasal dari server milik TREK sendiri, bukan dari Google dan sejenisnya, dan dataforest cloud mensponsori mesin tempat server itu berjalan.',
+  'settings.about.sponsor.cta': 'Kunjungi dataforest cloud',
+  'settings.about.sponsor.search': 'Pencarian tempat',
+  'settings.about.sponsor.address': 'Pencarian alamat',
+  'settings.about.sponsor.routing': 'Perutean',
   'settings.about.descriptionManaged':
     'TREK membantumu mengatur perjalanan dari ide pertama sampai kenangan terakhir. Perencanaan harian, anggaran, daftar bawaan, foto, dan banyak lagi, semua di satu tempat.',
   'settings.about.sourceTitle': 'Kode sumber',

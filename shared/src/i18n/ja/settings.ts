@@ -243,6 +243,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': '機能リクエスト',
   'settings.about.featureRequestHint': '新機能を提案',
   'settings.about.wikiHint': 'ドキュメント・ガイド',
+  'settings.about.sponsor.eyebrow': 'インフラのスポンサー',
+  'settings.about.sponsor.title': 'TREK 独自のサーバーは dataforest cloud で動いています',
+  'settings.about.sponsor.body':
+    '場所の検索、住所の検索、ルート計算は Google などではなく TREK 独自のサーバーから提供されており、そのマシンは dataforest cloud がスポンサーとして提供しています。',
+  'settings.about.sponsor.cta': 'dataforest cloud を見る',
+  'settings.about.sponsor.search': '場所の検索',
+  'settings.about.sponsor.address': '住所の検索',
+  'settings.about.sponsor.routing': 'ルート計算',
   'settings.about.descriptionManaged':
     'TREK は、最初のアイデアから最後の思い出まで、旅行の整理をお手伝いします。日程の計画、予算、持ち物リスト、写真など、すべてを一か所で。',
   'settings.about.sourceTitle': 'ソースコード',

@@ -275,6 +275,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Αίτημα Λειτουργίας',
   'settings.about.featureRequestHint': 'Προτείνετε ένα νέο χαρακτηριστικό',
   'settings.about.wikiHint': 'Τεκμηρίωση & οδηγοί',
+  'settings.about.sponsor.eyebrow': 'Χορηγούμενη υποδομή',
+  'settings.about.sponsor.title': 'Οι δικοί διακομιστές του TREK τρέχουν στο dataforest cloud',
+  'settings.about.sponsor.body':
+    'Η αναζήτηση τοποθεσιών, η αναζήτηση διευθύνσεων και η δρομολόγηση προέρχονται από τους δικούς διακομιστές του TREK αντί για την Google και τους ομοίους της, και το dataforest cloud χορηγεί τα μηχανήματα στα οποία τρέχουν.',
+  'settings.about.sponsor.cta': 'Επισκεφθείτε το dataforest cloud',
+  'settings.about.sponsor.search': 'Αναζήτηση τοποθεσιών',
+  'settings.about.sponsor.address': 'Αναζήτηση διευθύνσεων',
+  'settings.about.sponsor.routing': 'Δρομολόγηση',
   'settings.about.descriptionManaged':
     'Το TREK σας βοηθά να οργανώνετε τα ταξίδια σας από την πρώτη ιδέα μέχρι την τελευταία ανάμνηση. Σχεδιασμός ημερών, προϋπολογισμός, λίστες αποσκευών, φωτογραφίες και πολλά ακόμη, όλα σε ένα μέρος.',
   'settings.about.sourceTitle': 'Πηγαίος κώδικας',

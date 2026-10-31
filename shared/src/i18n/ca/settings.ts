@@ -195,6 +195,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Sol·licita una funció',
   'settings.about.featureRequestHint': 'Suggereix una funció nova',
   'settings.about.wikiHint': 'Documentació i guies',
+  'settings.about.sponsor.eyebrow': 'Infraestructura patrocinada',
+  'settings.about.sponsor.title': 'Els servidors de TREK funcionen a dataforest cloud',
+  'settings.about.sponsor.body':
+    'La cerca de llocs, la cerca d’adreces i el càlcul de rutes surten de servidors propis de TREK en lloc de Google i companyia, i dataforest cloud patrocina les màquines on funcionen.',
+  'settings.about.sponsor.cta': 'Visita dataforest cloud',
+  'settings.about.sponsor.search': 'Cerca de llocs',
+  'settings.about.sponsor.address': 'Cerca d’adreces',
+  'settings.about.sponsor.routing': 'Rutes',
   'settings.about.descriptionManaged':
     "TREK t'ajuda a organitzar els teus viatges des de la primera idea fins al darrer record. Planificació de dies, pressupost, llistes d'equipatge, fotos i molt més, tot en un sol lloc.",
   'settings.about.sourceTitle': 'Codi font',

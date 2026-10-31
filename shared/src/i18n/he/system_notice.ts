@@ -50,23 +50,20 @@ const system_notice: TranslationStrings = {
   'system_notice.thank_you_support.cta_bmc': 'Buy Me a Coffee',
   'system_notice.thank_you_support.cta_kofi': 'תמיכה ב-Ko-fi',
   'system_notice.release_notes.eyebrow': 'העדכון הותקן',
-  'system_notice.release_notes.headline': 'ה-TREK הגדול ביותר עד היום.',
+  'system_notice.release_notes.headline': 'קודם כל, המקום הנכון.',
   'system_notice.release_notes.intro':
-    'מסלולים לכל סוג של יום בחוץ, סטודיו לאלבומי התמונות שלכם, עוזר שמתכנן איתכם, ועזרה בכל מסך.',
+    'חיפוש מקומות, חיפוש כתובות וניתוב פועלים עכשיו על השרתים של TREK עצמו, בחסות dataforest cloud, וכל TREK יכול לשתף את מה שהוא יודע על מקומות עם כל השאר.',
   'system_notice.release_notes.features_label': 'החידושים המרכזיים',
   'system_notice.release_notes.features_aside': 'ולא רק',
-  'system_notice.release_notes.feature_tours_title': 'מסלולים',
-  'system_notice.release_notes.feature_tours_body':
-    'טיולים רגליים, רכיבות אופניים, ריצות, נסיעות, חתירה, סיורים עירוניים וימי סקי, עם פרופיל גובה, שיפועים וטיסה תלת-ממדית מעל המסלול.',
-  'system_notice.release_notes.feature_studio_title': 'TREK Studio',
-  'system_notice.release_notes.feature_studio_body':
-    'הופך יומן מסע לאלבום תמונות מעוצב: 17 ערכות נושא, 34 גופנים, 160 מדבקות ופריסה אוטומטית בלחיצה אחת.',
-  'system_notice.release_notes.feature_assistant_title': 'עוזר AI',
-  'system_notice.release_notes.feature_assistant_body':
-    'מתכנן איתכם את הטיולים האמיתיים שלכם, עם חשבון ה-AI שכבר יש לכם. אתם רואים כל שינוי קודם ויכולים לבטל אותו.',
-  'system_notice.release_notes.feature_help_title': 'עזרה בכל מסך, ב-27 שפות',
-  'system_notice.release_notes.feature_help_body':
-    'כ-370 מדריכים צעד אחר צעד עם 1,600 תמונות, בדיוק במקום שבו צריך אותם. חדש: אזרית, אסטונית, סלובקית ותאית.',
+  'system_notice.release_notes.feature_search_title': 'חיפוש מקומות שקולע',
+  'system_notice.release_notes.feature_search_body':
+    'ערים, איים, אתרים מפורסמים ושדות תעופה לפי הקוד שלהם מופיעים ראשונים, בתי קפה מגיעים מהסביבה שלכם, והצעות מופיעות תוך כדי הקלדה.',
+  'system_notice.release_notes.feature_share_title': 'פרטי מקומות, משותפים',
+  'system_notice.release_notes.feature_share_body':
+    'שתפו אתרים, שעות פתיחה ותמונות עם כל TREK, שדה אחר שדה, והמקומות השמורים שלכם מקבלים את מה שאחרים הוסיפו.',
+  'system_notice.release_notes.feature_routing_title': 'ניתוב מהיר יותר',
+  'system_notice.release_notes.feature_routing_body':
+    'יום שלם מנותב בבת אחת עם עד עשרים עצירות, מסלול איטי אחד כבר לא מעכב את השאר, ותחבורה ציבורית פונה לספק שני כשהראשון לא מוצא כלום.',
   'system_notice.release_notes.footnote': 'ועוד רשימה ארוכה של שינויים קטנים בכל שאר TREK.',
   'system_notice.release_notes.notes_label': 'הערות גרסה',
   'system_notice.release_notes.note_eyebrow': 'מילה מהמתחזק',
@@ -79,8 +76,10 @@ const system_notice: TranslationStrings = {
   'system_notice.release_notes.note_body_after':
     'ואז אתם הגעתם. תוך כמה חודשים הייתם אלפים: כוכבים, דיווחי באגים, תרגומים לשפות שאני לא מדבר, בקשות משיכה מאנשים שמעולם לא פגשתי. אני עדיין בודק את המאגר דבר ראשון כל בוקר, וזה עדיין לא לגמרי מרגיש אמיתי.',
   'system_notice.release_notes.note_closing': 'תודה שאתם כאן, מ-Maurice.',
-  'system_notice.release_notes.support_lead': 'TREK חינמי ותמיד יהיה, אבל שרתים, דומיינים והרבה לילות מאוחרים — לא.',
-  'system_notice.release_notes.support_text': 'אם הוא הרוויח מקום בטיולים שלכם, קנו לי קפה ועזרו לגרסה הבאה להגיע.',
+  'system_notice.release_notes.support_label': 'נשארים עצמאיים',
+  'system_notice.release_notes.support_lead': "בלי Google ושות'.",
+  'system_notice.release_notes.support_text':
+    'חיפוש מקומות, חיפוש כתובות וניתוב פועלים על השרתים של TREK עצמו, היום בחסות dataforest cloud. אני נלחם על זה כל יום, וכדי שזה יישאר כך אני צריך את התמיכה שלכם.',
   'system_notice.release_notes.cta_bmc': 'קנו לי קפה',
   'system_notice.release_notes.cta_kofi': 'תמיכה ב-Ko-fi',
   'system_notice.pager.prev': 'ההודעה הקודמת',

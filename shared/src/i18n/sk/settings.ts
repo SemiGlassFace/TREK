@@ -275,6 +275,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Navrhnúť funkciu',
   'settings.about.featureRequestHint': 'Navrhnite novú funkciu',
   'settings.about.wikiHint': 'Dokumentácia a návody',
+  'settings.about.sponsor.eyebrow': 'Sponzorovaná infraštruktúra',
+  'settings.about.sponsor.title': 'Vlastné servery TREK bežia na dataforest cloud',
+  'settings.about.sponsor.body':
+    'Vyhľadávanie miest, vyhľadávanie adries a trasy pochádzajú z vlastných serverov TREK namiesto od Google a spol. a stroje, na ktorých bežia, sponzoruje dataforest cloud.',
+  'settings.about.sponsor.cta': 'Navštíviť dataforest cloud',
+  'settings.about.sponsor.search': 'Vyhľadávanie miest',
+  'settings.about.sponsor.address': 'Vyhľadávanie adries',
+  'settings.about.sponsor.routing': 'Trasy',
   'settings.about.descriptionManaged':
     'TREK vám pomáha organizovať vaše cesty od prvého nápadu po poslednú spomienku. Denné plánovanie, rozpočet, zoznamy balenia, fotky a oveľa viac — všetko na jednom mieste.',
   'settings.about.sourceTitle': 'Zdrojový kód',

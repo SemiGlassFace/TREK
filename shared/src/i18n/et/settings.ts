@@ -279,6 +279,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': 'Funktsioonisoov',
   'settings.about.featureRequestHint': 'Paku välja uus funktsioon',
   'settings.about.wikiHint': 'Dokumentatsioon ja juhendid',
+  'settings.about.sponsor.eyebrow': 'Sponsoreeritud taristu',
+  'settings.about.sponsor.title': 'TREKi enda serverid töötavad dataforest cloud platvormil',
+  'settings.about.sponsor.body':
+    "Kohaotsing, aadressiotsing ja teekonnad tulevad TREKi enda serveritest, mitte Google'ilt ja teistelt, ning masinaid, millel need töötavad, sponsoreerib dataforest cloud.",
+  'settings.about.sponsor.cta': 'Ava dataforest cloud',
+  'settings.about.sponsor.search': 'Kohaotsing',
+  'settings.about.sponsor.address': 'Aadressiotsing',
+  'settings.about.sponsor.routing': 'Teekonnad',
   'settings.about.descriptionManaged':
     'TREK aitab korraldada reise esimesest ideest viimase mälestuseni. Päevaplaanid, eelarve, pakkimisnimekirjad, fotod ja palju muud — kõik ühes kohas.',
   'settings.about.sourceTitle': 'Lähtekood',

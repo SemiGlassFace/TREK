@@ -255,6 +255,14 @@ const settings: TranslationStrings = {
   'settings.about.featureRequest': '기능 요청',
   'settings.about.featureRequestHint': '새로운 기능을 제안하세요',
   'settings.about.wikiHint': '문서 및 가이드',
+  'settings.about.sponsor.eyebrow': '후원받는 인프라',
+  'settings.about.sponsor.title': 'TREK 자체 서버는 dataforest cloud에서 운영됩니다',
+  'settings.about.sponsor.body':
+    '장소 검색, 주소 검색, 경로 안내는 Google 등이 아닌 TREK 자체 서버에서 제공되며, 이 서버가 돌아가는 머신은 dataforest cloud가 후원합니다.',
+  'settings.about.sponsor.cta': 'dataforest cloud 방문하기',
+  'settings.about.sponsor.search': '장소 검색',
+  'settings.about.sponsor.address': '주소 검색',
+  'settings.about.sponsor.routing': '경로 안내',
   'settings.about.descriptionManaged':
     'TREK은 첫 아이디어부터 마지막 추억까지 여행을 정리하도록 도와줍니다. 일정 계획, 예산, 짐 목록, 사진 등 모든 것을 한곳에서 관리하세요.',
   'settings.about.sourceTitle': '소스 코드',
