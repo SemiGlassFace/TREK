@@ -38,6 +38,10 @@ on:
         description: "Type MAJOR (all caps) to confirm a major release"
         type: string
         default: ''
+      ci_from:
+        description: 'Take ci-ok from this earlier commit instead of the one on main, when main differs from it only under .github/ (a fix to a release workflow needs no second test run)'
+        type: string
+        default: ''
       allow_stale_dialect:
         description: 'Ship without a dialect of its own even if the one on main is the original one or has under 90 days left'
         type: boolean
@@ -87,6 +91,7 @@ jobs:
       # finished last to be green, so a later green run supersedes a flaky or
       # cancelled one. It prints the link of every run it counted.
       - name: Require a green ci-ok on the commit being released
+        if: inputs.ci_from == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -95,6 +100,36 @@ jobs:
           runs="$RUNNER_TEMP/ci-ok-runs.json"
           gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?check_name=ci-ok&filter=all&per_page=100" > "$runs"
           node scripts/ci/ci-ok-verdict.mjs "$runs" "$sha"
+
+      # ci_from: main carries only workflow changes on top of a commit that
+      # already passed. That commit must be an ancestor of main, everything
+      # outside .github/ must be identical, and one of its ci-ok runs must be
+      # green (its dev push, typically).
+      - name: Require a green ci-ok on the commit main's code comes from
+        if: inputs.ci_from != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_FROM: ${{ inputs.ci_from }}
+        run: |
+          set -euo pipefail
+          from="$(git rev-parse --verify "$CI_FROM^{commit}")"
+          if ! git merge-base --is-ancestor "$from" HEAD; then
+            echo "::error::$from is not an ancestor of main."
+            exit 1
+          fi
+          outside="$(git diff --name-only "$from" HEAD -- . ':(exclude).github/**')"
+          if [ -n "$outside" ]; then
+            echo "::error::main differs from $from outside .github/:"
+            echo "$outside"
+            exit 1
+          fi
+          green="$(gh api "repos/$GITHUB_REPOSITORY/commits/$from/check-runs?check_name=ci-ok&filter=all&per_page=100" \
+            --jq '[.check_runs[] | select(.status == "completed" and .conclusion == "success")] | length')"
+          if [ "$green" -lt 1 ]; then
+            echo "::error::$from has no green ci-ok."
+            exit 1
+          fi
+          echo "main differs from $from only under .github/, and $from has $green green ci-ok run(s)."
 
       - name: Determine bump type and version
         id: bump
