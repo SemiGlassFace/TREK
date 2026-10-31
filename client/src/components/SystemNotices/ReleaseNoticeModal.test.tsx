@@ -45,6 +45,14 @@ function releaseNotice(overrides: Partial<SystemNoticeDTO> = {}): SystemNoticeDT
   } as SystemNoticeDTO;
 }
 
+type Release = NonNullable<SystemNoticeDTO['release']>;
+
+/** The fixture with a few fields of its release block replaced. */
+function withRelease(patch: Partial<Release>): SystemNoticeDTO {
+  const n = releaseNotice();
+  return { ...n, release: { ...(n.release as Release), ...patch } };
+}
+
 function renderModal(
   notice = releaseNotice(),
   handlers: Partial<{
@@ -221,11 +229,13 @@ describe('ReleaseNoticeModal', () => {
   });
 
   it('FE-RN-017: links the sponsor wherever a line names it, and leaves other lines plain', () => {
-    const n = releaseNotice();
     // The translation stub echoes the key, so the lines carry the brand name as their value.
-    n.release!.introKey = 'Our servers, sponsored by dataforest cloud, and more.';
-    n.release!.supportTextKey = 'Thanks to dataforest cloud today.';
-    renderModal(n);
+    renderModal(
+      withRelease({
+        introKey: 'Our servers, sponsored by dataforest cloud, and more.',
+        supportTextKey: 'Thanks to dataforest cloud today.',
+      })
+    );
     const links = screen.getAllByRole('link', { name: 'dataforest cloud' });
     expect(links).toHaveLength(2);
     for (const link of links) {
@@ -240,13 +250,11 @@ describe('ReleaseNoticeModal', () => {
   });
 
   it('FE-RN-018: with a support label the ask is set as a card like the promise', () => {
-    const n = releaseNotice();
-    n.release!.supportLabelKey = 'rel.support.label';
-    renderModal(n);
+    renderModal(withRelease({ supportLabelKey: 'rel.support.label' }));
     const card = document.querySelector('.rn-support .rn-support-card');
     expect(card).not.toBeNull();
-    expect(card!.classList.contains('rn-promise')).toBe(true);
-    expect(card!.querySelector('.rn-promise-label')).toHaveTextContent('rel.support.label');
+    expect(card?.classList.contains('rn-promise')).toBe(true);
+    expect(card?.querySelector('.rn-promise-label')).toHaveTextContent('rel.support.label');
     expect(screen.getByText('rel.support.lead').tagName).toBe('B');
     expect(document.querySelector('.rn-support-text')).toBeNull();
   });
@@ -258,13 +266,15 @@ describe('ReleaseNoticeModal', () => {
   });
 
   it('FE-RN-020: draws the search, sharing and routing cards', () => {
-    const n = releaseNotice();
-    n.release!.features = [
-      { iconName: 'Search', visual: 'search', titleKey: 'rel.s.title', bodyKey: 'rel.s.body' },
-      { iconName: 'Share2', visual: 'share', titleKey: 'rel.sh.title', bodyKey: 'rel.sh.body' },
-      { iconName: 'Route', visual: 'routing', titleKey: 'rel.r.title', bodyKey: 'rel.r.body' },
-    ];
-    renderModal(n);
+    renderModal(
+      withRelease({
+        features: [
+          { iconName: 'Search', visual: 'search', titleKey: 'rel.s.title', bodyKey: 'rel.s.body' },
+          { iconName: 'Share2', visual: 'share', titleKey: 'rel.sh.title', bodyKey: 'rel.sh.body' },
+          { iconName: 'Route', visual: 'routing', titleKey: 'rel.r.title', bodyKey: 'rel.r.body' },
+        ],
+      })
+    );
     expect(document.querySelectorAll('.rn-vis-icon')).toHaveLength(0);
     // The right place on top: the first result is the highlighted one.
     const rows = document.querySelectorAll('.rn-vis-search-row');
