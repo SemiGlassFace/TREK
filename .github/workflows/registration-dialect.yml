@@ -120,7 +120,9 @@ jobs:
         run: |
           set -uo pipefail
           cp "$FILE" src/nest/service-identity/registration-dialect.ts
-          printf '%s\n' '{"extends": "./tsconfig.strict.json", "include": [],' \
+          # TypeScript 6 includes no @types by default and the dialect imports nothing
+          # from node, so checked on its own it would not know Buffer: name node here.
+          printf '%s\n' '{"extends": "./tsconfig.strict.json", "compilerOptions": {"types": ["node"]}, "include": [],' \
             '"files": ["src/nest/service-identity/registration-dialect.ts"]}' > tsconfig.dialect-check.json
           if ! npx tsc -p tsconfig.dialect-check.json --noEmit --pretty false; then
             echo "::warning::The issuer's registration dialect for $VERSION does not type-check under the strict config."
