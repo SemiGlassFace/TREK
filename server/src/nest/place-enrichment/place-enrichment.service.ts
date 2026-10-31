@@ -907,6 +907,9 @@ export class PlaceEnrichmentService {
    * This is the same lookup the dialog already made when the user picked the
    * search result, and it is row-cached, so in practice it is a cache read
    * rather than a second provider call.
+   *
+   * @txStandalone the only write is the details row cache filling itself; a
+   * failure reads as no details and nothing else is written with it.
    */
   private async readDetails(
     userId: number,
