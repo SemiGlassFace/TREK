@@ -26,6 +26,9 @@ export interface OutboxRow {
  */
 export type OutboxSent = Pick<OutboxRow, 'id' | 'cid'>;
 
+const ids = (sent: OutboxSent[]): number[] => sent.map((row) => row.id);
+const cids = (sent: OutboxSent[]): string[] => sent.map((row) => row.cid);
+
 /** A value to queue: the newest one for its key and field replaces what waits there. */
 interface OutboxWrite {
   contrib_key: string;
@@ -136,8 +139,8 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
     if (sent.length === 0) return 0;
     const result = await this.db()
       .deleteFrom('place_contrib_outbox')
-      .where('id', 'in', sent.map((row) => row.id))
-      .where('cid', 'in', sent.map((row) => row.cid))
+      .where('id', 'in', ids(sent))
+      .where('cid', 'in', cids(sent))
       .executeTakeFirst();
     return Number(result.numDeletedRows);
   }
@@ -203,8 +206,8 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
     await this.db()
       .updateTable('place_contrib_outbox')
       .set((eb) => ({ attempts: eb('attempts', '+', 1), next_attempt_at: nextAttemptAt }))
-      .where('id', 'in', sent.map((row) => row.id))
-      .where('cid', 'in', sent.map((row) => row.cid))
+      .where('id', 'in', ids(sent))
+      .where('cid', 'in', cids(sent))
       .execute();
   }
 
@@ -217,8 +220,8 @@ export class PlaceContribOutboxRepository extends TrekRepository<PlaceContribOut
     await this.db()
       .updateTable('place_contrib_outbox')
       .set({ next_attempt_at: nextAttemptAt })
-      .where('id', 'in', sent.map((row) => row.id))
-      .where('cid', 'in', sent.map((row) => row.cid))
+      .where('id', 'in', ids(sent))
+      .where('cid', 'in', cids(sent))
       .execute();
   }
 
