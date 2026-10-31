@@ -180,6 +180,15 @@ const places: TranslationStrings = {
   'places.image.needsConnection': 'תמונה חדשה דורשת חיבור. שמרו שוב כשתחזרו לרשת.',
   'places.openPhotos': 'הצגת תמונות',
   'places.imageUploadError': 'לא ניתן היה להעלות את התמונה',
+  'places.refresh.pill': 'פרטי מקום חדשים',
+  'places.refresh.title': 'עדכון פרטי המקום',
+  'places.refresh.intro':
+    'TREK מכיר פרטים חדשים יותר על המקום הזה. בחרו מה לאמץ; השאר נשאר כמו שהוא. אחר כך שמרו את המקום.',
+  'places.refresh.apply': 'לאמץ',
+  'places.refresh.replaces': 'מחליף את מה ששמור עכשיו',
+  'places.refresh.empty': 'ריק',
+  'places.refresh.now': 'עכשיו',
+  'places.refresh.new': 'חדש',
 };
 
 export default places;
